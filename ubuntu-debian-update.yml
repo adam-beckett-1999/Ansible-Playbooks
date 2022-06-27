@@ -1,10 +1,18 @@
 - hosts: "*"
   become: yes
+  sudo: true
   tasks:
+    - name: packages | ensure apt list dir exists
+      file:
+        path: /var/lib/apt/lists/
+        state: directory
+        mode: 0755
+    - name: update cache
+      apt:
+        update_cache: yes
     - name: install all updates
       apt:
         upgrade: dist
-        update_cache: yes
         autoremove: yes
         autoclean: yes
       register: result

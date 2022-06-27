@@ -1,6 +1,5 @@
 - hosts: "*"
   become: yes
-  sudo: true
   tasks:
     - name: packages | ensure apt list dir exists
       file:

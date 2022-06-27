@@ -1,7 +1,7 @@
 - hosts: "*"
-  become: yes
+  become: true
   tasks:
-    - name: Upgrade all packages, excluding kernel & foo related packages
+    - name: Upgrade all packages, excluding kernel packages
       yum:
         name: '*'
         state: latest

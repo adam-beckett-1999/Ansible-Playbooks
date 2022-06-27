@@ -7,9 +7,11 @@
         state: directory
         mode: 0755
     - name: update cache
+      become: yes
       apt:
         update_cache: yes
     - name: install all updates
+      become: yes
       apt:
         upgrade: dist
         autoremove: yes

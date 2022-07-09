@@ -1,0 +1,6 @@
+- hosts: *
+  tasks:
+    - name: Reboot systems
+      reboot:
+        post_reboot_delay: 120
+        test_command: uptime

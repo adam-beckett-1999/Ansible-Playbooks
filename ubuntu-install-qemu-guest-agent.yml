@@ -1,4 +1,5 @@
 - hosts: "*"
+  become: true
   tasks:
     - name: update cache
       apt:

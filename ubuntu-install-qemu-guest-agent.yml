@@ -1,5 +1,8 @@
 - hosts: "*"
   tasks:
+    - name: update cache
+      apt:
+        update_cache: yes
     - name: install qemu guest agent
       apt:
         name:

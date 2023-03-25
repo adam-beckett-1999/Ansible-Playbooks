@@ -1,6 +1,5 @@
 - hosts: "*"
   become: true
-  sudo: True
   tasks:
     - name: update cache
       apt:

@@ -2,6 +2,5 @@
   become: true
   tasks:
     - name: Prune docker images that are unused and dangling
-      become: true
       community.docker.docker_prune:
         images: true

@@ -6,12 +6,12 @@
         - cockpit
         state: present
         update_cache: true
-    - name: install 45drives cockpit navigator
+    - name: install 45drives cockpit navigator plugin
       apt:
         deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.8/cockpit-navigator_0.5.8-2focal_all.deb
         state: present
       register: apt_output
-    - name: install 45drives cockpit file sharing
+    - name: install 45drives cockpit file sharing plugin
       apt:
         deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v2.4.5/cockpit-file-sharing_2.4.5-1focal_all.deb
         state: present

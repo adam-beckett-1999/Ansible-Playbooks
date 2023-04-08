@@ -1,4 +1,5 @@
-- hosts: *
+- hosts: "*"
+  become: true
   tasks:
     - name: Reboot systems
       reboot:

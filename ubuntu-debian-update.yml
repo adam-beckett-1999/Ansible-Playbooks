@@ -32,3 +32,6 @@
         post_reboot_delay: 30
         test_command: uptime
       when: reboot_required_file.stat.exists
+    - name: send slack alert
+      community.general.slack:
+        webhook_url: https://mattermost.beckettcloud.com/hooks/3wyfzahfcfn6uy6cm5s9kxjh4e

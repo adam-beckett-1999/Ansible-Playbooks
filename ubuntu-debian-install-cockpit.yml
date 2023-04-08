@@ -8,12 +8,12 @@
         update_cache: true
     - name: install 45drives cockpit navigator plugin
       apt:
-        deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.8/cockpit-navigator_0.5.8-2focal_all.deb
+        deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
         state: present
       register: apt_output
     - name: install 45drives cockpit file sharing plugin
       apt:
-        deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v2.4.5/cockpit-file-sharing_2.4.5-1focal_all.deb
+        deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
         state: present
       register: apt_output
     - name: Enable service cockpit and ensure it is not masked

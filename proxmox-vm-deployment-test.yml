@@ -15,7 +15,7 @@
         memory: 4096
         agent: 'enabled=1'
         scsi:
-          scsi0: 'pool-1:100,format=qcow2'
+          scsi0: 'pool-1:100,format=raw'
         ide:
           ide0: 'ISOs:iso/UBUNTU-22.04.2.iso,media=cdrom'
           ide1: 'pool-1:cloudinit,format=qcow2'

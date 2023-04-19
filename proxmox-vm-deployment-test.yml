@@ -17,7 +17,7 @@
         scsi:
           scsi0: 'pool-1:100G,format=qcow2'
         ide:
-          ide2: 'ISOs:UBUNTU-22.04.2.iso,format=iso'
+          ide2: 'ISOs:UBUNTU-22.04.2.iso'
           ide1: 'pool-1:cloudinit,format=qcow2'
         citype: nocloud
         ciuser: abeckett
@@ -26,5 +26,4 @@
         nameservers: 192.168.0.210,192.168.0.1
         net:
           net0: 'virtio,bridge=vmbr0'
-        ipconfig:
-          ipconfig0: 'gw=192.168.0.1/24,ip=192.168.0.220'
+        ipconfig: 'gw=192.168.0.1,ip=192.168.0.220/24'

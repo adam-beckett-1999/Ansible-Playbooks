@@ -17,7 +17,7 @@
         scsi:
           scsi0: 'pool-1:100G,format=qcow2'
         ide:
-          ide2: 'ISOs:UBUNTU-22.04.2.iso'
+          ide0: 'ISOs:iso/UBUNTU-22.04.2.iso,media=cdrom'
           ide1: 'pool-1:cloudinit,format=qcow2'
         citype: nocloud
         ciuser: abeckett

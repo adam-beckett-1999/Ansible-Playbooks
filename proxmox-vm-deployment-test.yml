@@ -26,4 +26,5 @@
         nameservers: 192.168.0.210,192.168.0.1
         net:
           net0: 'virtio,bridge=vmbr0'
-        ipconfig: 'gw=192.168.0.1,ip=192.168.0.220/24'
+        ipconfig: 
+          ipconfig0: 'gw=192.168.0.1,ip=192.168.0.220/24'

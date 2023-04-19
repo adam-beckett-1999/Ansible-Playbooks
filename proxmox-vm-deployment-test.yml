@@ -14,6 +14,7 @@
         cores: 2
         memory: 4096
         agent: 'enabled=1'
+        scsihw: virtio-scsi-pci
         scsi:
           scsi0: 'pool-1:100,format=raw'
         ide:
@@ -25,6 +26,6 @@
         searchdomains: 'homelab.internal'
         nameservers: 192.168.0.210,192.168.0.1
         net:
-          net0: 'virtio,bridge=vmbr0'
+          net0: 'virtio,bridge=vmbr0,firewall=1'
         ipconfig: 
           ipconfig0: 'gw=192.168.0.1,ip=192.168.0.220/24'

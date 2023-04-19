@@ -1,0 +1,49 @@
+- hosts: "*"
+  become: true
+  tasks:
+    - name: Create virtual-machine with cloud-init
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: ansible@pve
+        api_password: Ch0c0Late$-1359!
+        api_host: phs-hv-01
+        name: VM-DOCKER-TEST
+        ostype: l26
+        cpu: kvm64
+        sockets: 2
+        cores: 2
+        memory: 4096
+        agent: 'enabled=1'
+        scsi:
+          scsi0: 'pool-1:100G,format=qcow2'
+        ide:
+          ide2: 'ISOs:UBUNTU-22.04.2.iso,format=iso'
+          ide1: 'pool-1:cloudinit,format=qcow2'
+        citype: nocloud
+        ciuser: abeckett
+        cipassword: Chocolate-1245!
+        searchdomains: 'homelab.internal'
+        nameservers: 192.168.0.210,192.168.0.1
+        net:
+          net0: 'virtio,bridge=vmbr0'
+        ipconfig:
+          ipconfig0: 'gw=192.168.0.1/24,ip=192.168.0.220'
+
+    - name: Start virtual-machine
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: ansible@pve
+        api_password: Ch0c0Late$-1359!
+        api_host: phs-hv-01
+        name: VM-DOCKER-TEST
+        state: started
+    
+    - name: Pause while virtual-machine boots and installs
+      ansible.builtin.pause:
+        minutes: 5
+
+    - name: Ping the virtual-machine to test IP config
+      ansible.netcommon.net_ping:
+        dest: 192.168.0.220
+
+

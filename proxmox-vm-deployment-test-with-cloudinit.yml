@@ -21,13 +21,13 @@
         ide:
           ide0: 'ISOs:iso/UBUNTU-22.04.2.iso,media=cdrom' # attaches the install iso as boot media
           ide1: 'pool-1:cloudinit,format=raw' # attaches a cloud-init drive
+        net: # defines the network configuration in proxmox for the virtual machine
+          net0: 'virtio,bridge=vmbr0,firewall=1'
         citype: nocloud # default for linux, do not change
         ciuser: abeckett # linux username
         cipassword: Chocolate-1245! # linux password
         searchdomains: 'homelab.internal'
         nameservers: 192.168.0.210,192.168.0.1
-        net: # defines the network configuration in proxmox for the virtual machine
-          net0: 'virtio,bridge=vmbr0,firewall=1'
         ipconfig: # sets a static ip address within the virtual-machine with cloud-init
           ipconfig0: 'gw=192.168.0.1,ip=192.168.0.220/24'
 

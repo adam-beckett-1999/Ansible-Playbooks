@@ -14,7 +14,7 @@
         format: raw
         timeout: 300
 
-    - name: Edit new virtual-machine with new disk size and cloud-init parameters
+    - name: Edit new virtual-machine with new cloud-init parameters
       community.general.proxmox_kvm:
         api_user: ansible@pve
         api_password: Ch0c0Late$-1359!
@@ -22,8 +22,6 @@
         name: VM-DOCKER-TEST
         node: phs-hv-01
         tags: 'docker,web-applications'
-        scsi:
-          scsi0: 'size=100'
         citype: nocloud
         ciuser: abeckett
         cipassword: Chocolate-1245!
@@ -32,12 +30,13 @@
         ipconfig: 
           ipconfig0: 'gw=192.168.0.1,ip=192.168.0.220/24'
         update: true
-
-    - name: Start virtual-machine
-      community.general.proxmox_kvm:
-        node: phs-hv-01
+    
+    - name: Re-size virtual machine disk
+      community.general.proxmox_disk:
         api_user: ansible@pve
         api_password: Ch0c0Late$-1359!
         api_host: phs-hv-01
         name: VM-DOCKER-TEST
-        state: started
+        disk: scsi0
+        size: 100
+        state: resized

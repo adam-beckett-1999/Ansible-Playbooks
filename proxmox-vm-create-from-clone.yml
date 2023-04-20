@@ -53,7 +53,12 @@
     - name: Pause while virtual-machine boots and network comes up
       ansible.builtin.pause:
         minutes: 1
-
-    - name: Ping the new machine to confirm network connectivity
-      ansible.builtin.shell:
-        cmd: ping -c 1 -w 2 192.168.0.220
+    
+    - name: Check the state of the virtual-machine
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: ansible@pve
+        api_password: Ch0c0Late$-1359!
+        api_host: phs-hv-01
+        name: VM-DOCKER-TEST
+        state: current

@@ -40,3 +40,12 @@
         disk: scsi0
         size: 100G
         state: resized
+
+    - name: Start virtual-machine
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: ansible@pve
+        api_password: Ch0c0Late$-1359!
+        api_host: phs-hv-01
+        name: VM-DOCKER-TEST
+        state: started

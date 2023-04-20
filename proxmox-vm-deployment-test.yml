@@ -8,7 +8,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         # leave the above as default
-        name: # name shown in proxmox-gui
+        name: "{{ vm_name }}" # name shown in proxmox-gui
         ostype: l26 # LEAVE AS DEFAULT
         cpu: kvm64 # LEAVE AS DEFAULT
         sockets: 2 # number of cpu sockets, in most scenarios this will be set as 2
@@ -22,3 +22,13 @@
           ide0: "{{ iso }}" # attaches the install iso as boot media
         net: # defines the network configuration in proxmox for the virtual machine
           net0: 'virtio,bridge=vmbr0,firewall=1'
+
+    - name: Start virtual-machine
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        # leave above as default
+        name: "{{ vm_name }}" # the name of the virtual machine
+        state: started # starts the virtual machine

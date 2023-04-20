@@ -30,7 +30,7 @@
         searchdomains: 'homelab.internal' # virtual machine search domains
         nameservers: 192.168.0.210,192.168.0.1 # virtual machine nameservers
         ipconfig: 
-          ipconfig0: 'gw=192.168.0.1,ip="{{ ip_address }}"' # virtual machine network configuration, always set as static
+          ipconfig0: '"{{ ip_address }}"' # virtual machine network configuration, always set as static
         update: true
     
     - name: Re-size virtual machine disk

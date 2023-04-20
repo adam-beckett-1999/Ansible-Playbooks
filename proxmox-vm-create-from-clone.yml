@@ -49,3 +49,11 @@
         api_host: phs-hv-01
         name: VM-DOCKER-TEST
         state: started
+    
+    - name: Pause while virtual-machine boots and network comes up
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Ping the new machine to confirm network connectivity
+      ansible.builtin.shell:
+        cmd: ping 192.168.0.220

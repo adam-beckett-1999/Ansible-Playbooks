@@ -9,13 +9,13 @@
         api_host: phs-hv-01
         # leave the above as default
         name: # name shown in proxmox-gui
-        ostype: l26
-        cpu: kvm64
+        ostype: l26 # LEAVE AS DEFAULT
+        cpu: kvm64 # LEAVE AS DEFAULT
         sockets: 2 # number of cpu sockets, defaulted to 2
         cores: # number of cpu cores
         memory: 4096 # memory in megabytes. e.g. 4096 (4GB), 2048 (2GB), 8192 (8GB)
         agent: 'enabled=1' # enables qemu guest agent support
-        scsihw: virtio-scsi-pci
+        scsihw: virtio-scsi-pci # defines the storage provider backend
         scsi:
           scsi0: 'pool-1:100,format=raw' # creates the disk, the number after pool-1 defines the size of the disk in GB
         ide:

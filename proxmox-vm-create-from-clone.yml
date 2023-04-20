@@ -38,5 +38,5 @@
         api_host: phs-hv-01
         name: VM-DOCKER-TEST
         disk: scsi0
-        size: 100
+        size: 100G
         state: resized

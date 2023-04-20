@@ -1,7 +1,7 @@
 - hosts: "*"
   become: true
   tasks:
-    - name: Create virtual-machine with specific hardware requirements
+    - name: Create virtual-machine with specific hardware requirements and configures cloud-init
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: ansible@pve

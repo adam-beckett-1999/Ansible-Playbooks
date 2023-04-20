@@ -1,7 +1,7 @@
 - hosts: "*"
   become: true
   tasks:
-    - name: Create virtual-machine with cloud-init
+    - name: Clone virtual-machine with cloud-init
       community.general.proxmox_kvm:
         api_user: ansible@pve
         api_password: Ch0c0Late$-1359!
@@ -10,14 +10,6 @@
         vmid: 1000
         name: VM-DOCKER-TEST
         node: phs-hv-01
-        ostype: l26
-        cpu: kvm64
-        sockets: 2
-        cores: 2
-        memory: 4096
-        agent: 'enabled=1'
-        ide:
-          ide0: 'pool-1:cloudinit,format=raw'
         citype: nocloud
         ciuser: abeckett
         cipassword: Chocolate-1245!

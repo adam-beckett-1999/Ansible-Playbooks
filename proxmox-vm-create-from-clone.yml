@@ -4,8 +4,8 @@
     - name: Clone virtual-machine from template
       community.general.proxmox_kvm:
         node: phs-hv-01
-        api_user: ansible@pve
-        api_password: Ch0c0Late$-1359!
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         # leave above as default
         clone: UBUNTU-22.04-TEMPLATE # name of the template
@@ -18,8 +18,8 @@
     - name: Edit new virtual-machine with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
-        api_user: ansible@pve
-        api_password: Ch0c0Late$-1359!
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         # leave above as default
         name: "{{ vm_name }}" # the name of the virtual machine
@@ -35,8 +35,8 @@
     
     - name: Re-size virtual machine disk
       community.general.proxmox_disk:
-        api_user: ansible@pve
-        api_password: Ch0c0Late$-1359!
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         # leave above as default
         name: "{{ vm_name }}" # the name of the virtual machine
@@ -47,8 +47,8 @@
     - name: Start virtual-machine
       community.general.proxmox_kvm:
         node: phs-hv-01
-        api_user: ansible@pve
-        api_password: Ch0c0Late$-1359!
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         # leave above as default
         name: "{{ vm_name }}" # the name of the virtual machine
@@ -61,8 +61,8 @@
     - name: Check the state of the virtual-machine
       community.general.proxmox_kvm:
         node: phs-hv-01
-        api_user: ansible@pve
-        api_password: Ch0c0Late$-1359!
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         # leave above as default
         name: "{{ vm_name }}" # the name of the virtual machine

@@ -4,21 +4,21 @@
     - name: Create virtual-machine with specific hardware requirements
       community.general.proxmox_kvm:
         node: phs-hv-01
-        api_user: ansible@pve
-        api_password: Ch0c0Late$-1359!
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         # leave the above as default
         name: # name shown in proxmox-gui
         ostype: l26 # LEAVE AS DEFAULT
         cpu: kvm64 # LEAVE AS DEFAULT
         sockets: 2 # number of cpu sockets, in most scenarios this will be set as 2
-        cores: 2 # number of cpu cores
-        memory: 4096 # memory in megabytes. e.g. 4096 (4GB), 2048 (2GB), 8192 (8GB)
+        cores: "{{ cores }}" # number of cpu cores
+        memory: "{{ memory }}" # memory in megabytes. e.g. 4096 (4GB), 2048 (2GB), 8192 (8GB)
         agent: 'enabled=1' # enables qemu guest agent support
         scsihw: virtio-scsi-pci # defines the storage provider backend
         scsi:
-          scsi0: 'pool-1:100,format=raw' # creates the disk, the number after pool-1 defines the size of the disk in GB
+          scsi0: "{{ storage }}" # creates the disk, the number after pool-1 defines the size of the disk in GB
         ide:
-          ide0: 'ISOs:iso/UBUNTU-22.04.2.iso,media=cdrom' # attaches the install iso as boot media
+          ide0: "{{ iso }}" # attaches the install iso as boot media
         net: # defines the network configuration in proxmox for the virtual machine
           net0: 'virtio,bridge=vmbr0,firewall=1'

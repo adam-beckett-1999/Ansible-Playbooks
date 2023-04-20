@@ -23,7 +23,7 @@
         node: phs-hv-01
         tags: 'docker,web-applications'
         scsi:
-          scsi0: 'pool-1:100'
+          scsi0: 'size=100'
         citype: nocloud
         ciuser: abeckett
         cipassword: Chocolate-1245!
@@ -41,11 +41,3 @@
         api_host: phs-hv-01
         name: VM-DOCKER-TEST
         state: started
-    
-    - name: Pause while virtual-machine boots and installs
-      ansible.builtin.pause:
-        minutes: 1
-
-    - name: Ping the virtual-machine to test IP config
-      ansible.netcommon.net_ping:
-        dest: 192.168.0.220

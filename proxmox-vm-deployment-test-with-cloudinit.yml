@@ -11,8 +11,8 @@
         name: # name shown in proxmox-gui
         ostype: l26 # LEAVE AS DEFAULT
         cpu: kvm64 # LEAVE AS DEFAULT
-        sockets: 2 # number of cpu sockets, defaulted to 2
-        cores: # number of cpu cores
+        sockets: 2 # number of cpu sockets, in most scenarios this will be set as 2
+        cores: 2 # number of cpu cores
         memory: 4096 # memory in megabytes. e.g. 4096 (4GB), 2048 (2GB), 8192 (8GB)
         agent: 'enabled=1' # enables qemu guest agent support
         scsihw: virtio-scsi-pci # defines the storage provider backend

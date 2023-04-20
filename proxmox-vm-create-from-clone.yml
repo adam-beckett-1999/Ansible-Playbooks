@@ -19,6 +19,7 @@
         api_host: phs-hv-01
         name: VM-DOCKER-TEST
         node: phs-hv-01
+        tags: 'docker,web-applications'
         citype: nocloud
         ciuser: abeckett
         cipassword: Chocolate-1245!

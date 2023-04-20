@@ -10,9 +10,11 @@
         vmid: 1000
         name: VM-DOCKER-TEST
         node: phs-hv-01
+        storage: pool-1
+        format: raw
         timeout: 300
 
-    - name: Edit new virtual-machine with new cloud-init parameters
+    - name: Edit new virtual-machine with new disk size and cloud-init parameters
       community.general.proxmox_kvm:
         api_user: ansible@pve
         api_password: Ch0c0Late$-1359!
@@ -20,6 +22,8 @@
         name: VM-DOCKER-TEST
         node: phs-hv-01
         tags: 'docker,web-applications'
+        scsi:
+          scsi0: 'pool-1:100'
         citype: nocloud
         ciuser: abeckett
         cipassword: Chocolate-1245!

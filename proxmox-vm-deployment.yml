@@ -1,7 +1,7 @@
 - hosts: "*"
   become: true
   tasks:
-    - name: Create virtual-machine with cloud-init
+    - name: Create virtual-machine with specific hardware requirements
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: ansible@pve
@@ -30,22 +30,5 @@
           net0: 'virtio,bridge=vmbr0,firewall=1'
         ipconfig: # sets a static ip address within the virtual-machine with cloud-init
           ipconfig0: 'gw=192.168.0.1,ip=192.168.0.220/24'
-
-    - name: Start virtual-machine
-      community.general.proxmox_kvm:
-        node: phs-hv-01
-        api_user: ansible@pve
-        api_password: Ch0c0Late$-1359!
-        api_host: phs-hv-01
-        name: VM-DOCKER-TEST
-        state: started
-    
-    - name: Pause while virtual-machine boots and installs
-      ansible.builtin.pause:
-        minutes: 5
-
-    - name: Ping the virtual-machine to test IP config
-      ansible.netcommon.net_ping:
-        dest: 192.168.0.220
 
 

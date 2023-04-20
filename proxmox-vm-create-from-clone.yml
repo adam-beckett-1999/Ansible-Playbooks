@@ -3,32 +3,34 @@
   tasks:
     - name: Clone virtual-machine from template
       community.general.proxmox_kvm:
+        node: phs-hv-01
         api_user: ansible@pve
         api_password: Ch0c0Late$-1359!
         api_host: phs-hv-01
-        clone: UBUNTU-22.04-TEMPLATE
-        vmid: 1000
-        name: VM-DOCKER-TEST
-        node: phs-hv-01
-        storage: pool-1
-        format: raw
-        timeout: 300
+        # leave above as default
+        clone: UBUNTU-22.04-TEMPLATE # name of the template
+        vmid: 1000 # virtual machine id of the template
+        name: VM-DOCKER-TEST # the name of the virtual machine
+        storage: pool-1 # defines which storage pool the virtual machine will clone to
+        format: raw # defines the format that the new virtual machines disk will be
+        timeout: 300 # sets the duration before the playbook will consider deployment failed, will depend on the size of the disk being cloned
 
     - name: Edit new virtual-machine with new cloud-init parameters
       community.general.proxmox_kvm:
+        node: phs-hv-01
         api_user: ansible@pve
         api_password: Ch0c0Late$-1359!
         api_host: phs-hv-01
-        name: VM-DOCKER-TEST
-        node: phs-hv-01
-        tags: 'docker,web-applications'
-        citype: nocloud
-        ciuser: abeckett
-        cipassword: Chocolate-1245!
-        searchdomains: 'homelab.internal'
-        nameservers: 192.168.0.210,192.168.0.1
+        # leave above as default
+        name: VM-DOCKER-TEST # the name of the virtual machine
+        tags: 'docker,web-applications' # sets the tags for the virtual machine within proxmox for better identification
+        citype: nocloud # default for linux, do not change
+        ciuser: abeckett # virtual machine username
+        cipassword: Chocolate-1245! # virtual machine password
+        searchdomains: 'homelab.internal' # virtual machine search domains
+        nameservers: 192.168.0.210,192.168.0.1 # virtual machine nameservers
         ipconfig: 
-          ipconfig0: 'gw=192.168.0.1,ip=192.168.0.220/24'
+          ipconfig0: 'gw=192.168.0.1,ip=192.168.0.220/24' # virtual machine network configuration, always set as static
         update: true
     
     - name: Re-size virtual machine disk
@@ -36,10 +38,11 @@
         api_user: ansible@pve
         api_password: Ch0c0Late$-1359!
         api_host: phs-hv-01
-        name: VM-DOCKER-TEST
-        disk: scsi0
-        size: 100G
-        state: resized
+        # leave above as default
+        name: VM-DOCKER-TEST # the name of the virtual machine
+        disk: scsi0 # the disk id of the primary boot disk cloned from the template
+        size: 100G # size value to change the disk to, formatted as 1G, 10G etc. Most virtual machines will have 100G as default
+        state: resized # states that the disk should be resized, leave as default
 
     - name: Start virtual-machine
       community.general.proxmox_kvm:
@@ -47,12 +50,13 @@
         api_user: ansible@pve
         api_password: Ch0c0Late$-1359!
         api_host: phs-hv-01
-        name: VM-DOCKER-TEST
-        state: started
+        # leave above as default
+        name: VM-DOCKER-TEST # the name of the virtual machine
+        state: started # starts the virtual machine
     
     - name: Pause while virtual-machine boots and network comes up
       ansible.builtin.pause:
-        minutes: 1
+        minutes: 1 # pauses the playbook for a specific amount of time while it boots
     
     - name: Check the state of the virtual-machine
       community.general.proxmox_kvm:
@@ -60,5 +64,6 @@
         api_user: ansible@pve
         api_password: Ch0c0Late$-1359!
         api_host: phs-hv-01
-        name: VM-DOCKER-TEST
-        state: current
+        # leave above as default
+        name: VM-DOCKER-TEST # the name of the virtual machine
+        state: current # checks the current state of the machine, no need to change this

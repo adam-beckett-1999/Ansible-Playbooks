@@ -56,4 +56,4 @@
 
     - name: Ping the new machine to confirm network connectivity
       ansible.builtin.shell:
-        cmd: ping -c 1 -w 192.168.0.220
+        cmd: ping -c 1 -w 2 192.168.0.220

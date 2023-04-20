@@ -10,7 +10,7 @@
         # leave above as default
         clone: UBUNTU-22.04-TEMPLATE # name of the template
         vmid: 1000 # virtual machine id of the template
-        name: {{ vm_name }} # the name of the virtual machine
+        name: "{{ vm_name }}" # the name of the virtual machine
         storage: pool-1 # defines which storage pool the virtual machine will clone to
         format: raw # defines the format that the new virtual machines disk will be
         timeout: 300 # sets the duration before the playbook will consider deployment failed, will depend on the size of the disk being cloned
@@ -22,15 +22,15 @@
         api_password: Ch0c0Late$-1359!
         api_host: phs-hv-01
         # leave above as default
-        name: {{ vm_name }} # the name of the virtual machine
+        name: "{{ vm_name }}" # the name of the virtual machine
         tags: 'docker,web-applications' # sets the tags for the virtual machine within proxmox for better identification
         citype: nocloud # default for linux, do not change
-        ciuser: {{ username }} # virtual machine username
-        cipassword: {{ password }} # virtual machine password
+        ciuser: "{{ username }}" # virtual machine username
+        cipassword: "{{ password }}" # virtual machine password
         searchdomains: 'homelab.internal' # virtual machine search domains
         nameservers: 192.168.0.210,192.168.0.1 # virtual machine nameservers
         ipconfig: 
-          ipconfig0: 'gw=192.168.0.1,ip={{ ip_address }}' # virtual machine network configuration, always set as static
+          ipconfig0: 'gw=192.168.0.1,ip="{{ ip_address }}"' # virtual machine network configuration, always set as static
         update: true
     
     - name: Re-size virtual machine disk
@@ -39,9 +39,9 @@
         api_password: Ch0c0Late$-1359!
         api_host: phs-hv-01
         # leave above as default
-        name: {{ vm_name }} # the name of the virtual machine
+        name: "{{ vm_name }}" # the name of the virtual machine
         disk: scsi0 # the disk id of the primary boot disk cloned from the template
-        size: {{ disk_size }} # size value to change the disk to, formatted as 1G, 10G etc. Most virtual machines will have 100G as default
+        size: "{{ disk_size }}" # size value to change the disk to, formatted as 1G, 10G etc. Most virtual machines will have 100G as default
         state: resized # states that the disk should be resized, leave as default
 
     - name: Start virtual-machine
@@ -51,7 +51,7 @@
         api_password: Ch0c0Late$-1359!
         api_host: phs-hv-01
         # leave above as default
-        name: {{ vm_name }} # the name of the virtual machine
+        name: "{{ vm_name }}" # the name of the virtual machine
         state: started # starts the virtual machine
     
     - name: Pause while virtual-machine boots and network comes up
@@ -65,5 +65,5 @@
         api_password: Ch0c0Late$-1359!
         api_host: phs-hv-01
         # leave above as default
-        name: {{ vm_name }} # the name of the virtual machine
+        name: "{{ vm_name }}" # the name of the virtual machine
         state: current # checks the current state of the machine, no need to change this

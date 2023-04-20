@@ -22,6 +22,7 @@
           ide0: "{{ iso }}" # attaches the install iso as boot media
         net: # defines the network configuration in proxmox for the virtual machine
           net0: 'virtio,bridge=vmbr0,firewall=1'
+        timeout: 90
 
     - name: Start virtual-machine
       community.general.proxmox_kvm:

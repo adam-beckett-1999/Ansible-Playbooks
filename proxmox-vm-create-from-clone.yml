@@ -10,6 +10,15 @@
         vmid: 1000
         name: VM-DOCKER-TEST
         node: phs-hv-01
+        timeout: 300
+
+    - name: Edit new virtual-machine with new cloud-init parameters
+      community.general.proxmox_kvm:
+        api_user: ansible@pve
+        api_password: Ch0c0Late$-1359!
+        api_host: phs-hv-01
+        name: VM-DOCKER-TEST
+        node: phs-hv-01
         citype: nocloud
         ciuser: abeckett
         cipassword: Chocolate-1245!
@@ -17,3 +26,4 @@
         nameservers: 192.168.0.210,192.168.0.1
         ipconfig: 
           ipconfig0: 'gw=192.168.0.1,ip=192.168.0.220/24'
+        update: true

@@ -31,4 +31,12 @@
         ipconfig: # sets a static ip address within the virtual-machine with cloud-init
           ipconfig0: "{{ ip_address }}"
 
-
+    - name: Start virtual-machine
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        # leave above as default
+        name: "{{ vm_name }}" # the name of the virtual machine
+        state: started # starts the virtual machine

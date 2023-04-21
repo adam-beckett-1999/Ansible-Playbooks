@@ -23,7 +23,7 @@
         api_host: phs-hv-01
         # leave above as default
         name: "{{ vm_name }}" # the name of the virtual machine
-        tags: 'docker,web-applications' # sets the tags for the virtual machine within proxmox for better identification
+        tags: "{{ tags }}" # sets the tags for the virtual machine within proxmox for better identification
         citype: nocloud # default for linux, do not change
         ciuser: "{{ username }}" # virtual machine username
         cipassword: "{{ password }}" # virtual machine password

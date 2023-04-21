@@ -78,3 +78,22 @@
     - name: Report
       debug:
         var: result
+
+
+    # mount the network shares vital for most application servers
+    - name: Mount NAS-01 network share
+      ansible.posix.mount:
+        src: //nas-01.homelab.internal/media
+        path: /mnt/nas-01
+        opts: "rw,vers=3,file_mode=0600,dir_mode=0700,username={{ nas-01_username }},password={{ nas-01_password }}"
+        fstype: cifs
+        boot: true
+        state: mounted
+    - name: Mount STORAGE-01 network share
+      ansible.posix.mount:
+        src: //storage-01.homelab.internal/media
+        path: /mnt/storage-01
+        opts: "rw,vers=3,file_mode=0600,dir_mode=0700,username={{ storage-01_username }},password={{ storage-01_password }}"
+        fstype: cifs
+        boot: true
+        state: mounted

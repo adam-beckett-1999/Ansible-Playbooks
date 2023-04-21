@@ -1,0 +1,82 @@
+- hosts: "*"
+  become: true
+  tasks:
+    # the below updates the virtual machines and ensures all packages are up to date
+    - name: Preliminary checks
+      file:
+        path: /var/lib/apt/lists/
+        state: directory
+        mode: 0755
+    - name: Update repository cache
+      apt:
+        update_cache: yes
+    - name: Install all updates
+      apt:
+        upgrade: dist
+        autoremove: yes
+        autoclean: yes
+      register: result
+    - name: List installed and updated packages
+      shell: grep -E "^$(date +%Y-%m-%d).+ (install|upgrade) " /var/log/dpkg.log |cut -d " " -f 3-5
+      register: result
+    - name: Show Output
+      debug: msg="{{ result.stdout_lines }}"
+    
+
+    # next part installs the qemu guest agent on the virtual machine so that proxmox can properly manage it and collect information
+    - name: install qemu guest agent
+      apt:
+        name:
+        - qemu-guest-agent
+        state: present
+        update_cache: true
+    - name: start guest agent service
+      systemd:
+        state: started
+        name: qemu-guest-agent  
+    - name: Check service status
+      command: systemctl status "{{ item }}"
+      with_items:
+      - qemu
+      register: result
+      ignore_errors: yes
+    - name: Report
+      debug:
+        var: result
+
+    
+    # the next part installs and enables cockpit web management for the virtual machine, and installs some useful extra plugins
+    - name: Install cockpit and its dependencies
+      apt:
+        name:
+        - cockpit
+        state: present
+        update_cache: true
+    - name: Install 45drives cockpit navigator plugin
+      apt:
+        deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
+        state: present
+      register: apt_output
+    - name: Install 45drives cockpit file sharing plugin
+      apt:
+        deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
+        state: present
+      register: apt_output
+    - name: Enable service cockpit and ensure it is not masked
+      systemd:
+        name: cockpit
+        enabled: yes
+        masked: no
+    - name: Start cockpit service if it isn't already
+      systemd:
+        state: started
+        name: cockpit
+    - name: Check service status
+      command: systemctl status "{{ item }}"
+      with_items:
+      - cockpit
+      register: result
+      ignore_errors: yes
+    - name: Report
+      debug:
+        var: result

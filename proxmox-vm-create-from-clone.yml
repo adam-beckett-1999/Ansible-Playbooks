@@ -8,7 +8,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         # leave above as default
-        clone: template # leave as default
+        clone: template # defines task as clone instead of create with a unnecessary string due to source vmid being stated
         vmid: "{{ template_id }}" # virtual machine id of the template
         name: "{{ vm_name }}" # the name of the virtual machine
         storage: pool-1 # defines which storage pool the virtual machine will clone to
@@ -58,7 +58,7 @@
       ansible.builtin.pause:
         minutes: 1 # pauses the playbook for a specific amount of time while it boots
     
-    - name: Check the state of the virtual-machine
+    - name: Stop virtual-machine # this fixes issues with debian cloud-img where on first boot after disk resize the machine will kernel panic, will have to manually start after
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
@@ -66,4 +66,4 @@
         api_host: phs-hv-01
         # leave above as default
         name: "{{ vm_name }}" # the name of the virtual machine
-        state: current # checks the current state of the machine, no need to change this
+        state: stopped # stops the machine, no need to change this

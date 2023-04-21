@@ -53,17 +53,3 @@
         # leave above as default
         name: "{{ vm_name }}" # the name of the virtual machine
         state: started # starts the virtual machine
-    
-    - name: Pause while virtual-machine boots and network comes up
-      ansible.builtin.pause:
-        minutes: 1 # pauses the playbook for a specific amount of time while it boots
-    
-    - name: Stop virtual-machine # this fixes issues with debian cloud-img where on first boot after disk resize the machine will kernel panic, will have to manually start after
-      community.general.proxmox_kvm:
-        node: phs-hv-01
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        api_host: phs-hv-01
-        # leave above as default
-        name: "{{ vm_name }}" # the name of the virtual machine
-        state: stopped # stops the machine, no need to change this

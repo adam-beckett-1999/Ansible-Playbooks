@@ -9,6 +9,7 @@
         api_host: phs-hv-01
         # leave the above as default
         name: "{{ vm_name }}" # name shown in proxmox-gui
+        tags: "{{ tags }}" # sets the tags for the virtual machine within proxmox for better identification
         ostype: l26 # LEAVE AS DEFAULT
         cpu: kvm64 # LEAVE AS DEFAULT
         sockets: 2 # number of cpu sockets, in most scenarios this will be set as 2

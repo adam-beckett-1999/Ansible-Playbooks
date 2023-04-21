@@ -1,12 +1,12 @@
 - hosts: "*"
   become: true
   tasks:
-    - name: packages | ensure apt list dir exists
+    - name: Preliminary checks
       file:
         path: /var/lib/apt/lists/
         state: directory
         mode: 0755
-    - name: install all updates
+    - name: Install all updates
       apt:
         update_cache: yes
         upgrade: dist

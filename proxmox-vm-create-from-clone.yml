@@ -24,6 +24,8 @@
         # leave above as default
         name: "{{ vm_name }}" # the name of the virtual machine
         tags: "{{ tags }}" # sets the tags for the virtual machine within proxmox for better identification
+        cores: "{{ cores }}" # number of cpu cores
+        memory: "{{ memory }}" # memory in megabytes. e.g. 4096 (4GB), 2048 (2GB), 8192 (8GB)
         citype: nocloud # default for linux, do not change
         ciuser: "{{ username }}" # virtual machine username
         cipassword: "{{ password }}" # virtual machine password

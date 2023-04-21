@@ -7,11 +7,9 @@
         path: /var/lib/apt/lists/
         state: directory
         mode: 0755
-    - name: Update repository cache
-      apt:
-        update_cache: yes
     - name: Install all updates
       apt:
+        update_cache: yes
         upgrade: dist
         autoremove: yes
         autoclean: yes

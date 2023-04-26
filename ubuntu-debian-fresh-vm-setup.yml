@@ -22,7 +22,7 @@
     
 
     # next part installs the qemu guest agent on the virtual machine so that proxmox can properly manage it and collect information
-    - name: install qemu guest agent
+    - name: Install QEMU guest agent
       apt:
         name:
         - qemu-guest-agent

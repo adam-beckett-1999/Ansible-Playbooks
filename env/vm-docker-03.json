@@ -9,5 +9,9 @@
 "username": "abeckett",
 "password": "Chocolate-1245!",
 "ip_address": "gw=192.168.0.1,ip=192.168.0.163/24",
-"disk_size": "100G"
+"disk_size": "100G",
+"nas-01_username": "abeckett",
+"nas-01_password": "3T3EC$99!rY!??Pe",
+"storage-01_username": "abeckett",
+"storage-01_password": "Chocolate-1245!"
 }

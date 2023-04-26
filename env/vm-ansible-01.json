@@ -2,12 +2,12 @@
 "proxmox_user": "ansible@pve",
 "proxmox_password": "Ch0c0Late$-1359!",
 "template_id": "1000",
-"vm_name": "VM-NETBOX-01",
-"tags": "netbox,app-server",
+"vm_name": "VM-ANSIBLE-01",
+"tags": "ansible,app-server",
 "cores": "2",
 "memory": "2048",
 "username": "abeckett",
 "password": "Chocolate-1245!",
-"ip_address": "gw=192.168.0.1,ip=192.168.0.166/24",
+"ip_address": "gw=192.168.0.1,ip=192.168.0.160/24",
 "disk_size": "50G"
 }

@@ -1,3 +1,13 @@
 {
-    ""
+"proxmox_user": "ansible@pve",
+"proxmox_password": "Ch0c0Late$-1359!",
+"template_id": "1000",
+"vm_name": "VM-GITLAB-01",
+"tags": "gitlab,app-server",
+"cores": "2",
+"memory": "2048",
+"username": "abeckett",
+"password": "Chocolate-1245!",
+"ip_address": "gw=192.168.0.1,ip=192.168.0.164/24",
+"disk_size": "100G"
 }

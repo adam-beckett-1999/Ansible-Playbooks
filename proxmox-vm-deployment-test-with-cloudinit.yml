@@ -27,7 +27,7 @@
         citype: nocloud # default for linux, do not change
         ciuser: "{{ username }}" # virtual machine username
         cipassword: "{{ password }}" # virtual machine password
-        sshkeys: "{{ ssh_keys }}" # ssh public key for auth
+        sshkeys: "{{ sshkeys }}" # ssh public key for auth
         searchdomains: 'homelab.internal'
         nameservers: 192.168.0.210,192.168.0.1
         ipconfig: # sets a static ip address within the virtual-machine with cloud-init

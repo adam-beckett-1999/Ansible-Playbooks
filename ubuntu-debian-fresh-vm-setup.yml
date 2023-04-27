@@ -46,7 +46,7 @@
         owner: abeckett
     - name: Mount NAS-01 network share
       ansible.posix.mount:
-        src: //nas-01.homelab.internal/media
+        src: //NAS-01.homelab.internal/Media
         path: /mnt/nas-01
         opts: 'username=abeckett,password=3T3EC$99!rY!??Pe'
         fstype: cifs
@@ -60,7 +60,7 @@
         owner: abeckett
     - name: Mount STORAGE-01 network share
       ansible.posix.mount:
-        src: //storage-01.homelab.internal/media
+        src: //PHS-STR-01.homelab.internal/Media
         path: /mnt/storage-01
         opts: 'username=abeckett,password=Ch0c0Late$-1359!'
         fstype: cifs

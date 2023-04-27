@@ -17,6 +17,8 @@
         name:
         - qemu-guest-agent
         - cockpit
+        - cifs-utils
+        - keyutils
         state: present
         update_cache: true
     - name: Install 45drives cockpit navigator plugin

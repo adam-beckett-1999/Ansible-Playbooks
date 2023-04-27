@@ -38,6 +38,12 @@
         enabled: yes
         state: started
         masked: no
+    - name: Check that NAS-01 mount point exists
+      ansible.builtin.file:
+        path: /mnt/nas-01
+        state: directory
+        mode: '0755'
+        owner: abeckett
     - name: Mount NAS-01 network share
       ansible.posix.mount:
         src: //nas-01.homelab.internal/media
@@ -46,6 +52,12 @@
         fstype: cifs
         boot: true
         state: mounted
+    - name: Check that STORAGE-01 mount point exists
+      ansible.builtin.file:
+        path: /mnt/storage-01
+        state: directory
+        mode: '0755'
+        owner: abeckett
     - name: Mount STORAGE-01 network share
       ansible.posix.mount:
         src: //storage-01.homelab.internal/media

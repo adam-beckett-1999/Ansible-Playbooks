@@ -52,7 +52,7 @@
         src: //NAS-01.homelab.internal/Media
         path: /nas-01
         fstype: cifs
-        opts: 'username=abeckett,password=3T3EC$99!rY!??Pe'
+        opts: 'uid=abeckett,mfsymlinks,username=abeckett-local,password=Chocolate-1245!'
         state: mounted
     - name: Check that STORAGE-01 mount point exists
       ansible.builtin.file:
@@ -66,5 +66,5 @@
         src: //PHS-STR-01.homelab.internal/Media
         path: /storage-01
         fstype: cifs
-        opts: 'username=abeckett,password=Ch0c0Late$-1359!'
+        opts: 'uid=abeckett,mfsymlinks,username=abeckett,password=Chocolate-1245!'
         state: mounted

@@ -42,7 +42,7 @@
       ansible.posix.mount:
         src: //nas-01.homelab.internal/media
         path: /mnt/nas-01
-        opts: "rw,vers=3,file_mode=0600,dir_mode=0700,username=abeckett,password=3T3EC$99!rY!??Pe"
+        opts: 'username=abeckett,password=3T3EC$99!rY!??Pe'
         fstype: cifs
         boot: true
         state: mounted
@@ -50,7 +50,7 @@
       ansible.posix.mount:
         src: //storage-01.homelab.internal/media
         path: /mnt/storage-01
-        opts: "rw,vers=3,file_mode=0600,dir_mode=0700,username=abeckett,password=Ch0c0Late$-1359!"
+        opts: 'username=abeckett,password=Ch0c0Late$-1359!'
         fstype: cifs
         boot: true
         state: mounted

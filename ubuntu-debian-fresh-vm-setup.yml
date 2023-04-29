@@ -23,30 +23,30 @@
         - keyutils
         state: present
 
-    - name: Install cockpit navigator plugin
+    - name: Install cockpit navigator plugin # downloads and installs the 45drives cockpit navigator plugin from their github repo
       apt:
         deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
         state: present
 
-    - name: Install cockpit file sharing plugin
+    - name: Install cockpit file sharing plugin # downloads and installs the 45drives cockpit file sharing plugin from their github repo
       apt:
         deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
         state: present
 
-    - name: Start qemu-guest-agent service
+    - name: Start qemu-guest-agent service # starts the qemu guest agent service and ensures it runs on startup
       systemd:
         name: qemu-guest-agent
         enabled: yes
         state: started
 
-    - name: Start cockpit service
+    - name: Start cockpit service # starts the cockpit service and ensures it runs on startup and isn't masked
       systemd:
         name: cockpit
         enabled: yes
         state: started
         masked: no
 
-    - name: Check that NAS-01 mount point exists
+    - name: Create NAS-01 local directory
       ansible.builtin.file:
         path: /nas-01
         state: directory
@@ -62,7 +62,7 @@
         opts: "{{ nas_01 }}"
         state: mounted
 
-    - name: Check that STORAGE-01 mount point exists
+    - name: Create STORAGE-01 local directory
       ansible.builtin.file:
         path: /storage-01
         state: directory

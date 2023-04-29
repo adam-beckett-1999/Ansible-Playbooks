@@ -6,6 +6,7 @@
         path: /var/lib/apt/lists/
         state: directory
         mode: 0755
+
     - name: Install all updates
       apt:
         update_cache: yes
@@ -21,25 +22,30 @@
         - keyutils
         state: present
         update_cache: true
+
     - name: Install 45drives cockpit navigator plugin
       apt:
         deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
         state: present
+
     - name: Install 45drives cockpit file sharing plugin
       apt:
         deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
         state: present
+
     - name: start guest agent service
       systemd:
         name: qemu-guest-agent
         enabled: yes
         state: started
+
     - name: Enable and start service cockpit and ensure it is not masked
       systemd:
         name: cockpit
         enabled: yes
         state: started
         masked: no
+
     - name: Check that NAS-01 mount point exists
       ansible.builtin.file:
         path: /nas-01
@@ -47,6 +53,7 @@
         mode: '0755'
         owner: abeckett
         group: abeckett
+
     - name: Mount NAS-01 network share
       ansible.posix.mount:
         src: //NAS-01.homelab.internal/Media
@@ -54,6 +61,7 @@
         fstype: cifs
         opts: "{{ nas_01 }}"
         state: mounted
+
     - name: Check that STORAGE-01 mount point exists
       ansible.builtin.file:
         path: /storage-01
@@ -61,6 +69,7 @@
         mode: '0755'
         owner: abeckett
         group: abeckett
+        
     - name: Mount STORAGE-01 network share
       ansible.posix.mount:
         src: //PHS-STR-01.homelab.internal/Media

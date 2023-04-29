@@ -4,6 +4,7 @@
     - name: Prune docker images that are unused and dangling
       community.docker.docker_prune:
         images: true
+        
     - name: Send Mattermost alert on completion
       community.general.mattermost:
         url: https://mattermost.beckettcloud.com

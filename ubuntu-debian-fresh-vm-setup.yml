@@ -33,11 +33,15 @@
         deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
         state: present
 
-    - name: Start all newly installed services
+    - name: Start qemu-guest-agent service
       systemd:
-        name: 
-        - qemu-guest-agent
-        - cockpit
+        name: qemu-guest-agent
+        enabled: yes
+        state: started
+
+    - name: Start cockpit service
+      systemd:
+        name: cockpit
         enabled: yes
         state: started
         masked: no

@@ -1,20 +1,20 @@
 - hosts: "*"
   become: true
   tasks:
-    - name: Preliminary checks
+    - name: Preliminary checks # checks that apt lists directory exists
       file:
         path: /var/lib/apt/lists/
         state: directory
         mode: 0755
 
-    - name: Install all updates
+    - name: Install all updates # updates cache and upgrades all packages
       apt:
         update_cache: yes
         upgrade: dist
         autoremove: yes
         autoclean: yes
         
-    - name: Install QEMU guest agent and cockpit
+    - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils) # installs qemu guest agent, cockpit, cifs-utils for cifs support and keyutils
       apt:
         name:
         - qemu-guest-agent
@@ -22,27 +22,22 @@
         - cifs-utils
         - keyutils
         state: present
-        update_cache: true
 
-    - name: Install 45drives cockpit navigator plugin
+    - name: Install cockpit navigator plugin
       apt:
         deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
         state: present
 
-    - name: Install 45drives cockpit file sharing plugin
+    - name: Install cockpit file sharing plugin
       apt:
         deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
         state: present
 
-    - name: start guest agent service
+    - name: Start all newly installed services
       systemd:
-        name: qemu-guest-agent
-        enabled: yes
-        state: started
-
-    - name: Enable and start service cockpit and ensure it is not masked
-      systemd:
-        name: cockpit
+        name: 
+        - qemu-guest-agent
+        - cockpit
         enabled: yes
         state: started
         masked: no

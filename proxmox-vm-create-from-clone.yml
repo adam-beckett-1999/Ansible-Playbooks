@@ -56,18 +56,35 @@
 - hosts: proxmox_vms
   become: true
   tasks:
-    - name: Preliminary checks
+    - name: Preliminary checks [Debian/Ubuntu]
       file:
         path: /var/lib/apt/lists/
         state: directory
         mode: 0755
-    - name: Install all updates
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Install all updates [Debian/Ubuntu]
       apt:
         update_cache: yes
         upgrade: dist
         autoremove: yes
         autoclean: yes
-    - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils)
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Upgrade all packages and install kernel updates [CentOS/Rocky]
+      yum:
+        update_cache: yes
+        update_only: yes
+        name: '*'
+        state: latest
+      when:
+        - ansible_facts.os_family == "RedHat"
+    - name: Remove packages not needed anymore [CentOS/Rocky]
+      yum:
+        autoremove: yes
+      when:
+        - ansible_facts.os_family == "RedHat"
+    - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils) [Debian/Ubuntu]
       apt:
         name:
         - qemu-guest-agent
@@ -75,14 +92,41 @@
         - cifs-utils
         - keyutils
         state: present
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Install required base-packages (qemu-guest-agent, cifs-utils) [CentOS/Rocky]
+      yum:
+        name: 
+        - qemu-guest-agent
+        - cifs-utils
+        - keyutils
+        state: present
+      when:
+        - ansible_facts.os_family == "RedHat"
     - name: Install cockpit navigator plugin
       apt:
         deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
         state: present
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Install cockpit navigator plugin
+      yum:
+        name: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.8/cockpit-navigator-0.5.8-2.el8.noarch.rpm
+        state: present
+      when:
+        - ansible_facts.os_family == "RedHat"
     - name: Install cockpit file sharing plugin
       apt:
         deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
         state: present
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Install cockpit file sharing plugin
+      yum:
+        name: https://github.com/45Drives/cockpit-file-sharing/releases/download/v2.4.5/cockpit-file-sharing-2.4.5-1.el8.noarch.rpm
+        state: present
+      when:
+        - ansible_facts.os_family == "RedHat"
     - name: Start qemu-guest-agent service
       systemd:
         name: qemu-guest-agent
@@ -94,6 +138,20 @@
         enabled: yes
         state: started
         masked: no
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Start cockpit
+      systemd:
+        name: cockpit
+        state: started
+      when:
+        - ansible_facts.os_family == "RedHat"
+    - name: Enable cockpit.socket
+      systemd:
+        name: cockpit.socket
+        enabled: yes
+      when:
+        - ansible_facts.os_family == "RedHat"
     - name: Create NAS-01 local directory
       ansible.builtin.file:
         path: /nas-01

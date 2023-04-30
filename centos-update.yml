@@ -8,7 +8,7 @@
         name: '*'
         state: latest
       register: yum_update_status
-    - name: Remove packates not needed anymore
+    - name: Remove packages not needed anymore
       yum:
         autoremove: yes
     - name: List updated packages

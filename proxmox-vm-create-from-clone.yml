@@ -57,9 +57,9 @@
         name: "{{ vm_name }}" # the name of the virtual machine
         state: started # starts the virtual machine
     
-    - name: Pause for 1 minute while virtual-machine boots
+    - name: Pause for 30 seconds while virtual-machine boots
       ansible.builtin.pause:
-        minutes: 1
+        seconds: 30
 
 - hosts: ubuntu_test_hosts
   remote_user: abeckett

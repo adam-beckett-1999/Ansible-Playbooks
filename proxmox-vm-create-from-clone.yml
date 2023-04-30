@@ -63,8 +63,6 @@
 
 - hosts: ubuntu_test_hosts
   remote_user: abeckett
-  vars:
-    ansible_ssh_private_key_file: "{{ key }}"
   become: true
   tasks:
     - name: Preliminary checks # checks that apt lists directory exists

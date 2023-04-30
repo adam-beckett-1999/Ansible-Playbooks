@@ -35,7 +35,7 @@
           ipconfig0: "{{ ip_address }}" # virtual machine network configuration, always set as static
         update: true
     
-    - name: Re-size virtual machine disk
+    - name: Re-size virtual-machine disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
@@ -55,6 +55,10 @@
         # leave above as default
         name: "{{ vm_name }}" # the name of the virtual machine
         state: started # starts the virtual machine
+    
+    - name: Pause for 1 minute while virtual-machine boots
+      ansible.builtin.pause:
+        minutes: 5
 
 - hosts: ubuntu_test_hosts
   become: true

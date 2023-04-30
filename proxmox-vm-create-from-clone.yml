@@ -104,26 +104,26 @@
         state: present
       when:
         - ansible_facts.os_family == "RedHat"
-    - name: Install cockpit navigator plugin
+    - name: Install cockpit navigator plugin [Debian/Ubuntu]
       apt:
         deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
         state: present
       when:
         - ansible_facts.os_family == "Debian"
-    - name: Install cockpit navigator plugin
+    - name: Install cockpit navigator plugin [CentOS/Rocky]
       dnf:
         name: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.8/cockpit-navigator-0.5.8-2.el8.noarch.rpm
         state: present
         disable_gpg_check: True
       when:
         - ansible_facts.os_family == "RedHat"
-    - name: Install cockpit file sharing plugin
+    - name: Install cockpit file sharing plugin [Debian/Ubuntu]
       apt:
         deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
         state: present
       when:
         - ansible_facts.os_family == "Debian"
-    - name: Install cockpit file sharing plugin
+    - name: Install cockpit file sharing plugin [CentOS/Rocky]
       dnf:
         name: https://github.com/45Drives/cockpit-file-sharing/releases/download/v2.4.5/cockpit-file-sharing-2.4.5-1.el8.noarch.rpm
         state: present
@@ -135,7 +135,7 @@
         name: qemu-guest-agent
         enabled: yes
         state: started
-    - name: Start cockpit service
+    - name: Start cockpit service [Debian/Ubuntu]
       systemd:
         name: cockpit
         enabled: yes
@@ -143,13 +143,13 @@
         masked: no
       when:
         - ansible_facts.os_family == "Debian"
-    - name: Start cockpit
+    - name: Start cockpit [CentOS/Rocky]
       systemd:
         name: cockpit
         state: started
       when:
         - ansible_facts.os_family == "RedHat"
-    - name: Enable cockpit.socket
+    - name: Enable cockpit.socket [CentOS/Rocky]
       systemd:
         name: cockpit.socket
         enabled: yes

@@ -7,56 +7,48 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        # leave above as default
-        clone: template # defines task as clone instead of create with a unnecessary string due to source vmid being stated
-        vmid: "{{ template_id }}" # virtual machine id of the template
-        name: "{{ vm_name }}" # the name of the virtual machine
-        storage: pool-1 # defines which storage pool the virtual machine will clone to
-        format: raw # defines the format that the new virtual machines disk will be
-        timeout: 300 # sets the duration before the playbook will consider deployment failed, will depend on the size of the disk being cloned
-
+        clone: template
+        vmid: "{{ template_id }}"
+        name: "{{ vm_name }}"
+        storage: pool-1
+        format: raw
+        timeout: 300
     - name: Edit new virtual-machine with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        # leave above as default
-        name: "{{ vm_name }}" # the name of the virtual machine
-        tags: "{{ tags }}" # sets the tags for the virtual machine within proxmox for better identification
-        cores: "{{ cores }}" # number of cpu cores
-        memory: "{{ memory }}" # memory in megabytes. e.g. 4096 (4GB), 2048 (2GB), 8192 (8GB)
-        citype: nocloud # default for linux, do not change
-        ciuser: "{{ username }}" # virtual machine username
-        cipassword: "{{ password }}" # virtual machine password
-        sshkeys: "{{ sshkeys }}" # configures the ssh public key
-        searchdomains: 'homelab.internal' # virtual machine search domains
-        nameservers: 192.168.0.210,192.168.0.1 # virtual machine nameservers
+        name: "{{ vm_name }}"
+        tags: "{{ tags }}"
+        cores: "{{ cores }}"
+        memory: "{{ memory }}"
+        citype: nocloud
+        ciuser: "{{ username }}"
+        cipassword: "{{ password }}"
+        sshkeys: "{{ sshkeys }}"
+        searchdomains: 'homelab.internal'
+        nameservers: 192.168.0.210,192.168.0.1
         ipconfig: 
-          ipconfig0: "{{ ip_address }}" # virtual machine network configuration, always set as static
+          ipconfig0: "{{ ip_address }}"
         update: true
-    
     - name: Re-size virtual-machine disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        # leave above as default
-        name: "{{ vm_name }}" # the name of the virtual machine
-        disk: scsi0 # the disk id of the primary boot disk cloned from the template
-        size: "{{ disk_size }}" # size value to change the disk to, formatted as 1G, 10G etc. Most virtual machines will have 100G as default
-        state: resized # states that the disk should be resized, leave as default
-
+        name: "{{ vm_name }}"
+        disk: scsi0
+        size: "{{ disk_size }}"
+        state: resized
     - name: Start virtual-machine
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        # leave above as default
-        name: "{{ vm_name }}" # the name of the virtual machine
-        state: started # starts the virtual machine
-    
+        name: "{{ vm_name }}"
+        state: started
     - name: Pause for 30 seconds while virtual-machine boots
       ansible.builtin.pause:
         seconds: 30
@@ -64,20 +56,18 @@
 - hosts: ubuntu_test_hosts
   become: true
   tasks:
-    - name: Preliminary checks # checks that apt lists directory exists
+    - name: Preliminary checks
       file:
         path: /var/lib/apt/lists/
         state: directory
         mode: 0755
-
-    - name: Install all updates # updates cache and upgrades all packages
+    - name: Install all updates
       apt:
         update_cache: yes
         upgrade: dist
         autoremove: yes
         autoclean: yes
-        
-    - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils) # installs qemu guest agent, cockpit, cifs-utils for cifs support and keyutils
+    - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils)
       apt:
         name:
         - qemu-guest-agent
@@ -85,58 +75,50 @@
         - cifs-utils
         - keyutils
         state: present
-
-    - name: Install cockpit navigator plugin # downloads and installs the 45drives cockpit navigator plugin from their github repo
+    - name: Install cockpit navigator plugin
       apt:
         deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
         state: present
-
-    - name: Install cockpit file sharing plugin # downloads and installs the 45drives cockpit file sharing plugin from their github repo
+    - name: Install cockpit file sharing plugin
       apt:
         deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
         state: present
-
-    - name: Start qemu-guest-agent service # starts the qemu guest agent service and ensures it runs on startup
+    - name: Start qemu-guest-agent service
       systemd:
         name: qemu-guest-agent
         enabled: yes
         state: started
-
-    - name: Start cockpit service # starts the cockpit service and ensures it runs on startup and isn't masked
+    - name: Start cockpit service
       systemd:
         name: cockpit
         enabled: yes
         state: started
         masked: no
-
-    - name: Create NAS-01 local directory # creates the local directory for the NAS-01 network share
+    - name: Create NAS-01 local directory
       ansible.builtin.file:
         path: /nas-01
         state: directory
         mode: '0755'
         owner: abeckett
         group: abeckett
-
-    - name: Mount NAS-01 network share # mounts the NAS-01 network share and configures in fstab
+    - name: Mount NAS-01 network share
       ansible.posix.mount:
         src: //NAS-01.homelab.internal/Media
         path: /nas-01
         fstype: cifs
-        opts: "{{ nas_01 }}"
+        opts: "{{ nas_01_auth }}"
         state: mounted
-
-    - name: Create STORAGE-01 local directory # creates the local directory for the STORAGE-01 network share
+    - name: Create STORAGE-01 local directory
       ansible.builtin.file:
         path: /storage-01
         state: directory
         mode: '0755'
         owner: abeckett
         group: abeckett
-
-    - name: Mount STORAGE-01 network share # mounts the STORAGE-01 network share and configures in fstab
+    - name: Mount STORAGE-01 network share
       ansible.posix.mount:
         src: //STORAGE-01.homelab.internal/Media
         path: /storage-01
         fstype: cifs
-        opts: "{{ storage_01 }}"
+        opts: "{{ storage_01_auth }}"
         state: mounted

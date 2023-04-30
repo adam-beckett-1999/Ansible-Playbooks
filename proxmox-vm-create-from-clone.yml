@@ -135,7 +135,7 @@
 
     - name: Mount STORAGE-01 network share # mounts the STORAGE-01 network share and configures in fstab
       ansible.posix.mount:
-        src: //PHS-STR-01.homelab.internal/Media
+        src: //STORAGE-01.homelab.internal/Media
         path: /storage-01
         fstype: cifs
         opts: "{{ storage_01 }}"

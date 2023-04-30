@@ -62,7 +62,6 @@
         seconds: 30
 
 - hosts: ubuntu_test_hosts
-  remote_user: abeckett
   become: true
   tasks:
     - name: Preliminary checks # checks that apt lists directory exists

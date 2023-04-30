@@ -113,6 +113,7 @@
       dnf:
         name: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.8/cockpit-navigator-0.5.8-2.el8.noarch.rpm
         state: present
+        disable_gpg_check: True
       when:
         - ansible_facts.os_family == "RedHat"
     - name: Install cockpit file sharing plugin
@@ -125,6 +126,7 @@
       dnf:
         name: https://github.com/45Drives/cockpit-file-sharing/releases/download/v2.4.5/cockpit-file-sharing-2.4.5-1.el8.noarch.rpm
         state: present
+        disable_gpg_check: True
       when:
         - ansible_facts.os_family == "RedHat"
     - name: Start qemu-guest-agent service

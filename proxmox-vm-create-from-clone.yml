@@ -58,7 +58,7 @@
     
     - name: Pause for 1 minute while virtual-machine boots
       ansible.builtin.pause:
-        minutes: 5
+        minutes: 1
 
 - hosts: ubuntu_test_hosts
   become: true

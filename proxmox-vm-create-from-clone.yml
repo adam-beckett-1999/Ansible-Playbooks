@@ -1,4 +1,4 @@
-- hosts: "*"
+- hosts: proxmox_servers
   become: true
   tasks:
     - name: Clone virtual-machine from template

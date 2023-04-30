@@ -29,6 +29,7 @@
         citype: nocloud # default for linux, do not change
         ciuser: "{{ username }}" # virtual machine username
         cipassword: "{{ password }}" # virtual machine password
+        sshkeys: "{{ sshkeys }}" # configures the ssh public key
         searchdomains: 'homelab.internal' # virtual machine search domains
         nameservers: 192.168.0.210,192.168.0.1 # virtual machine nameservers
         ipconfig: 

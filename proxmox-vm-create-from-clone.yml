@@ -72,7 +72,7 @@
       when:
         - ansible_facts.os_family == "Debian"
     - name: Upgrade all packages and install kernel updates [CentOS/Rocky]
-      yum:
+      dnf:
         update_cache: yes
         update_only: yes
         name: '*'
@@ -80,7 +80,7 @@
       when:
         - ansible_facts.os_family == "RedHat"
     - name: Remove packages not needed anymore [CentOS/Rocky]
-      yum:
+      dnf:
         autoremove: yes
       when:
         - ansible_facts.os_family == "RedHat"
@@ -95,7 +95,7 @@
       when:
         - ansible_facts.os_family == "Debian"
     - name: Install required base-packages (qemu-guest-agent, cifs-utils) [CentOS/Rocky]
-      yum:
+      dnf:
         name: 
         - qemu-guest-agent
         - cifs-utils
@@ -110,7 +110,7 @@
       when:
         - ansible_facts.os_family == "Debian"
     - name: Install cockpit navigator plugin
-      yum:
+      dnf:
         name: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.8/cockpit-navigator-0.5.8-2.el8.noarch.rpm
         state: present
       when:
@@ -122,7 +122,7 @@
       when:
         - ansible_facts.os_family == "Debian"
     - name: Install cockpit file sharing plugin
-      yum:
+      dnf:
         name: https://github.com/45Drives/cockpit-file-sharing/releases/download/v2.4.5/cockpit-file-sharing-2.4.5-1.el8.noarch.rpm
         state: present
       when:

@@ -160,8 +160,8 @@
         path: /nas-01
         state: directory
         mode: '0755'
-        owner: abeckett
-        group: abeckett
+        owner: "{{ username }}"
+        group: "{{ username }}"
     - name: Mount NAS-01 network share
       ansible.posix.mount:
         src: //NAS-01.homelab.internal/Media
@@ -174,8 +174,8 @@
         path: /storage-01
         state: directory
         mode: '0755'
-        owner: abeckett
-        group: abeckett
+        owner: "{{ username }}"
+        group: "{{ username }}"
     - name: Mount STORAGE-01 network share
       ansible.posix.mount:
         src: //STORAGE-01.homelab.internal/Media

@@ -1,7 +1,7 @@
 - hosts: swarm_manager
   become: true
   tasks:
-    - name: Spin-up a Portainer 
+    - name: Spin-up a Portainer instance for management of Swarm
       docker_container:
         name: Portainer
         image: portainer/portainer-ce

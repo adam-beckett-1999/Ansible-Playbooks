@@ -15,30 +15,25 @@
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
           - portainer_data:/data
-    - name: Check if Swarm has already been Initialized
-      shell: docker node ls
-      register: swarm_status
-      ignore_errors: true
-      tags: swarm
     - name: Initialize Docker Swarm
       docker_swarm:
         state: present
         default_addr_poll: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
       when: swarm_status.rc != 0
       run_once: true
-      tags: swarm
     - name: Get the worker join-token
-      shell: docker swarm join-token --quiet worker
-      register: worker_token
-      tags: swarm
+      docker_swarm_info:
+        nodes: yes
+      register: result
+    - debug:
+        var: result.swarm_facts
 
 - hosts: swarm_nodes
   become: true
   tasks:
     - name: Add Workers to the Swarm
-      docker_swarm:
+      community.docker.docker_swarm:
         state: join
         advertise_addr: "{{ ansible_host }}"
-        join_token: "{{ hostvars['swarm_manager']['worker_token']['stdout'] }}"
-        remote_addrs: [ "{{ hostvars['swarm_manager']['ansible_default_ipv4']['address'] }}:2377" ]
-      tags: swarm
+        join_token: "{{ hostvars['swarm-manager']['worker_token']['stdout'] }}"
+        remote_addrs: [ '192.168.1.163:2377' ]

@@ -183,6 +183,18 @@
         fstype: cifs
         opts: "{{ storage_01_auth }}"
         state: mounted
+    - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
+      copy:
+        dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
+        content: |
+          [keyfile]
+          unmanaged-devices=none
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Create fake network interface to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
+      ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
+      when:
+        - ansible_facts.os_family == "Debian"
     - name: Install extra packages [Debian/Ubuntu]
       apt:
         name:

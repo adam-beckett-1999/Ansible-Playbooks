@@ -1,25 +1,17 @@
 - hosts: "*"
   become: true
   tasks:
-    - name: packages | ensure apt list dir exists
+    - name: Preliminary checks
       file:
         path: /var/lib/apt/lists/
         state: directory
         mode: 0755
-    - name: update cache
+    - name: Install all updates and auto-remove old/unused packages
       apt:
         update_cache: yes
-    - name: install all updates
-      apt:
         upgrade: dist
         autoremove: yes
         autoclean: yes
-      register: result
-    - name: List installed and updated packages
-      shell: grep -E "^$(date +%Y-%m-%d).+ (install|upgrade) " /var/log/dpkg.log |cut -d " " -f 3-5
-      register: result
-    - name: Show Output
-      debug: msg="{{ result.stdout_lines }}"
     - name: Send Mattermost alert on completion
       community.general.mattermost:
         url: https://mattermost.beckettcloud.com

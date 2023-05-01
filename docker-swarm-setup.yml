@@ -23,6 +23,7 @@
     - name: Initialize Docker Swarm
       docker_swarm:
         state: present
+        default_addr_poll: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
       when: swarm_status.rc != 0
       run_once: true
       tags: swarm
@@ -39,5 +40,5 @@
         state: join
         advertise_addr: "{{ ansible_host }}"
         join_token: "{{ hostvars['swarm-manager']['worker_token']['stdout'] }}"
-        remote_addrs: [ '192.168.0.163:2377' ]
+        remote_addrs: [ "{{ hostvars['swarm-manager']['ansible_default_ipv4']['address'] }}:2377" ]
       tags: swarm

@@ -38,6 +38,6 @@
       docker_swarm:
         state: join
         advertise_addr: "{{ ansible_host }}"
-        join_token: "{{ worker_token }}"
+        join_token: "{{ hostvars['swarm-manager']['worker_token']['stdout'] }}"
         remote_addrs: [ '192.168.0.163:2377' ]
       tags: swarm

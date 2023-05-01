@@ -143,16 +143,16 @@
         masked: no
       when:
         - ansible_facts.os_family == "Debian"
-    - name: Start cockpit [CentOS/Rocky]
-      systemd:
-        name: cockpit
-        state: started
-      when:
-        - ansible_facts.os_family == "RedHat"
     - name: Enable cockpit.socket [CentOS/Rocky]
       systemd:
         name: cockpit.socket
         enabled: yes
+      when:
+        - ansible_facts.os_family == "RedHat"
+    - name: Start cockpit [CentOS/Rocky]
+      systemd:
+        name: cockpit
+        state: started
       when:
         - ansible_facts.os_family == "RedHat"
     - name: Create NAS-01 local directory

@@ -18,7 +18,6 @@
     - name: Initialize Docker Swarm
       docker_swarm:
         state: present
-        default_addr_poll: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
       run_once: true
     - name: Get the worker join-token
       docker_swarm_info:

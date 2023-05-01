@@ -53,7 +53,7 @@
       ansible.builtin.pause:
         seconds: 30
 
-- hosts: proxmox_vms
+- hosts: docker_vms,app_vms
   become: true
   tasks:
     - name: Preliminary checks [Debian/Ubuntu]

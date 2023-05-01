@@ -1,0 +1,43 @@
+- hosts: swarm_manager
+  become: true
+  tasks:
+    - name: Spin-up a Portainer 
+      docker_container:
+        name: Portainer
+        image: portainer/portainer-ce
+        state: started
+        recreate: yes
+        restart_policy: always
+        published_ports:
+          - "8000:8000"
+          - "9000:9000"
+          - "9443:9443"
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - portainer_data:/data
+    - name: Check if Swarm has already been Initialized
+      shell: docker node ls
+      register: swarm_status
+      ignore_errors: true
+      tags: swarm
+    - name: Initialize Docker Swarm
+      docker_swarm:
+        state: present
+      when: swarm_status.rc != 0
+      run_once: true
+      tags: swarm
+    - name: Get the worker join-token
+      shell: docker swarm join-token --quiet worker
+      register: worker_token
+      tags: swarm
+
+- hosts: swarm_nodes
+  become: true
+  tasks:
+    - name: Add Workers to the Swarm
+      docker_swarm:
+        state: join
+        advertise_addr: "{{ ansible_host }}"
+        join_token: "{{ worker_token }}"
+        remote_addrs: [ '192.168.0.163:2377' ]
+      tags: swarm

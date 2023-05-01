@@ -1,4 +1,4 @@
-- hosts: "docker_vms"
+- hosts: docker_vms
   become: true
   tasks:
     - name: Install required system packages [Debian/Ubuntu]

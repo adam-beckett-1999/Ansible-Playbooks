@@ -10,6 +10,7 @@
         clone: template
         vmid: "{{ template_id }}"
         name: "{{ vm_name }}"
+        newid: "{{ vm_id }}"
         storage: pool-1
         format: raw
         timeout: 300

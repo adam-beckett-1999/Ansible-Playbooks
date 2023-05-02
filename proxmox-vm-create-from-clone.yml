@@ -50,9 +50,9 @@
         api_host: phs-hv-01
         name: "{{ vm_name }}"
         state: started
-    - name: Pause for 30 seconds while virtual-machine boots
+    - name: Pause for 60 seconds while virtual-machine boots
       ansible.builtin.pause:
-        seconds: 30
+        seconds: 60
 
 - hosts: docker_vms,app_vms
   become: true

@@ -171,7 +171,7 @@
         path: /nas-01
         fstype: nfs
         boot: true
-        opts: rw,sync
+        opts: rw,sync,hard
         state: mounted
     - name: Create STORAGE-01 local directory
       ansible.builtin.file:
@@ -186,7 +186,7 @@
         path: /storage-01
         fstype: nfs
         boot: true
-        opts: rw,sync
+        opts: rw,sync,hard
         state: mounted
     - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
       copy:

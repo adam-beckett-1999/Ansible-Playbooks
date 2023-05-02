@@ -91,6 +91,7 @@
         - qemu-guest-agent
         - cockpit
         - cifs-utils
+        - nfs-utils
         - keyutils
         state: present
       when:
@@ -100,6 +101,7 @@
         name: 
         - qemu-guest-agent
         - cifs-utils
+        - nfs-utils
         - keyutils
         - epel-release
         state: present

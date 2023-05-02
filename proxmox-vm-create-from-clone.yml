@@ -164,10 +164,11 @@
         group: "{{ username }}"
     - name: Mount NAS-01 network share
       ansible.posix.mount:
-        src: //NAS-01.homelab.internal/Media
+        src: NAS-01.homelab.internal:/Media
         path: /nas-01
-        fstype: cifs
-        opts: "{{ nas_01_auth }}"
+        fstype: nfs
+        boot: true
+        opts: rw,sync
         state: mounted
     - name: Create STORAGE-01 local directory
       ansible.builtin.file:
@@ -178,10 +179,11 @@
         group: "{{ username }}"
     - name: Mount STORAGE-01 network share
       ansible.posix.mount:
-        src: //STORAGE-01.homelab.internal/Media
+        src: STORAGE-01.homelab.internal:/Media
         path: /storage-01
-        fstype: cifs
-        opts: "{{ storage_01_auth }}"
+        fstype: nfs
+        boot: true
+        opts: rw,sync
         state: mounted
     - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
       copy:

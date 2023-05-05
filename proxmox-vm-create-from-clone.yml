@@ -68,7 +68,6 @@
       apt:
         update_cache: yes
         upgrade: dist
-        autoremove: yes
         autoclean: yes
       when:
         - ansible_facts.os_family == "Debian"

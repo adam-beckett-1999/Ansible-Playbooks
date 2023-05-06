@@ -50,19 +50,13 @@
         api_host: phs-hv-01
         name: "{{ vm_name }}"
         state: started
-    - name: Pause for 60 seconds while virtual-machine boots
+    - name: Pause for 2 minutes while virtual-machine boots
       ansible.builtin.pause:
-        seconds: 60
+        seconds: 120
 
 - hosts: docker_vms,app_vms
   become: true
   tasks:
-    - name: Reboot systems
-      reboot:
-        post_reboot_delay: 60
-        test_command: uptime
-      when:
-        - ansible_facts.os_family == "Debian" or ansible_facts.os_family == "RedHat"
     - name: Preliminary checks [Debian/Ubuntu]
       file:
         path: /var/lib/apt/lists/

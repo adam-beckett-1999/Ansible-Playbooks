@@ -63,10 +63,6 @@
         test_command: uptime
       when:
         - ansible_facts.os_family == "Debian" or ansible_facts.os_family == "RedHat"
-    - name: Run dpkg configure [Debian/Ubuntu]
-      ansible.builtin.command: sudo dpkg --configure -a
-      when:
-        - ansible_facts.os_family == "Debian"
     - name: Preliminary checks [Debian/Ubuntu]
       file:
         path: /var/lib/apt/lists/

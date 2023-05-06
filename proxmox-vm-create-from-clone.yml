@@ -171,9 +171,6 @@
       ansible.builtin.file:
         path: /nas-01
         state: directory
-        mode: '0755'
-        owner: "{{ username }}"
-        group: "{{ username }}"
     - name: Mount NAS-01 network share
       ansible.posix.mount:
         src: NAS-01.homelab.internal:/volume1/Media
@@ -186,9 +183,6 @@
       ansible.builtin.file:
         path: /storage-01
         state: directory
-        mode: '0755'
-        owner: "{{ username }}"
-        group: "{{ username }}"
     - name: Mount STORAGE-01 network share
       ansible.posix.mount:
         src: STORAGE-01.homelab.internal:/mnt/user/media

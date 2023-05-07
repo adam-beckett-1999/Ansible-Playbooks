@@ -1,20 +1,6 @@
 - hosts: swarm_manager
   become: true
   tasks:
-    - name: Spin-up a Portainer instance for management of Swarm
-      docker_container:
-        name: Portainer
-        image: portainer/portainer-ce
-        state: started
-        recreate: yes
-        restart_policy: always
-        published_ports:
-          - "8000:8000"
-          - "9000:9000"
-          - "9443:9443"
-        volumes:
-          - /var/run/docker.sock:/var/run/docker.sock
-          - portainer_data:/data
     - name: Check if Swarm has already been Initialized
       shell: docker node ls
       register: swarm_status

@@ -15,7 +15,7 @@
         state: present
         name: load-balancer
         compose:
-          - /opt/load-balancer-compose.yml
+          - /opt/docker-compose.yml
           - version: "3"
             services:
               loadbalancer:

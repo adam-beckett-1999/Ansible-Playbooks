@@ -1,7 +1,7 @@
 - hosts: loadbalancer
   become: true
   tasks:
-    - name: Deploy NGINX load-balancer
+    - name: Deploy the Portainer Agent to the host
       community.docker.docker_container:
         name: Portainer-Agent
         image: portainer/agent:2.18.2

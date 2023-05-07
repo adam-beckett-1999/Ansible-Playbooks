@@ -37,9 +37,9 @@
         name: VM-SWARM-03
         state: stopped
         force: true
-    - name: Pause for 30 seconds while virtual-machines stop
+    - name: Pause for 10 seconds while virtual-machines stop
       ansible.builtin.pause:
-        seconds: 30
+        seconds: 10
     - name: Remove VM-LB-01
       community.general.proxmox_kvm:
         node: phs-hv-01

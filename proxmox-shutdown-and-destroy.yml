@@ -1,0 +1,74 @@
+- hosts: proxmox_servers
+  become: true
+  tasks:
+    - name: Stop VM-LB-01
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-LB-01
+        state: stopped
+        force: true
+    - name: Stop VM-SWARM-01
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-01
+        state: stopped
+        force: true
+    - name: Stop VM-SWARM-02
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-02
+        state: stopped
+        force: true
+    - name: Stop VM-SWARM-03
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-03
+        state: stopped
+        force: true
+    - name: Pause for 30 seconds while virtual-machines stop
+      ansible.builtin.pause:
+        seconds: 30
+    - name: Remove VM-LB-01
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-LB-01
+        state: absent
+    - name: Remove VM-SWARM-01
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-01
+        state: absent
+    - name: Remove VM-SWARM-02
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-02
+        state: absent
+    - name: Remove VM-SWARM-03
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-03
+        state: absent

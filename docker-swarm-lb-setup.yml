@@ -54,5 +54,5 @@
         - 11010:11010
         - 11011:11011
         - 11012:11012
-        restart: always
+        restart_policy: always
         

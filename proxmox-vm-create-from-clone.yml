@@ -404,7 +404,9 @@
       when:
         - ansible_facts.os_family == "Debian"
     - name: Add GPG key for GlusterFS repository [Debian/Ubuntu]
-      ansible.builtin.command: wget -O - https://download.gluster.org/pub/gluster/glusterfs/7/rsa.pub | apt-key add -
+      ansible.builtin.command:
+        wget -O - https://download.gluster.org/pub/gluster/glusterfs/7/rsa.pub
+        apt-key add -
       when:
         - ansible_facts.os_family == "Debian"
     - name: Add GlusterFS repository [Debian/Ubuntu]

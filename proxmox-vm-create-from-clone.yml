@@ -1,6 +1,7 @@
 - hosts: proxmox_servers
   become: true
   tasks:
+    ### VM-LB-01 ###
     - name: Clone virtual-machine from template
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -8,9 +9,9 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         clone: template
-        vmid: "{{ template_id }}"
-        name: "{{ vm_name }}"
-        newid: "{{ vm_id }}"
+        vmid: 1000
+        name: VM-LB-01
+        newid: 200
         storage: pool-1
         format: raw
         timeout: 300
@@ -20,10 +21,10 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: "{{ vm_name }}"
-        tags: "{{ tags }}"
-        cores: "{{ cores }}"
-        memory: "{{ memory }}"
+        name: VM-LB-01
+        tags: load-balancer,docker
+        cores: 2
+        memory: 2048
         citype: nocloud
         ciuser: "{{ username }}"
         cipassword: "{{ password }}"
@@ -31,16 +32,16 @@
         searchdomains: 'homelab.internal'
         nameservers: 192.168.0.210,192.168.0.1
         ipconfig: 
-          ipconfig0: "{{ ip_address }}"
+          ipconfig0: gw=192.168.0.1,ip=192.168.0.160/24
         update: true
     - name: Re-size virtual-machine disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: "{{ vm_name }}"
+        name: VM-LB-01
         disk: scsi0
-        size: "{{ disk_size }}"
+        size: 100G
         state: resized
     - name: Start virtual-machine
       community.general.proxmox_kvm:
@@ -48,7 +49,169 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: "{{ vm_name }}"
+        name: VM-LB-01
+        state: started
+    - name: Pause for 2 minutes while virtual-machine boots
+      ansible.builtin.pause:
+        seconds: 120
+
+    ### VM-SWARM-01 ###
+    - name: Clone virtual-machine from template
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        clone: template
+        vmid: 1000
+        name: VM-SWARM-01
+        newid: 201
+        storage: pool-1
+        format: raw
+        timeout: 300
+    - name: Edit new virtual-machine with new cloud-init parameters
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-01
+        tags: docker,media-management,app-server
+        cores: 2
+        memory: 4096
+        citype: nocloud
+        ciuser: "{{ username }}"
+        cipassword: "{{ password }}"
+        sshkeys: "{{ sshkeys }}"
+        searchdomains: 'homelab.internal'
+        nameservers: 192.168.0.210,192.168.0.1
+        ipconfig: 
+          ipconfig0: gw=192.168.0.1,ip=192.168.0.161/24
+        update: true
+    - name: Re-size virtual-machine disk
+      community.general.proxmox_disk:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-01
+        disk: scsi0
+        size: 100G
+        state: resized
+    - name: Start virtual-machine
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-01
+        state: started
+    - name: Pause for 2 minutes while virtual-machine boots
+      ansible.builtin.pause:
+        seconds: 120
+    
+    ### VM-SWARM-02 ###
+    - name: Clone virtual-machine from template
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        clone: template
+        vmid: 1000
+        name: VM-SWARM-02
+        newid: 202
+        storage: pool-1
+        format: raw
+        timeout: 300
+    - name: Edit new virtual-machine with new cloud-init parameters
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-02
+        tags: docker,web-services,smart-home,app-server
+        cores: 2
+        memory: 4096
+        citype: nocloud
+        ciuser: "{{ username }}"
+        cipassword: "{{ password }}"
+        sshkeys: "{{ sshkeys }}"
+        searchdomains: 'homelab.internal'
+        nameservers: 192.168.0.210,192.168.0.1
+        ipconfig: 
+          ipconfig0: gw=192.168.0.1,ip=192.168.0.162/24
+        update: true
+    - name: Re-size virtual-machine disk
+      community.general.proxmox_disk:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-02
+        disk: scsi0
+        size: 100G
+        state: resized
+    - name: Start virtual-machine
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-02
+        state: started
+    - name: Pause for 2 minutes while virtual-machine boots
+      ansible.builtin.pause:
+        seconds: 120
+
+    ### VM-SWARM-03 ###
+    - name: Clone virtual-machine from template
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        clone: template
+        vmid: 1000
+        name: VM-SWARM-03
+        newid: 203
+        storage: pool-1
+        format: raw
+        timeout: 300
+    - name: Edit new virtual-machine with new cloud-init parameters
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-03
+        tags: docker,rev-proxy,monitoring,app-server
+        cores: 2
+        memory: 4096
+        citype: nocloud
+        ciuser: "{{ username }}"
+        cipassword: "{{ password }}"
+        sshkeys: "{{ sshkeys }}"
+        searchdomains: 'homelab.internal'
+        nameservers: 192.168.0.210,192.168.0.1
+        ipconfig: 
+          ipconfig0: gw=192.168.0.1,ip=192.168.0.163/24
+        update: true
+    - name: Re-size virtual-machine disk
+      community.general.proxmox_disk:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-03
+        disk: scsi0
+        size: 100G
+        state: resized
+    - name: Start virtual-machine
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-03
         state: started
     - name: Pause for 2 minutes while virtual-machine boots
       ansible.builtin.pause:

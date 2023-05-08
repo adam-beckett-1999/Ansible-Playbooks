@@ -10,6 +10,7 @@
         name: VM-LB-01
         state: stopped
         force: true
+        timeout: 300
     - name: Stop VM-SWARM-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -19,6 +20,7 @@
         name: VM-SWARM-01
         state: stopped
         force: true
+        timeout: 300
     - name: Stop VM-SWARM-02
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -28,6 +30,7 @@
         name: VM-SWARM-02
         state: stopped
         force: true
+        timeout: 300
     - name: Stop VM-SWARM-03
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -37,6 +40,7 @@
         name: VM-SWARM-03
         state: stopped
         force: true
+        timeout: 300
     - name: Pause for 10 seconds while virtual-machines stop
       ansible.builtin.pause:
         seconds: 10

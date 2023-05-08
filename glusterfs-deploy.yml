@@ -1,0 +1,27 @@
+- hosts: loadbalancer
+  become: true
+  tasks:
+    - name: Create a trusted storage pool
+      gluster.gluster.gluster_peer:
+        state: present
+        nodes:
+          - 192.168.0.161
+          - 192.168.0.162
+          - 192.168.0.163
+    - name: Create GlusterFS volume
+      gluster.gluster.gluster_volume:
+        state: present
+        name: gv0
+        replicas: 4
+        bricks: /glusterfs/bricks/gv0
+        cluster:
+          - 192.168.0.160
+          - 192.168.0.161
+          - 192.168.0.162
+          - 192.168.0.163
+        force: true
+      run_once: true
+    - name: Start GlusterFS volume
+      gluster.gluster.gluster_volume:
+        state: started
+        name: gv0

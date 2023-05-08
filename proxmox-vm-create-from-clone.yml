@@ -192,23 +192,21 @@
 
 
 
-    - name: Add GPG Key for GlusterFS repository [Debian/Ubuntu]
-      ansible.builtin.command: wget -O - https://download.gluster.org/pub/gluster/glusterfs/9/rsa.pub | apt-key add -
+    - name: Install software-properties-common [Debian/Ubuntu]
+      apt:
+        name:
+        - software-properties-common
+        state: present
       when:
         - ansible_facts.os_family == "Debian"
     - name: Add GlusterFS repository [Debian/Ubuntu]
-      ansible.builtin.command:
-        DEBID=$(grep 'VERSION_ID=' /etc/os-release | cut -d '=' -f 2 | tr -d '"')
-        DEBVER=$(grep 'VERSION=' /etc/os-release | grep -Eo '[a-z]+')
-        DEBARCH=$(dpkg --print-architecture)
-        echo deb https://download.gluster.org/pub/gluster/glusterfs/LATEST/Debian/${DEBID}/${DEBARCH}/apt ${DEBVER} main > /etc/apt/sources.list.d/gluster.list
+      ansible.builtin.command: add-apt-repository ppa:gluster/glusterfs-7
       when:
         - ansible_facts.os_family == "Debian"
     - name: Install GlusterFS [Debian/Ubuntu]
       apt:
         name:
         - glusterfs-server
-        - software-properties-common
         state: present
         update_cache: yes
       when:

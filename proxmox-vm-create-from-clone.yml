@@ -410,11 +410,9 @@
       when:
         - ansible_facts.os_family == "Debian"
     - name: Add GlusterFS repository [Debian/Ubuntu]
-      ansible.builtin.command:
-        DEBID=$(grep 'VERSION_ID=' /etc/os-release | cut -d '=' -f 2 | tr -d '"')
-        DEBVER=$(grep 'VERSION=' /etc/os-release | grep -Eo '[a-z]+')
-        DEBARCH=$(dpkg --print-architecture)
-        echo deb https://download.gluster.org/pub/gluster/glusterfs/LATEST/Debian/${DEBID}/${DEBARCH}/apt ${DEBVER} main > /etc/apt/sources.list.d/gluster.list
+      apt_repository:
+        repo: deb https://download.gluster.org/pub/gluster/glusterfs/LATEST/Debian/bullseye/amd64/apt focal main
+        state: present
       when:
         - ansible_facts.os_family == "Debian"
     - name: Install GlusterFS [Debian/Ubuntu]

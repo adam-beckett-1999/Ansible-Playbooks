@@ -207,9 +207,9 @@
         api_host: phs-hv-01
         name: VM-SWARM-03
         state: started
-    - name: Pause for 2 minutes
+    - name: Pause for 5 minutes
       ansible.builtin.pause:
-        seconds: 120
+        seconds: 300
 
 
 ################################################## UPDATE PACKAGES ###################################################

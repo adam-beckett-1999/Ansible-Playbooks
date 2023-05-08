@@ -685,18 +685,16 @@
 - hosts: swarm_manager
   become: true
   tasks:
-    - name: Create portainer_agent network
-      docker_network:
-        name: portainer_agent_network
-        driver: overlay
     - name: Start portainer_agent service
       docker_swarm_service:
         name: portainer_agent
         image: portainer/agent:2.18.2
         networks:
           - portainer_agent_network
-        publish: 
-          - 9001:9001/tcp
+        publish:
+          - published_port: 9001
+            target_port: 9001
+            protocol: tcp
         mode: global
         placement:
           constraints:

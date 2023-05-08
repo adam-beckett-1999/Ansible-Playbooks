@@ -7,8 +7,7 @@
         image: portainer/agent:2.18.2
         networks:
           - portainer_agent_network
-        publish: 
-          - 9001:9001/tcp
+        publish: 9001:9001/tcp
         mode: global
         placement:
           constraints:

@@ -427,7 +427,7 @@
         state: started
     - name: Create GlusterFS brick-1 directory
       ansible.builtin.file:
-        path: /glusterfs/bricks/docker-brick
+        path: /glusterfs/bricks/
         state: directory
 
 
@@ -447,7 +447,7 @@
         state: present
         name: docker-brick
         replicas: 1
-        bricks: /glusterfs/bricks/docker-brick
+        bricks: /glusterfs/bricks/g1
         cluster:
           - 192.168.0.161
           - 192.168.0.162

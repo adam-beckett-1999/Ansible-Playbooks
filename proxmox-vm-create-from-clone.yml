@@ -55,7 +55,7 @@
         seconds: 120
 
 
-
+################################################## UPDATE PACKAGES ###################################################
 - hosts: docker_vms,app_vms
   become: true
   tasks:
@@ -88,7 +88,7 @@
         - ansible_facts.os_family == "RedHat"
 
 
-
+############################### INSTALL BASE PACKAGES [qemu-guest-agent, cockpit & addons] ###########################
     - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common) [Debian/Ubuntu]
       apt:
         name:
@@ -164,7 +164,7 @@
         - ansible_facts.os_family == "RedHat"
 
 
-
+################################################ CONFIGURE NETWORK SHARES ############################################
     - name: Create NAS-01 local directory
       ansible.builtin.file:
         path: /nas-01
@@ -191,36 +191,7 @@
         state: mounted
 
 
-
-    - name: Install software-properties-common [Debian/Ubuntu]
-      apt:
-        name:
-        - software-properties-common
-        state: present
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Add GlusterFS repository [Debian/Ubuntu]
-      ansible.builtin.command: add-apt-repository ppa:gluster/glusterfs-7
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install GlusterFS [Debian/Ubuntu]
-      apt:
-        name:
-        - glusterfs-server
-        state: present
-        update_cache: yes
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install GlusterFS [CentOS/Rocky]
-      dnf:
-        name: 
-        - glusterfs-server
-        state: present
-      when:
-        - ansible_facts.os_family == "RedHat"
-
-
-
+############################################# FIX COCKPIT UPDATE PLUGIN ##############################################
     - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
       copy:
         dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
@@ -235,7 +206,7 @@
         - ansible_facts.os_family == "Debian"
 
 
-
+################################################## EXTRA PACKAGES ####################################################
     - name: Install extra packages [Debian/Ubuntu]
       apt:
         name:
@@ -252,10 +223,71 @@
         - ansible_facts.os_family == "RedHat"
 
 
-        
+###################################################### REBOOT ########################################################
     - name: Reboot systems
       reboot:
         post_reboot_delay: 60
         test_command: uptime
       when:
         - ansible_facts.os_family == "Debian" or ansible_facts.os_family == "RedHat"
+
+
+################################################# INSTALL GLUSTERFS ##################################################
+- hosts: docker_vms
+  become: true
+  tasks:
+    - name: Install software-properties-common [Debian/Ubuntu]
+      apt:
+        name:
+        - software-properties-common
+        state: present
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Add GlusterFS repository [Debian/Ubuntu]
+      ansible.builtin.command: add-apt-repository ppa:gluster/glusterfs-7
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Install GlusterFS [Debian/Ubuntu]
+      apt:
+        name:
+        - glusterfs-server
+        - glusterfs-client
+        state: present
+        update_cache: yes
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Install GlusterFS [CentOS/Rocky]
+      dnf:
+        name: 
+        - glusterfs-server
+        - glusterfs-client
+        state: present
+      when:
+        - ansible_facts.os_family == "RedHat"
+    - name: Start glusterd service
+      systemd:
+        name: glusterd
+        enabled: yes
+        state: started
+    - name: Create GlusterFS brick-1 directory
+      ansible.builtin.file:
+        path: /glusterfs/brick-1
+        state: directory
+
+
+############################################## CREATE GLUSTERFS VOLUME ###############################################
+- hosts: loadbalancer
+  become: true
+  tasks:
+    - name: Create GlusterFS volume
+      gluster.gluster.gluster_volume:
+        state: present
+        name: docker-storage
+        force: true
+        replicas: 4
+        bricks: /glusterfs/brick-1
+        cluster:
+          - 192.168.0.161
+          - 192.168.0.162
+          - 192.168.0.163
+      run_once: true

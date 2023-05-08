@@ -207,9 +207,9 @@
         api_host: phs-hv-01
         name: VM-SWARM-03
         state: started
-    - name: Pause for 5 minutes
+    - name: Pause for 3 minutes
       ansible.builtin.pause:
-        seconds: 300
+        seconds: 180
 
 
 ################################################## UPDATE PACKAGES ###################################################
@@ -404,7 +404,7 @@
       when:
         - ansible_facts.os_family == "Debian"
     - name: Add GPG key for GlusterFS repository [Debian/Ubuntu]
-      ansible.builtin.command: wget -O - https://download.gluster.org/pub/gluster/glusterfs/9/rsa.pub | apt-key add -
+      ansible.builtin.command: wget -O - https://download.gluster.org/pub/gluster/glusterfs/7/rsa.pub | apt-key add -
       when:
         - ansible_facts.os_family == "Debian"
     - name: Add GlusterFS repository [Debian/Ubuntu]

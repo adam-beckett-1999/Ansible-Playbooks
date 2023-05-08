@@ -54,6 +54,8 @@
       ansible.builtin.pause:
         seconds: 120
 
+
+
 - hosts: docker_vms,app_vms
   become: true
   tasks:
@@ -84,6 +86,9 @@
         autoremove: yes
       when:
         - ansible_facts.os_family == "RedHat"
+
+
+
     - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common) [Debian/Ubuntu]
       apt:
         name:
@@ -157,6 +162,9 @@
         state: started
       when:
         - ansible_facts.os_family == "RedHat"
+
+
+
     - name: Create NAS-01 local directory
       ansible.builtin.file:
         path: /nas-01
@@ -181,6 +189,33 @@
         boot: true
         opts: rw,sync,hard
         state: mounted
+
+
+
+    - name: Add GPG Key for GlusterFS repository [Debian/Ubuntu]
+      ansible.builtin.command: wget -O - https://download.gluster.org/pub/gluster/glusterfs/9/rsa.pub | apt-key add -
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Add GlusterFS repository [Debian/Ubuntu]
+      ansible.builtin.command:
+        DEBID=$(grep 'VERSION_ID=' /etc/os-release | cut -d '=' -f 2 | tr -d '"')
+        DEBVER=$(grep 'VERSION=' /etc/os-release | grep -Eo '[a-z]+')
+        DEBARCH=$(dpkg --print-architecture)
+        echo deb https://download.gluster.org/pub/gluster/glusterfs/LATEST/Debian/${DEBID}/${DEBARCH}/apt ${DEBVER} main > /etc/apt/sources.list.d/gluster.list
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Install GlusterFS [Debian/Ubuntu]
+      apt:
+        name:
+        - glusterfs-server
+        - software-properties-common
+        state: present
+        update_cache: yes
+      when:
+        - ansible_facts.os_family == "Debian"
+
+
+
     - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
       copy:
         dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
@@ -193,6 +228,9 @@
       ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
       when:
         - ansible_facts.os_family == "Debian"
+
+
+
     - name: Install extra packages [Debian/Ubuntu]
       apt:
         name:
@@ -207,6 +245,9 @@
         state: present
       when:
         - ansible_facts.os_family == "RedHat"
+
+
+        
     - name: Reboot systems
       reboot:
         post_reboot_delay: 60

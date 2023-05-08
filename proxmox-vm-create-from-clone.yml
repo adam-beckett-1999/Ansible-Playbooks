@@ -431,7 +431,7 @@
         state: directory
 
 
-############################################## CREATE GLUSTERFS VOLUME ###############################################
+########################################## CREATE GLUSTERFS VOLUME AND MOUNT #########################################
 - hosts: loadbalancer
   become: true
   tasks:

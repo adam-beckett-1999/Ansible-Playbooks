@@ -8,7 +8,9 @@
         networks:
           - portainer_agent_network
         publish:
-          - 9001:9001/tcp
+          - published_port: 9001
+            target_port: 9001
+            protocol: tcp
         mode: global
         placement:
           constraints:

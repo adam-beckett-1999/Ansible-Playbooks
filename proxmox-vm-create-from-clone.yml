@@ -427,7 +427,7 @@
         state: started
     - name: Create GlusterFS brick-1 directory
       ansible.builtin.file:
-        path: /glusterfs/bricks/brick1
+        path: /glusterfs/bricks/docker-brick
         state: directory
 
 
@@ -445,16 +445,19 @@
     - name: Create GlusterFS volume
       gluster.gluster.gluster_volume:
         state: present
-        name: brick1
+        name: docker-brick
         replicas: 4
-        bricks: /glusterfs/bricks/brick1
+        bricks: /glusterfs/bricks/docker-brick
         cluster:
           - 192.168.0.161
           - 192.168.0.162
           - 192.168.0.163
         force: true
       run_once: true
-
+    - name: Start GlusterFS volume
+      gluster.gluster.gluster_volume:
+        state: started
+        name: docker-brick
 
 ########################################### INSTALL DOCKER & PYTHON MODULE ###########################################
 - hosts: docker_vms

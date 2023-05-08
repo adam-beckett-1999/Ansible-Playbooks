@@ -446,7 +446,7 @@
       gluster.gluster.gluster_volume:
         state: present
         name: docker-brick
-        replicas: 4
+        replicas: 1
         bricks: /glusterfs/bricks/docker-brick
         cluster:
           - 192.168.0.161

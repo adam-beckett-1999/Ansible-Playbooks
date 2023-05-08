@@ -34,6 +34,7 @@
         ipconfig: 
           ipconfig0: gw=192.168.0.1,ip=192.168.0.160/24
         update: true
+        timeout: 300
     - name: Re-size VM-LB-01 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -43,6 +44,7 @@
         disk: scsi0
         size: 100G
         state: resized
+        timeout: 300
     - name: Start VM-LB-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -51,6 +53,7 @@
         api_host: phs-hv-01
         name: VM-LB-01
         state: started
+        timeout: 300
 
 
     ### VM-SWARM-01 ###
@@ -86,6 +89,7 @@
         ipconfig: 
           ipconfig0: gw=192.168.0.1,ip=192.168.0.161/24
         update: true
+        timeout: 300
     - name: Re-size VM-SWARM-01 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -95,6 +99,7 @@
         disk: scsi0
         size: 100G
         state: resized
+        timeout: 300
     - name: Start VM-SWARM-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -103,6 +108,7 @@
         api_host: phs-hv-01
         name: VM-SWARM-01
         state: started
+        timeout: 300
 
     
     ### VM-SWARM-02 ###
@@ -138,6 +144,7 @@
         ipconfig: 
           ipconfig0: gw=192.168.0.1,ip=192.168.0.162/24
         update: true
+        timeout: 300
     - name: Re-size VM-SWARM-02 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -147,6 +154,7 @@
         disk: scsi0
         size: 100G
         state: resized
+        timeout: 300
     - name: Start VM-SWARM-02
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -155,6 +163,7 @@
         api_host: phs-hv-01
         name: VM-SWARM-02
         state: started
+        timeout: 300
 
 
     ### VM-SWARM-03 ###
@@ -190,6 +199,7 @@
         ipconfig: 
           ipconfig0: gw=192.168.0.1,ip=192.168.0.163/24
         update: true
+        timeout: 300
     - name: Re-size VM-SWARM-03 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -199,6 +209,7 @@
         disk: scsi0
         size: 100G
         state: resized
+        timeout: 300
     - name: Start VM-SWARM-03
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -207,6 +218,7 @@
         api_host: phs-hv-01
         name: VM-SWARM-03
         state: started
+        timeout: 300
     - name: Pause for 3 minutes
       ansible.builtin.pause:
         seconds: 180

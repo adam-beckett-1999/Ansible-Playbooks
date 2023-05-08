@@ -460,6 +460,60 @@
         state: started
         name: gv0
 
+- hosts: loadbalancer
+  become: true
+  tasks:
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: VM-LB-01.homelab.internal:/gv0
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+- hosts: swarm_manager
+  become: true
+  tasks:
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: VM-SWARM-03.homelab.internal:/gv0
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+- hosts: swarm_1
+  become: true
+  tasks:
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: VM-SWARM-01.homelab.internal:/gv0
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+- hosts: swarm_2
+  become: true
+  tasks:
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: VM-SWARM-02.homelab.internal:/gv0
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+
+
 ########################################### INSTALL DOCKER & PYTHON MODULE ###########################################
 - hosts: docker_vms
   become: true

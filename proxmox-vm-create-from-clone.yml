@@ -435,10 +435,17 @@
 - hosts: loadbalancer
   become: true
   tasks:
+    - name: Create a trusted storage pool
+      gluster.gluster.gluster_peer:
+        state: present
+        nodes:
+          - 192.168.0.161
+          - 192.168.0.162
+          - 192.168.0.163
     - name: Create GlusterFS volume
       gluster.gluster.gluster_volume:
         state: present
-        name: docker-storage
+        name: brick1
         replicas: 4
         bricks: /glusterfs/bricks/brick1
         cluster:

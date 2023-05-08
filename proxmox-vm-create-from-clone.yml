@@ -763,3 +763,29 @@
         - 15011:15011
         - 15012:15012
         restart_policy: always
+- hosts: swarm_manager
+  become: true
+  tasks:
+    - name: Create portainer_agent network
+      docker_network:
+        name: portainer_agent_network
+        driver: overlay
+    - name: Start portainer_agent service
+      docker_swarm_service:
+        name: portainer_agent
+        image: portainer/agent:2.18.2
+        networks:
+          - portainer_agent_network
+        publish:
+          - 9001:9001
+        mode: global
+        placement:
+          constraints:
+            - node.platform.os == linux
+        mounts:
+          - source: //var/run/docker.sock
+            target: /var/run/docker.sock
+            type: bind
+          - source: //var/lib/docker/volumes
+            target: /var/lib/docker/volumes
+            type: bind

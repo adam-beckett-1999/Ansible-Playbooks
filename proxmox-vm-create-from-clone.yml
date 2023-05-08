@@ -445,7 +445,7 @@
     - name: Create GlusterFS volume
       gluster.gluster.gluster_volume:
         state: present
-        name: docker-brick
+        name: gv0
         replicas: 4
         bricks: /glusterfs/bricks/gv0
         cluster:
@@ -458,7 +458,7 @@
     - name: Start GlusterFS volume
       gluster.gluster.gluster_volume:
         state: started
-        name: docker-brick
+        name: gv0
 
 ########################################### INSTALL DOCKER & PYTHON MODULE ###########################################
 - hosts: docker_vms

@@ -682,6 +682,21 @@
         - 14000-14012:14000-14012
         - 15000-15012:15000-15012
         restart_policy: always
+    - name: Deploy File-Manager for GlusterFS volume
+      community.docker.docker_container:
+        name: File-Manager
+        image: hurlenko/filebrowser
+        state: started
+        volumes:
+          - /nas-01/Container-configs/file-browser-glusterfs:/config
+          - /mnt/gluster:/data
+        ports:
+          - 9002:8080
+        environment:
+          - PUID=1000
+          - PGID=1000
+          - TZ=Europe/London
+        restart_policy: always
 - hosts: swarm_manager
   become: true
   tasks:

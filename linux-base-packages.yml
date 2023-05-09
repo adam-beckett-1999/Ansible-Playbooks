@@ -1,3 +1,4 @@
+############################### INSTALL BASE PACKAGES [qemu-guest-agent, cockpit & addons] ###########################
 - hosts: "*"
   become: true
   tasks:    

@@ -1,0 +1,120 @@
+################################################# INSTALL GLUSTERFS ##################################################
+- hosts: "*"
+  become: true
+  tasks:
+    - name: Install software-properties-common [Debian/Ubuntu]
+      apt:
+        name:
+        - software-properties-common
+        state: present
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Install GlusterFS [Debian/Ubuntu]
+      apt:
+        name:
+        - glusterfs-server
+        - glusterfs-client
+        state: present
+        update_cache: yes
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Install GlusterFS [CentOS/Rocky]
+      dnf:
+        name: 
+        - glusterfs-server
+        - glusterfs-client
+        state: present
+      when:
+        - ansible_facts.os_family == "RedHat"
+    - name: Start glusterd service
+      systemd:
+        name: glusterd
+        enabled: yes
+        state: started
+    ### Ensure that a directory for the brick is created on each node ###
+    - name: Create GlusterFS brick-1 directory
+      ansible.builtin.file:
+        path: /glusterfs/bricks/gv0
+        state: directory
+
+########################################## CREATE GLUSTERFS VOLUME AND MOUNT #########################################
+- hosts: "*"
+  become: true
+  tasks:
+    - name: Create a trusted storage pool
+      gluster.gluster.gluster_peer:
+        state: present
+        nodes:
+          - # ip address of first remote node
+          - # ip address of second remote node
+          - # ip address of third remote node
+    - name: Create GlusterFS volume
+      gluster.gluster.gluster_volume:
+        state: present
+        name: gv0
+        replicas: 4 # number of replicas based on number of servers in gluster trusted pool
+        bricks: /glusterfs/bricks/gv0
+        cluster:
+          - # ip address of node that is running the create command
+          - # ip address of first remote node
+          - # ip address of second remote node
+          - # ip address of third remote node
+        force: true
+      run_once: true
+    - name: Start GlusterFS volume
+      gluster.gluster.gluster_volume:
+        state: started
+        name: gv0
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume # mount to glusterfs controller
+      ansible.posix.mount:
+        src: # ip address of node that is running the create command:/gv0
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+
+### mount to next node ###
+- hosts: "*"                                                  ### COPY PASTE THIS SECTION AND CONFIGURE FOR INDIVIDUAL 
+  become: true                                                ### NODES BASED ON THE NUMBER SETUP IN CREATE STAGE
+  tasks:
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: # ip address of first remote node:/gv0
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+### mount to next node ###
+- hosts: "*"
+  become: true
+  tasks:
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: # ip address of second remote node:/gv0
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+### mount to next node ###
+- hosts: "*"
+  become: true
+  tasks:
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: # ip address of third remote node:/gv0
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted

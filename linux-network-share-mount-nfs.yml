@@ -1,0 +1,27 @@
+- hosts: "*"
+  become: true
+  tasks:   
+    - name: Create NAS-01 local directory
+      ansible.builtin.file:
+        path: /nas-01
+        state: directory
+    - name: Mount NAS-01 network share
+      ansible.posix.mount:
+        src: NAS-01.homelab.internal:/volume1/Media
+        path: /nas-01
+        fstype: nfs
+        boot: true
+        opts: rw,sync,hard
+        state: mounted
+    - name: Create STORAGE-01 local directory
+      ansible.builtin.file:
+        path: /storage-01
+        state: directory
+    - name: Mount STORAGE-01 network share
+      ansible.posix.mount:
+        src: STORAGE-01.homelab.internal:/mnt/user/media
+        path: /storage-01
+        fstype: nfs
+        boot: true
+        opts: rw,sync,hard
+        state: mounted

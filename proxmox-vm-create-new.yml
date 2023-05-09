@@ -7,27 +7,19 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: "{{ vm_name }}"
-        tags: "{{ tags }}"
+        name: "{{ vm_name }}" # name of virtual-machine
+        tags: "{{ tags }}" # tags within proxmox web-ui 'web-server,docker,linux'
         ostype: l26
         cpu: kvm64
         sockets: 2
-        cores: "{{ cores }}"
-        memory: "{{ memory }}"
+        cores: "{{ cores }}" # 2,4 etc
+        memory: "{{ memory }}" # 2048,4096 etc
         agent: 'enabled=1'
         scsihw: virtio-scsi-pci
         scsi:
-          scsi0: "{{ storage }}"
+          scsi0: "{{ storage }}" # pool-1:100,format=raw '100' being size of disk
         ide:
-          ide0: "{{ iso }}"
+          ide0: "{{ iso }}" # ISOs:iso/UBUNTU-22.04.2.iso,media=cdrom
         net:
           net0: 'virtio,bridge=vmbr0,firewall=1'
         timeout: 90
-    - name: Start virtual-machine
-      community.general.proxmox_kvm:
-        node: phs-hv-01
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        api_host: phs-hv-01
-        name: "{{ vm_name }}"
-        state: started

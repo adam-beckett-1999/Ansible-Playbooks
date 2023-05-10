@@ -45,7 +45,7 @@
         api_host: phs-hv-01
         name: VM-LB-01
         disk: scsi0
-        size: 100G
+        size: 50G
         state: resized
         timeout: 300
     - name: Start VM-LB-01
@@ -103,7 +103,7 @@
         api_host: phs-hv-01
         name: VM-SWARM-01
         disk: scsi0
-        size: 100G
+        size: 50G
         state: resized
         timeout: 300
     - name: Start VM-SWARM-01
@@ -161,7 +161,7 @@
         api_host: phs-hv-01
         name: VM-SWARM-02
         disk: scsi0
-        size: 100G
+        size: 50G
         state: resized
         timeout: 300
     - name: Start VM-SWARM-02
@@ -219,7 +219,7 @@
         api_host: phs-hv-01
         name: VM-SWARM-03
         disk: scsi0
-        size: 100G
+        size: 50G
         state: resized
         timeout: 300
     - name: Start VM-SWARM-03

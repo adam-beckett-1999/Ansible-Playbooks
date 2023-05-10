@@ -705,9 +705,9 @@
         ports:
           - 9002:8080
         env:
-          PUID: 1000
-          PGID: 1000
-          TZ: Europe/London
+          "PUID: 1000"
+          "PGID: 1000"
+          "TZ: Europe/London"
         restart_policy: always
 - hosts: swarm_manager
   become: true

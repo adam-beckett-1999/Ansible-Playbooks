@@ -88,6 +88,9 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.160/24
         update: true
         timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
     - name: Edit VM-SWARM-01 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -108,6 +111,9 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.161/24
         update: true
         timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
     - name: Edit VM-SWARM-02 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -128,6 +134,9 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.162/24
         update: true
         timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
     - name: Edit VM-SWARM-03 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -148,6 +157,9 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.163/24
         update: true
         timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
 
 ################################################################ RESIZE VIRTUAL-MACHINE DISKS #################################################################
     - name: Re-size VM-LB-01 disk
@@ -160,6 +172,9 @@
         size: 50G
         state: resized
         timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
     - name: Re-size VM-SWARM-01 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -170,6 +185,9 @@
         size: 50G
         state: resized
         timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
     - name: Re-size VM-SWARM-02 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -180,6 +198,9 @@
         size: 50G
         state: resized
         timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
     - name: Re-size VM-SWARM-03 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -190,6 +211,9 @@
         size: 50G
         state: resized
         timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
 
 ################################################################### START VIRTUAL-MACHINES ####################################################################
     - name: Start VM-LB-01

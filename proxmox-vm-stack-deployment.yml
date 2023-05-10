@@ -1,7 +1,7 @@
+############################################################# CLONE VIRTUAL-MACHINES FROM TEMPLATE ############################################################
 - hosts: proxmox_servers
   become: true
-  tasks:
-    ### VM-LB-01 ###
+  tasks:    
     - name: Clone template to VM-LB-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -15,9 +15,59 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 30 seconds
+    - name: Pause for 10 seconds
       ansible.builtin.pause:
-        seconds: 30
+        seconds: 10
+    - name: Clone template to VM-SWARM-01
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        clone: template
+        vmid: 1000
+        name: VM-SWARM-01
+        newid: 201
+        storage: pool-1
+        format: raw
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+    - name: Clone template to VM-SWARM-02
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        clone: template
+        vmid: 1000
+        name: VM-SWARM-02
+        newid: 202
+        storage: pool-1
+        format: raw
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+    - name: Clone template to VM-SWARM-03
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        clone: template
+        vmid: 1000
+        name: VM-SWARM-03
+        newid: 203
+        storage: pool-1
+        format: raw
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+########################################################### UPDATE VIRTUAL-MACHINES CONFIGURATIONS ############################################################
     - name: Edit VM-LB-01 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -38,44 +88,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.160/24
         update: true
         timeout: 300
-    - name: Re-size VM-LB-01 disk
-      community.general.proxmox_disk:
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        api_host: phs-hv-01
-        name: VM-LB-01
-        disk: scsi0
-        size: 50G
-        state: resized
-        timeout: 300
-    - name: Start VM-LB-01
-      community.general.proxmox_kvm:
-        node: phs-hv-01
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        api_host: phs-hv-01
-        name: VM-LB-01
-        state: started
-        timeout: 300
-
-
-    ### VM-SWARM-01 ###
-    - name: Clone template to VM-SWARM-01
-      community.general.proxmox_kvm:
-        node: phs-hv-01
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        api_host: phs-hv-01
-        clone: template
-        vmid: 1000
-        name: VM-SWARM-01
-        newid: 201
-        storage: pool-1
-        format: raw
-        timeout: 300
-    - name: Pause for 30 seconds
-      ansible.builtin.pause:
-        seconds: 30
     - name: Edit VM-SWARM-01 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -96,44 +108,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.161/24
         update: true
         timeout: 300
-    - name: Re-size VM-SWARM-01 disk
-      community.general.proxmox_disk:
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        api_host: phs-hv-01
-        name: VM-SWARM-01
-        disk: scsi0
-        size: 50G
-        state: resized
-        timeout: 300
-    - name: Start VM-SWARM-01
-      community.general.proxmox_kvm:
-        node: phs-hv-01
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        api_host: phs-hv-01
-        name: VM-SWARM-01
-        state: started
-        timeout: 300
-
-    
-    ### VM-SWARM-02 ###
-    - name: Clone template to VM-SWARM-02
-      community.general.proxmox_kvm:
-        node: phs-hv-01
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        api_host: phs-hv-01
-        clone: template
-        vmid: 1000
-        name: VM-SWARM-02
-        newid: 202
-        storage: pool-1
-        format: raw
-        timeout: 300
-    - name: Pause for 30 seconds
-      ansible.builtin.pause:
-        seconds: 30
     - name: Edit VM-SWARM-02 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -154,44 +128,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.162/24
         update: true
         timeout: 300
-    - name: Re-size VM-SWARM-02 disk
-      community.general.proxmox_disk:
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        api_host: phs-hv-01
-        name: VM-SWARM-02
-        disk: scsi0
-        size: 50G
-        state: resized
-        timeout: 300
-    - name: Start VM-SWARM-02
-      community.general.proxmox_kvm:
-        node: phs-hv-01
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        api_host: phs-hv-01
-        name: VM-SWARM-02
-        state: started
-        timeout: 300
-
-
-    ### VM-SWARM-03 ###
-    - name: Clone template to VM-SWARM-03
-      community.general.proxmox_kvm:
-        node: phs-hv-01
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        api_host: phs-hv-01
-        clone: template
-        vmid: 1000
-        name: VM-SWARM-03
-        newid: 203
-        storage: pool-1
-        format: raw
-        timeout: 300
-    - name: Pause for 30 seconds
-      ansible.builtin.pause:
-        seconds: 30
     - name: Edit VM-SWARM-03 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -212,6 +148,38 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.163/24
         update: true
         timeout: 300
+
+################################################################ RESIZE VIRTUAL-MACHINE DISKS #################################################################
+    - name: Re-size VM-LB-01 disk
+      community.general.proxmox_disk:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-LB-01
+        disk: scsi0
+        size: 50G
+        state: resized
+        timeout: 300
+    - name: Re-size VM-SWARM-01 disk
+      community.general.proxmox_disk:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-01
+        disk: scsi0
+        size: 50G
+        state: resized
+        timeout: 300
+    - name: Re-size VM-SWARM-02 disk
+      community.general.proxmox_disk:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-02
+        disk: scsi0
+        size: 50G
+        state: resized
+        timeout: 300
     - name: Re-size VM-SWARM-03 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -221,6 +189,35 @@
         disk: scsi0
         size: 50G
         state: resized
+        timeout: 300
+
+################################################################### START VIRTUAL-MACHINES ####################################################################
+    - name: Start VM-LB-01
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-LB-01
+        state: started
+        timeout: 300
+    - name: Start VM-SWARM-01
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-01
+        state: started
+        timeout: 300
+    - name: Start VM-SWARM-02
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-SWARM-02
+        state: started
         timeout: 300
     - name: Start VM-SWARM-03
       community.general.proxmox_kvm:
@@ -234,7 +231,6 @@
     - name: Pause for 3 minutes
       ansible.builtin.pause:
         seconds: 180
-
 
 ################################################## UPDATE PACKAGES ###################################################
 - hosts: docker_vms,app_vms
@@ -267,7 +263,6 @@
         autoremove: yes
       when:
         - ansible_facts.os_family == "RedHat"
-
 
 ############################### INSTALL BASE PACKAGES [qemu-guest-agent, cockpit & addons] ###########################
     - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common) [Debian/Ubuntu]
@@ -344,7 +339,6 @@
       when:
         - ansible_facts.os_family == "RedHat"
 
-
 ################################################ CONFIGURE NETWORK SHARES ############################################
     - name: Create NAS-01 local directory
       ansible.builtin.file:
@@ -371,7 +365,6 @@
         opts: rw,sync,hard
         state: mounted
 
-
 ############################################# FIX COCKPIT UPDATE PLUGIN ##############################################
     - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
       copy:
@@ -385,7 +378,6 @@
       ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
       when:
         - ansible_facts.os_family == "Debian"
-
 
 ################################################## EXTRA PACKAGES ####################################################
     - name: Install extra packages [Debian/Ubuntu]
@@ -403,7 +395,6 @@
       when:
         - ansible_facts.os_family == "RedHat"
 
-
 ###################################################### REBOOT ########################################################
     - name: Reboot systems
       reboot:
@@ -414,7 +405,6 @@
     - name: Pause for 1 minute
       ansible.builtin.pause:
         seconds: 60
-
 
 ################################################# INSTALL GLUSTERFS ##################################################
 - hosts: docker_vms
@@ -453,7 +443,6 @@
       ansible.builtin.file:
         path: /glusterfs/bricks/gv0
         state: directory
-
 
 ########################################## CREATE GLUSTERFS VOLUME AND MOUNT #########################################
 - hosts: loadbalancer
@@ -532,7 +521,6 @@
         path: /mnt/gluster
         fstype: glusterfs
         state: mounted
-
 
 ########################################### INSTALL DOCKER & PYTHON MODULE ###########################################
 - hosts: docker_vms
@@ -629,7 +617,6 @@
       ansible.builtin.pause:
         seconds: 60
 
-
 ################################################ DEPLOY DOCKER SWARM #################################################
 - hosts: swarm_manager
   become: true
@@ -658,7 +645,6 @@
         advertise_addr: "{{ ansible_host }}"
         join_token: "{{ hostvars[groups['swarm_manager'][0]]['worker_token']['stdout'] }}"
         remote_addrs: [ "{{ hostvars[groups['swarm_manager'][0]]['ansible_default_ipv4']['address'] }}:2377" ]
-
 
 ####################################### DEPLOY NGINX LOADBALANCER & PORTAINER ########################################
 - hosts: loadbalancer

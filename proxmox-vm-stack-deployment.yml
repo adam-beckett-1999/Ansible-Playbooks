@@ -252,9 +252,9 @@
         name: VM-SWARM-03
         state: started
         timeout: 300
-    - name: Pause for 3 minutes
+    - name: Pause for 5 minutes
       ansible.builtin.pause:
-        seconds: 180
+        seconds: 300
 
 ################################################## UPDATE PACKAGES ###################################################
 - hosts: docker_vms,app_vms

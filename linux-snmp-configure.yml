@@ -1,3 +1,4 @@
+########################################### INSTALL SNMPD, CONFIGURE & TEST ###########################################
 - name: Playbook for configuration of SNMP on linux based hosts
   hosts: "*"
   become: true

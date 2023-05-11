@@ -36,6 +36,10 @@
         state: started
         enabled: true
         daemon_reload: true
+    - name: Restart SNMPd systemd service if already running.
+      systemd:
+        name: snmpd
+        state: restarted
     - name: Test that SNMP is working
       community.general.snmp_facts:
         host: '{{ inventory_hostname }}'

@@ -28,4 +28,13 @@
         state: started
         enabled: true
         daemon_reload: true
+    - name: Test that SNMP is working
+      community.general.snmp_facts:
+        host: '{{ inventory_hostname }}'
+        version: v2c
+        community: BCloudHomelab
+      register: response
+    - name: Print the results of the test
+      debug:
+        var: response
 

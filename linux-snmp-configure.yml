@@ -21,6 +21,9 @@
         update_cache: yes
       when:
         - ansible_facts.os_family == "RedHat"
+    - name: Install Docker Module for Python
+      pip:
+        name: pysnmp
     - name: Configure SNMP server
       copy: src=/home/abeckett/snmpd.conf dest=/etc/snmp/snmpd.conf owner=root group=root mode=600
     - name: Start and enable SNMPd systemd service.

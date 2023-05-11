@@ -677,6 +677,3 @@
           - source: //var/lib/docker/volumes
             target: /var/lib/docker/volumes
             type: bind
-
-
-    

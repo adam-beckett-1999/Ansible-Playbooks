@@ -5,8 +5,9 @@
     - name: Update cache & install SNMP packages [Debian/Ubuntu]
       apt:
         name:
-          - net-snmp
-          - net-snmp-utils
+          - snmpd
+          - snmp
+          - libsnmp-dev
         state: latest
         update_cache: yes
       when:

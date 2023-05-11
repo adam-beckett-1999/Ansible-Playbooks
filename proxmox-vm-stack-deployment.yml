@@ -257,7 +257,7 @@
         seconds: 300
 
 ################################################## UPDATE PACKAGES ###################################################
-- hosts: docker_vms,app_vms
+- hosts: docker_vms
   become: true
   tasks:
     - name: Preliminary checks [Debian/Ubuntu]
@@ -282,14 +282,8 @@
         state: latest
       when:
         - ansible_facts.os_family == "RedHat"
-    - name: Remove packages not needed anymore [CentOS/Rocky]
-      dnf:
-        autoremove: yes
-      when:
-        - ansible_facts.os_family == "RedHat"
-
-############################### INSTALL BASE PACKAGES [qemu-guest-agent, cockpit & addons] ###########################
-    - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common) [Debian/Ubuntu]
+############################ INSTALL BASE PACKAGES [qemu-guest-agent, cockpit & addons, etc] ########################
+    - name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
       apt:
         name:
         - qemu-guest-agent
@@ -297,10 +291,23 @@
         - cifs-utils
         - nfs-common
         - keyutils
+        - snmpd
+        - snmp
+        - libsnmp-dev
+        - software-properties-common
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - python3-pip
+        - virtualenv
+        - python3-setuptools
+        - neofetch
+        - glusterfs-server
+        - glusterfs-client
         state: present
       when:
         - ansible_facts.os_family == "Debian"
-    - name: Install required base-packages (qemu-guest-agent, cifs-utils, nfs-common) [CentOS/Rocky]
+    - name: Install required base-packages (qemu-guest-agent, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [CentOS/Rocky]
       dnf:
         name: 
         - qemu-guest-agent
@@ -308,6 +315,18 @@
         - nfs-common
         - keyutils
         - epel-release
+        - net-snmp
+        - net-snmp-utils
+        - software-properties-common
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - python3-pip
+        - virtualenv
+        - python3-setuptools
+        - neofetch
+        - glusterfs-server
+        - glusterfs-client
         state: present
       when:
         - ansible_facts.os_family == "RedHat"
@@ -342,6 +361,18 @@
         name: qemu-guest-agent
         enabled: yes
         state: started
+    - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
+      copy:
+        dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
+        content: |
+          [keyfile]
+          unmanaged-devices=none
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Create fake network interface to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
+      ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
+      when:
+        - ansible_facts.os_family == "Debian"
     - name: Start cockpit service [Debian/Ubuntu]
       systemd:
         name: cockpit
@@ -362,7 +393,31 @@
         state: started
       when:
         - ansible_facts.os_family == "RedHat"
-
+############################################### CONFIGURE SNMPD & TEST ###############################################
+    - name: Install pysnmp for testing SNMP on hosts
+      pip:
+        name: pysnmp
+    - name: Configure SNMP server
+      copy: src=/home/abeckett/snmpd.conf dest=/etc/snmp/snmpd.conf owner=root group=root mode=600
+    - name: Start and enable SNMPd systemd service.
+      systemd:
+        name: snmpd
+        state: started
+        enabled: true
+        daemon_reload: true
+    - name: Restart SNMPd systemd service if already running.
+      systemd:
+        name: snmpd
+        state: restarted
+    - name: Test that SNMP is working
+      community.general.snmp_facts:
+        host: '{{ inventory_hostname }}'
+        version: v2c
+        community: BCloudHomelab
+      register: response
+    - name: Print the results of the test
+      debug:
+        var: response
 ################################################ CONFIGURE NETWORK SHARES ############################################
     - name: Create NAS-01 local directory
       ansible.builtin.file:
@@ -388,76 +443,7 @@
         boot: true
         opts: rw,sync,hard
         state: mounted
-
-############################################# FIX COCKPIT UPDATE PLUGIN ##############################################
-    - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
-      copy:
-        dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
-        content: |
-          [keyfile]
-          unmanaged-devices=none
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Create fake network interface to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
-      ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
-      when:
-        - ansible_facts.os_family == "Debian"
-
-################################################## EXTRA PACKAGES ####################################################
-    - name: Install extra packages [Debian/Ubuntu]
-      apt:
-        name:
-        - neofetch
-        state: present
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install extra packages [CentOS/Rocky]
-      dnf:
-        name: 
-        - neofetch
-        state: present
-      when:
-        - ansible_facts.os_family == "RedHat"
-
-###################################################### REBOOT ########################################################
-    - name: Reboot systems
-      reboot:
-        post_reboot_delay: 60
-        test_command: uptime
-      when:
-        - ansible_facts.os_family == "Debian" or ansible_facts.os_family == "RedHat"
-    - name: Pause for 1 minute
-      ansible.builtin.pause:
-        seconds: 60
-
 ################################################# INSTALL GLUSTERFS ##################################################
-- hosts: docker_vms
-  become: true
-  tasks:
-    - name: Install software-properties-common [Debian/Ubuntu]
-      apt:
-        name:
-        - software-properties-common
-        state: present
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install GlusterFS [Debian/Ubuntu]
-      apt:
-        name:
-        - glusterfs-server
-        - glusterfs-client
-        state: present
-        update_cache: yes
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install GlusterFS [CentOS/Rocky]
-      dnf:
-        name: 
-        - glusterfs-server
-        - glusterfs-client
-        state: present
-      when:
-        - ansible_facts.os_family == "RedHat"
     - name: Start glusterd service
       systemd:
         name: glusterd
@@ -467,116 +453,7 @@
       ansible.builtin.file:
         path: /glusterfs/bricks/gv0
         state: directory
-
-########################################## CREATE GLUSTERFS VOLUME AND MOUNT #########################################
-- hosts: loadbalancer
-  become: true
-  tasks:
-    - name: Create a trusted storage pool
-      gluster.gluster.gluster_peer:
-        state: present
-        nodes:
-          - 192.168.0.161
-          - 192.168.0.162
-          - 192.168.0.163
-    - name: Create GlusterFS volume
-      gluster.gluster.gluster_volume:
-        state: present
-        name: gv0
-        replicas: 4
-        bricks: /glusterfs/bricks/gv0
-        cluster:
-          - 192.168.0.160
-          - 192.168.0.161
-          - 192.168.0.162
-          - 192.168.0.163
-        force: true
-      run_once: true
-    - name: Start GlusterFS volume
-      gluster.gluster.gluster_volume:
-        state: started
-        name: gv0
-    - name: Create mountpoint for Gluster volume
-      ansible.builtin.file:
-        path: /mnt/gluster
-        state: directory
-    - name: Mount Gluster volume
-      ansible.posix.mount:
-        src: VM-LB-01.homelab.internal:/gv0
-        path: /mnt/gluster
-        fstype: glusterfs
-        state: mounted
-- hosts: swarm_manager
-  become: true
-  tasks:
-    - name: Create mountpoint for Gluster volume
-      ansible.builtin.file:
-        path: /mnt/gluster
-        state: directory
-    - name: Mount Gluster volume
-      ansible.posix.mount:
-        src: VM-SWARM-03.homelab.internal:/gv0
-        path: /mnt/gluster
-        fstype: glusterfs
-        state: mounted
-- hosts: swarm_1
-  become: true
-  tasks:
-    - name: Create mountpoint for Gluster volume
-      ansible.builtin.file:
-        path: /mnt/gluster
-        state: directory
-    - name: Mount Gluster volume
-      ansible.posix.mount:
-        src: VM-SWARM-01.homelab.internal:/gv0
-        path: /mnt/gluster
-        fstype: glusterfs
-        state: mounted
-- hosts: swarm_2
-  become: true
-  tasks:
-    - name: Create mountpoint for Gluster volume
-      ansible.builtin.file:
-        path: /mnt/gluster
-        state: directory
-    - name: Mount Gluster volume
-      ansible.posix.mount:
-        src: VM-SWARM-02.homelab.internal:/gv0
-        path: /mnt/gluster
-        fstype: glusterfs
-        state: mounted
-
-########################################### INSTALL DOCKER & PYTHON MODULE ###########################################
-- hosts: docker_vms
-  become: true
-  tasks:
-    - name: Install required system packages [Debian/Ubuntu]
-      apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - python3-pip
-          - virtualenv
-          - python3-setuptools
-        state: latest
-        update_cache: true
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install required system packages [CentOS/Rocky]
-      dnf:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - software-properties-common
-          - python3-pip
-          - virtualenv
-          - python3-setuptools
-        state: latest
-        update_cache: true
-      when:
-        - ansible_facts.os_family == "RedHat"
+########################################### INSTALL DOCKER & PYTHON MODULE ###########################################    
     - name: Add Docker GPG Key [Debian/Ubuntu]
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
@@ -631,6 +508,7 @@
         state: started
         enabled: true
         daemon_reload: true
+###################################################### REBOOT ########################################################
     - name: Reboot systems
       reboot:
         post_reboot_delay: 60
@@ -640,40 +518,45 @@
     - name: Pause for 1 minute
       ansible.builtin.pause:
         seconds: 60
-
-################################################ DEPLOY DOCKER SWARM #################################################
-- hosts: swarm_manager
-  become: true
-  tasks:
-    - name: Check if Swarm has already been Initialized
-      shell: docker node ls
-      register: swarm_status
-      ignore_errors: true
-    - name: Initialize Docker Swarm
-      docker_swarm:
-        state: present
-      when: swarm_status.rc != 0
-      run_once: true
-    - name: Change task-history limit to 0
-      shell: docker swarm update --task-history-limit 0
-    - name: Get the worker join-token
-      shell: docker swarm join-token --quiet worker
-      register: worker_token
-
-- hosts: swarm_nodes
-  become: true
-  tasks:
-    - name: Add Workers to the Swarm
-      community.docker.docker_swarm:
-        state: join
-        advertise_addr: "{{ ansible_host }}"
-        join_token: "{{ hostvars[groups['swarm_manager'][0]]['worker_token']['stdout'] }}"
-        remote_addrs: [ "{{ hostvars[groups['swarm_manager'][0]]['ansible_default_ipv4']['address'] }}:2377" ]
-
-####################################### DEPLOY NGINX LOADBALANCER & PORTAINER ########################################
+########################################## CREATE GLUSTERFS VOLUME AND MOUNT #########################################
 - hosts: loadbalancer
   become: true
   tasks:
+    - name: Create a trusted storage pool
+      gluster.gluster.gluster_peer:
+        state: present
+        nodes:
+          - 192.168.0.161
+          - 192.168.0.162
+          - 192.168.0.163
+    - name: Create GlusterFS volume
+      gluster.gluster.gluster_volume:
+        state: present
+        name: gv0
+        replicas: 4
+        bricks: /glusterfs/bricks/gv0
+        cluster:
+          - 192.168.0.160
+          - 192.168.0.161
+          - 192.168.0.162
+          - 192.168.0.163
+        force: true
+      run_once: true
+    - name: Start GlusterFS volume
+      gluster.gluster.gluster_volume:
+        state: started
+        name: gv0
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: VM-LB-01.homelab.internal:/gv0
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+####################################### DEPLOY NGINX LOADBALANCER & PORTAINER ########################################
     - name: Spin-up a Portainer instance for management of Swarm
       docker_container:
         name: Portainer
@@ -719,6 +602,57 @@
           PGID: "1000"
           TZ: "Europe/London"
         restart_policy: always
+################################################# MOUNT GLUSTERFS VOLUME ##############################################
+- hosts: swarm_manager
+  become: true
+  tasks:
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: VM-SWARM-03.homelab.internal:/gv0
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+################################################### DEPLOY DOCKER SWARM ###############################################
+    - name: Check if Swarm has already been Initialized
+      shell: docker node ls
+      register: swarm_status
+      ignore_errors: true
+    - name: Initialize Docker Swarm
+      docker_swarm:
+        state: present
+      when: swarm_status.rc != 0
+      run_once: true
+    - name: Change task-history limit to 0
+      shell: docker swarm update --task-history-limit 0
+    - name: Get the worker join-token
+      shell: docker swarm join-token --quiet worker
+      register: worker_token
+################################################## ADD NODES TO SWARM #################################################
+- hosts: swarm_nodes
+  become: true
+  tasks:
+    - name: Add Workers to the Swarm
+      community.docker.docker_swarm:
+        state: join
+        advertise_addr: "{{ ansible_host }}"
+        join_token: "{{ hostvars[groups['swarm_manager'][0]]['worker_token']['stdout'] }}"
+        remote_addrs: [ "{{ hostvars[groups['swarm_manager'][0]]['ansible_default_ipv4']['address'] }}:2377" ]
+################################################ MOUNT GLUSTERFS VOLUME ###############################################    
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: "{{ ansible_host }}":/gv0
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+############################################### DEPLOY PORTAINER AGENT ################################################
 - hosts: swarm_manager
   become: true
   tasks:
@@ -747,3 +681,6 @@
           - source: //var/lib/docker/volumes
             target: /var/lib/docker/volumes
             type: bind
+
+
+    

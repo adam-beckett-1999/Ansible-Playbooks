@@ -66,7 +66,6 @@
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
-
 ########################################################### UPDATE VIRTUAL-MACHINES CONFIGURATIONS ############################################################
     - name: Edit VM-LB-01 with new cloud-init parameters
       community.general.proxmox_kvm:
@@ -160,7 +159,6 @@
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
-
 ################################################################ RESIZE VIRTUAL-MACHINE DISKS #################################################################
     - name: Re-size VM-LB-01 disk
       community.general.proxmox_disk:
@@ -214,7 +212,6 @@
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
-
 ################################################################### START VIRTUAL-MACHINES ####################################################################
     - name: Start VM-LB-01
       community.general.proxmox_kvm:
@@ -255,7 +252,6 @@
     - name: Pause for 5 minutes
       ansible.builtin.pause:
         seconds: 300
-
 ################################################## UPDATE PACKAGES ###################################################
 - hosts: docker_vms
   become: true

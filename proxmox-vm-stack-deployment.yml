@@ -644,7 +644,7 @@
         state: directory
     - name: Mount Gluster volume
       ansible.posix.mount:
-        src: "{{ ansible_host }}":/gv0
+        src: "{{ ansible_host }}:/gv0"
         path: /mnt/gluster
         fstype: glusterfs
         state: mounted

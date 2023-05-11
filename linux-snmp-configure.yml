@@ -8,6 +8,8 @@
           - snmpd
           - snmp
           - libsnmp-dev
+          - python3-setuptools
+          - python3-pip
         state: latest
         update_cache: yes
       when:
@@ -17,6 +19,8 @@
         name:
           - net-snmp
           - net-snmp-utils
+          - python3-setuptools
+          - python3-pip
         state: latest
         update_cache: yes
       when:

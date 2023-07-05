@@ -970,13 +970,6 @@
       when:
         - ansible_facts.os_family == "Debian" or ansible_facts.os_family == "RedHat"
 
-    - name: Reboot systems [Windows]
-      ansible.windows.win_reboot:
-        post_reboot_delay: 60
-        test_command: 'exit (Get-Service -Name Netlogon).Status -ne "Running"'
-      when:
-        - ansible_facts.os_family == "Windows"
-
 
 
 - name: Snapshot all VMs after all configuration has been completed and they are ready for active deployment

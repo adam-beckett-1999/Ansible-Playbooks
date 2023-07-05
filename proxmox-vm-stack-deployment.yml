@@ -744,7 +744,7 @@
             target: /var/lib/docker/volumes
             type: bind
 ################################################## GITLAB INSTALL ####################################################
-- hosts: app_vms
+- hosts: git
   become: true
   tasks:
     - name: Install required packages for Gitlab install [Debian/Ubuntu]
@@ -762,13 +762,26 @@
         - openssh-server
         - perl
         - tzdata
+        - policycoreutils
         state: present
       when:
         - ansible_facts.os_family == "RedHat"
-    - name: Add Gitlab Repository
+    - name: Add Gitlab Repository [Debian/Ubuntu]
       shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
-    - name: Install Gitlab with external URL set
-      shell: EXTERNAL_URL="https://gitlab.beckettcloud.com" apt-get install gitlab-ee
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Add Gitlab Repository [CentOS/Rocky]
+      shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash
+      when:
+        - ansible_facts.os_family == "RedHat"
+    - name: Install Gitlab with external URL set [Debian/Ubuntu]
+      shell: sudo EXTERNAL_URL="https://gitlab.beckettcloud.com" apt-get install gitlab-ee
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Install Gitlab with external URL set [CentOS/Rocky]
+      shell: sudo EXTERNAL_URL="https://gitlab.beckettcloud.com" dnf install -y gitlab-ee
+      when:
+        - ansible_facts.os_family == "RedHat"
 ###################################################### REBOOT ########################################################
 - hosts: docker_vms,app_vms
   become: true

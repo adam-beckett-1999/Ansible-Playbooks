@@ -1,4 +1,5 @@
 ############################################################# CLONE VIRTUAL-MACHINES FROM TEMPLATE ############################################################
+
 - hosts: proxmox_servers
   become: true
   tasks:    
@@ -15,9 +16,11 @@
         storage: pool-1
         format: raw
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Clone template to VM-SWARM-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -31,9 +34,11 @@
         storage: pool-1
         format: raw
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Clone template to VM-SWARM-02
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -47,9 +52,11 @@
         storage: pool-1
         format: raw
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Clone template to VM-SWARM-03
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -63,9 +70,11 @@
         storage: pool-1
         format: raw
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Clone template to VM-GIT-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -79,10 +88,16 @@
         storage: pool-1
         format: raw
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
 ########################################################### UPDATE VIRTUAL-MACHINES CONFIGURATIONS ############################################################
+
+- hosts: proxmox_servers
+  become: true
+  tasks:    
     - name: Edit VM-LB-01 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -103,9 +118,11 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.160/24
         update: true
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Edit VM-SWARM-01 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -126,9 +143,11 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.161/24
         update: true
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Edit VM-SWARM-02 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -149,9 +168,11 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.162/24
         update: true
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Edit VM-SWARM-03 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -172,9 +193,11 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.163/24
         update: true
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Edit VM-GIT-01 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -195,10 +218,16 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.164/24
         update: true
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
 ################################################################ RESIZE VIRTUAL-MACHINE DISKS #################################################################
+
+- hosts: proxmox_servers
+  become: true
+  tasks:    
     - name: Re-size VM-LB-01 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -209,9 +238,11 @@
         size: 50G
         state: resized
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Re-size VM-SWARM-01 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -222,9 +253,11 @@
         size: 50G
         state: resized
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Re-size VM-SWARM-02 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -235,9 +268,11 @@
         size: 50G
         state: resized
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Re-size VM-SWARM-03 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -248,9 +283,11 @@
         size: 50G
         state: resized
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
     - name: Re-size VM-GIT-01 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -261,10 +298,16 @@
         size: 50G
         state: resized
         timeout: 300
+
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
 ################################################################### START VIRTUAL-MACHINES ####################################################################
+
+- hosts: proxmox_servers
+  become: true
+  tasks:    
     - name: Start VM-LB-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -274,6 +317,7 @@
         name: VM-LB-01
         state: started
         timeout: 300
+
     - name: Start VM-SWARM-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -283,6 +327,7 @@
         name: VM-SWARM-01
         state: started
         timeout: 300
+
     - name: Start VM-SWARM-02
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -292,6 +337,7 @@
         name: VM-SWARM-02
         state: started
         timeout: 300
+
     - name: Start VM-SWARM-03
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -301,6 +347,7 @@
         name: VM-SWARM-03
         state: started
         timeout: 300
+
     - name: Start VM-GIT-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -310,10 +357,13 @@
         name: VM-GIT-01
         state: started
         timeout: 300
+
     - name: Pause for 5 minutes
       ansible.builtin.pause:
         seconds: 300
+
 ################################################## UPDATE PACKAGES ###################################################
+
 - hosts: docker_vms,app_vms
   become: true
   tasks:
@@ -324,6 +374,7 @@
         mode: 0755
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Install all updates [Debian/Ubuntu]
       apt:
         update_cache: yes
@@ -331,6 +382,7 @@
         autoclean: yes
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Upgrade all packages and install kernel updates [CentOS/Rocky]
       dnf:
         update_cache: yes
@@ -339,7 +391,9 @@
         state: latest
       when:
         - ansible_facts.os_family == "RedHat"
+
 ############################ INSTALL BASE PACKAGES [qemu-guest-agent, cockpit & addons, etc] ########################
+
 - hosts: docker_vms,app_vms
   become: true
   tasks:
@@ -367,6 +421,7 @@
         state: present
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Install required base-packages (qemu-guest-agent, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [CentOS/Rocky]
       dnf:
         name: 
@@ -390,12 +445,14 @@
         state: present
       when:
         - ansible_facts.os_family == "RedHat"
+
     - name: Install cockpit navigator plugin [Debian/Ubuntu]
       apt:
         deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
         state: present
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Install cockpit navigator plugin [CentOS/Rocky]
       dnf:
         name: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.8/cockpit-navigator-0.5.8-2.el8.noarch.rpm
@@ -403,12 +460,14 @@
         disable_gpg_check: True
       when:
         - ansible_facts.os_family == "RedHat"
+
     - name: Install cockpit file sharing plugin [Debian/Ubuntu]
       apt:
         deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
         state: present
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Install cockpit file sharing plugin [CentOS/Rocky]
       dnf:
         name: https://github.com/45Drives/cockpit-file-sharing/releases/download/v2.4.5/cockpit-file-sharing-2.4.5-1.el8.noarch.rpm
@@ -416,11 +475,13 @@
         disable_gpg_check: True
       when:
         - ansible_facts.os_family == "RedHat"
+
     - name: Start qemu-guest-agent service
       systemd:
         name: qemu-guest-agent
         enabled: yes
         state: started
+
     - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
       copy:
         dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
@@ -429,10 +490,12 @@
           unmanaged-devices=none
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Create fake network interface to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
       ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Start cockpit service [Debian/Ubuntu]
       systemd:
         name: cockpit
@@ -441,47 +504,58 @@
         masked: no
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Enable cockpit.socket [CentOS/Rocky]
       systemd:
         name: cockpit.socket
         enabled: yes
       when:
         - ansible_facts.os_family == "RedHat"
+
     - name: Start cockpit [CentOS/Rocky]
       systemd:
         name: cockpit
         state: started
       when:
         - ansible_facts.os_family == "RedHat"
+
 ############################################### CONFIGURE SNMPD & TEST ###############################################
+
 - hosts: docker_vms,app_vms
   become: true
   tasks:
     - name: Install pysnmp for testing SNMP on hosts
       pip:
         name: pysnmp
+
     - name: Configure SNMP server
       copy: src=/home/abeckett/snmpd.conf dest=/etc/snmp/snmpd.conf owner=root group=root mode=600
+
     - name: Start and enable SNMPd systemd service.
       systemd:
         name: snmpd
         state: started
         enabled: true
         daemon_reload: true
+
     - name: Restart SNMPd systemd service if already running.
       systemd:
         name: snmpd
         state: restarted
+
     - name: Test that SNMP is working
       community.general.snmp_facts:
         host: '{{ inventory_hostname }}'
         version: v2c
         community: BCloudHomelab
       register: response
+
     - name: Print the results of the test
       debug:
         var: response
+
 ################################################ CONFIGURE NETWORK SHARES ############################################
+
 - hosts: docker_vms,app_vms
   become: true
   tasks:
@@ -489,6 +563,7 @@
       ansible.builtin.file:
         path: /nas-01
         state: directory
+
     - name: Mount NAS-01 network share
       ansible.posix.mount:
         src: NAS-01.homelab.internal:/volume1/Media
@@ -497,10 +572,12 @@
         boot: true
         opts: rw,sync,hard
         state: mounted
+
     - name: Create STORAGE-01 local directory
       ansible.builtin.file:
         path: /storage-01
         state: directory
+
     - name: Mount STORAGE-01 network share
       ansible.posix.mount:
         src: STORAGE-01.homelab.internal:/mnt/user/media
@@ -509,7 +586,9 @@
         boot: true
         opts: rw,sync,hard
         state: mounted
+
 ################################################# INSTALL GLUSTERFS ##################################################
+
 - hosts: docker_vms
   become: true
   tasks:
@@ -518,11 +597,14 @@
         name: glusterd
         enabled: yes
         state: started
+
     - name: Create GlusterFS brick-1 directory
       ansible.builtin.file:
         path: /glusterfs/bricks/gv0
         state: directory
+
 ########################################### INSTALL DOCKER & PYTHON MODULE ###########################################
+
 - hosts: docker_vms
   become: true
   tasks:    
@@ -532,12 +614,14 @@
         state: present
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Add Docker Repository [Debian/Ubuntu]
       apt_repository:
         repo: deb https://download.docker.com/linux/ubuntu focal stable
         state: present
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Add Docker Repository [CentOS/Rocky]
       shell: |
         dnf install -y yum-utils
@@ -546,6 +630,7 @@
         warn: no
       when:
         - ansible_facts.os_family == "RedHat"
+
     - name: Install the latest version of Docker Engine and containerd [Debian/Ubuntu]
       apt:
         name:
@@ -556,6 +641,7 @@
         update_cache: true
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Install the latest version of Docker Engine and containerd [CentOS/Rocky]
       dnf:
         name:
@@ -566,21 +652,26 @@
         update_cache: true
       when:
         - ansible_facts.os_family == "RedHat"
+
     - name: Add the admin user to the docker group
       user:
         name: "{{ username }}"
         groups: docker
         append: yes
+
     - name: Install Docker Module for Python
       pip:
         name: docker
+
     - name: Start and enable Docker systemd service.
       systemd:
         name: docker
         state: started
         enabled: true
         daemon_reload: true
+
 ########################################## CREATE GLUSTERFS VOLUME AND MOUNT #########################################
+
 - hosts: loadbalancer
   become: true
   tasks:
@@ -591,6 +682,7 @@
           - 192.168.0.161
           - 192.168.0.162
           - 192.168.0.163
+
     - name: Create GlusterFS volume
       gluster.gluster.gluster_volume:
         state: present
@@ -604,21 +696,29 @@
           - 192.168.0.163
         force: true
       run_once: true
+
     - name: Start GlusterFS volume
       gluster.gluster.gluster_volume:
         state: started
         name: gv0
+
     - name: Create mountpoint for Gluster volume
       ansible.builtin.file:
         path: /mnt/gluster
         state: directory
+
     - name: Mount Gluster volume
       ansible.posix.mount:
         src: "{{ ansible_host }}:/gv0"
         path: /mnt/gluster
         fstype: glusterfs
         state: mounted
+
 ####################################### DEPLOY NGINX LOADBALANCER & PORTAINER ########################################
+
+- hosts: loadbalancer
+  become: true
+  tasks:
     - name: Spin-up a Portainer instance for management of Swarm
       docker_container:
         name: Portainer
@@ -633,6 +733,7 @@
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
           - portainer_data:/data
+
     - name: Deploy NGINX load-balancer
       community.docker.docker_container:
         name: Load-Balancer
@@ -649,6 +750,7 @@
         - 14000-14012:14000-14012
         - 15000-15012:15000-15012
         restart_policy: always
+
     - name: Deploy File-Manager for GlusterFS volume
       community.docker.docker_container:
         name: File-Manager
@@ -664,7 +766,9 @@
           PGID: "1000"
           TZ: "Europe/London"
         restart_policy: always
+
 ################################################# MOUNT GLUSTERFS VOLUME ##############################################
+
 - hosts: swarm_manager
   become: true
   tasks:
@@ -672,28 +776,39 @@
       ansible.builtin.file:
         path: /mnt/gluster
         state: directory
+
     - name: Mount Gluster volume
       ansible.posix.mount:
         src: "{{ ansible_host }}:/gv0"
         path: /mnt/gluster
         fstype: glusterfs
         state: mounted
+
 ################################################### DEPLOY DOCKER SWARM ###############################################
+
+- hosts: swarm_manager
+  become: true
+  tasks:
     - name: Check if Swarm has already been Initialized
       shell: docker node ls
       register: swarm_status
       ignore_errors: true
+
     - name: Initialize Docker Swarm
       docker_swarm:
         state: present
       when: swarm_status.rc != 0
       run_once: true
+
     - name: Change task-history limit to 0
       shell: docker swarm update --task-history-limit 0
+
     - name: Get the worker join-token
       shell: docker swarm join-token --quiet worker
       register: worker_token
+
 ################################################## ADD NODES TO SWARM #################################################
+
 - hosts: swarm_nodes
   become: true
   tasks:
@@ -703,18 +818,26 @@
         advertise_addr: "{{ ansible_host }}"
         join_token: "{{ hostvars[groups['swarm_manager'][0]]['worker_token']['stdout'] }}"
         remote_addrs: [ "{{ hostvars[groups['swarm_manager'][0]]['ansible_default_ipv4']['address'] }}:2377" ]
-################################################ MOUNT GLUSTERFS VOLUME ###############################################    
+
+################################################ MOUNT GLUSTERFS VOLUME ###############################################
+
+- hosts: swarm_nodes
+  become: true
+  tasks:
     - name: Create mountpoint for Gluster volume
       ansible.builtin.file:
         path: /mnt/gluster
         state: directory
+
     - name: Mount Gluster volume
       ansible.posix.mount:
         src: "{{ ansible_host }}:/gv0"
         path: /mnt/gluster
         fstype: glusterfs
         state: mounted
+
 ############################################### DEPLOY PORTAINER AGENT ################################################
+
 - hosts: swarm_manager
   become: true
   tasks:
@@ -722,6 +845,7 @@
       docker_network:
         name: portainer_agent_network
         driver: overlay
+
     - name: Start portainer_agent service
       docker_swarm_service:
         name: portainer_agent
@@ -743,7 +867,9 @@
           - source: //var/lib/docker/volumes
             target: /var/lib/docker/volumes
             type: bind
+
 ################################################## GITLAB INSTALL ####################################################
+
 - hosts: git
   become: true
   tasks:
@@ -756,6 +882,7 @@
         state: present
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Install required packages for Gitlab install [CentOS/Rocky]
       dnf:
         name: 
@@ -766,23 +893,29 @@
         state: present
       when:
         - ansible_facts.os_family == "RedHat"
+
     - name: Add Gitlab Repository [Debian/Ubuntu]
       shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
       when:
         - ansible_facts.os_family == "Debian"
+
     - name: Add Gitlab Repository [CentOS/Rocky]
       shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash
       when:
         - ansible_facts.os_family == "RedHat"
+
     - name: Install Gitlab with external URL set [Debian/Ubuntu]
       shell: sudo EXTERNAL_URL="https://gitlab.beckettcloud.com" apt-get install gitlab-ee
       when:
         - ansible_facts.os_family == "Debian"
+ 
     - name: Install Gitlab with external URL set [CentOS/Rocky]
       shell: sudo EXTERNAL_URL="https://gitlab.beckettcloud.com" dnf install -y gitlab-ee
       when:
         - ansible_facts.os_family == "RedHat"
+
 ###################################################### REBOOT ########################################################
+
 - hosts: docker_vms,app_vms
   become: true
   tasks:
@@ -792,6 +925,7 @@
         test_command: uptime
       when:
         - ansible_facts.os_family == "Debian" or ansible_facts.os_family == "RedHat"
+
     - name: Reboot systems [Windows]
       ansible.windows.win_reboot:
         post_reboot_delay: 60

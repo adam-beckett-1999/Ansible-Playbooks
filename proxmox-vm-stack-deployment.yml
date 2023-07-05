@@ -82,7 +82,7 @@
         cipassword: "{{ password }}"
         sshkeys: "{{ sshkeys }}"
         searchdomains: 'homelab.internal'
-        nameservers: 192.168.0.210,192.168.0.1
+        nameservers: 192.168.0.210
         ipconfig: 
           ipconfig0: gw=192.168.0.1,ip=192.168.0.160/24
         update: true
@@ -105,7 +105,7 @@
         cipassword: "{{ password }}"
         sshkeys: "{{ sshkeys }}"
         searchdomains: 'homelab.internal'
-        nameservers: 192.168.0.210,192.168.0.1
+        nameservers: 192.168.0.210
         ipconfig: 
           ipconfig0: gw=192.168.0.1,ip=192.168.0.161/24
         update: true
@@ -128,7 +128,7 @@
         cipassword: "{{ password }}"
         sshkeys: "{{ sshkeys }}"
         searchdomains: 'homelab.internal'
-        nameservers: 192.168.0.210,192.168.0.1
+        nameservers: 192.168.0.210
         ipconfig: 
           ipconfig0: gw=192.168.0.1,ip=192.168.0.162/24
         update: true
@@ -151,7 +151,7 @@
         cipassword: "{{ password }}"
         sshkeys: "{{ sshkeys }}"
         searchdomains: 'homelab.internal'
-        nameservers: 192.168.0.210,192.168.0.1
+        nameservers: 192.168.0.210
         ipconfig: 
           ipconfig0: gw=192.168.0.1,ip=192.168.0.163/24
         update: true

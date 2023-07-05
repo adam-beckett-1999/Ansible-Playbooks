@@ -605,7 +605,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         vmid: 200
-        snapname: "Post-update-early-configuration/Pre-service-install"
+        snapname: Post-update-early-configuration
         state: present
 
     - name: Take a snapshot of VM-SWARM-01 with final configuration completed
@@ -614,7 +614,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         vmid: 201
-        snapname: "Post-update-early-configuration/Pre-service-install"
+        snapname: Post-update-early-configuration
         state: present
     
     - name: Take a snapshot of VM-SWARM-02 with final configuration completed
@@ -623,7 +623,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         vmid: 202
-        snapname: "Post-update-early-configuration/Pre-service-install"
+        snapname: Post-update-early-configuration
         state: present
     
     - name: Take a snapshot of VM-SWARM-03 with final configuration completed
@@ -632,7 +632,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         vmid: 203
-        snapname: "Post-update-early-configuration/Pre-service-install"
+        snapname: Post-update-early-configuration
         state: present
     
     - name: Take a snapshot of VM-GIT-01 with final configuration completed
@@ -641,7 +641,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         vmid: 204
-        snapname: "Post-update-early-configuration/Pre-service-install"
+        snapname: Post-update-early-configuration
         state: present
 
 
@@ -1004,7 +1004,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         vmid: 200
-        snapname: "Post-configuration/Ready-for-service"
+        snapname: Post-configuration
         state: present
 
     - name: Take a snapshot of VM-SWARM-01 with final configuration completed
@@ -1013,7 +1013,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         vmid: 201
-        snapname: "Post-configuration/Ready-for-service"
+        snapname: Post-configuration
         state: present
     
     - name: Take a snapshot of VM-SWARM-02 with final configuration completed
@@ -1022,7 +1022,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         vmid: 202
-        snapname: "Post-configuration/Ready-for-service"
+        snapname: Post-configuration
         state: present
     
     - name: Take a snapshot of VM-SWARM-03 with final configuration completed
@@ -1031,7 +1031,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         vmid: 203
-        snapname: "Post-configuration/Ready-for-service"
+        snapname: Post-configuration
         state: present
     
     - name: Take a snapshot of VM-GIT-01 with final configuration completed
@@ -1040,5 +1040,5 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         vmid: 204
-        snapname: "Post-configuration/Ready-for-service"
+        snapname: Post-configuration
         state: present

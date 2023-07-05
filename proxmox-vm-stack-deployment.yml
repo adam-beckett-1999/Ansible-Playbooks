@@ -105,7 +105,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         name: VM-LB-01
-        tags: load-balancer,docker
+        tags: load-balancer,docker,cockpit
         cores: 4
         memory: 2048
         citype: nocloud
@@ -130,7 +130,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         name: VM-SWARM-01
-        tags: docker,media-management,app-server
+        tags: docker,media-management,app-server,cockpit
         cores: 4
         memory: 4096
         citype: nocloud
@@ -155,7 +155,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         name: VM-SWARM-02
-        tags: docker,web-services,smart-home,app-server
+        tags: docker,web-services,smart-home,app-server,cockpit
         cores: 4
         memory: 4096
         citype: nocloud
@@ -180,7 +180,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         name: VM-SWARM-03
-        tags: docker,rev-proxy,monitoring,app-server
+        tags: docker,rev-proxy,monitoring,app-server,cockpit
         cores: 4
         memory: 4096
         citype: nocloud
@@ -205,7 +205,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         name: VM-GIT-01
-        tags: gitlab,app-server
+        tags: gitlab,app-server,cockpit
         cores: 4
         memory: 4096
         citype: nocloud

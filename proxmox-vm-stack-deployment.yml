@@ -314,7 +314,7 @@
       ansible.builtin.pause:
         seconds: 300
 ################################################## UPDATE PACKAGES ###################################################
-- hosts: docker_vms
+- hosts: docker_vms,app_vms
   become: true
   tasks:
     - name: Preliminary checks [Debian/Ubuntu]
@@ -340,6 +340,9 @@
       when:
         - ansible_facts.os_family == "RedHat"
 ############################ INSTALL BASE PACKAGES [qemu-guest-agent, cockpit & addons, etc] ########################
+- hosts: docker_vms,app_vms
+  become: true
+  tasks:
     - name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
       apt:
         name:
@@ -451,6 +454,9 @@
       when:
         - ansible_facts.os_family == "RedHat"
 ############################################### CONFIGURE SNMPD & TEST ###############################################
+- hosts: docker_vms,app_vms
+  become: true
+  tasks:
     - name: Install pysnmp for testing SNMP on hosts
       pip:
         name: pysnmp
@@ -476,6 +482,9 @@
       debug:
         var: response
 ################################################ CONFIGURE NETWORK SHARES ############################################
+- hosts: docker_vms,app_vms
+  become: true
+  tasks:
     - name: Create NAS-01 local directory
       ansible.builtin.file:
         path: /nas-01
@@ -501,6 +510,9 @@
         opts: rw,sync,hard
         state: mounted
 ################################################# INSTALL GLUSTERFS ##################################################
+- hosts: docker_vms
+  become: true
+  tasks:
     - name: Start glusterd service
       systemd:
         name: glusterd
@@ -510,7 +522,10 @@
       ansible.builtin.file:
         path: /glusterfs/bricks/gv0
         state: directory
-########################################### INSTALL DOCKER & PYTHON MODULE ###########################################    
+########################################### INSTALL DOCKER & PYTHON MODULE ###########################################
+- hosts: docker_vms
+  become: true
+  tasks:    
     - name: Add Docker GPG Key [Debian/Ubuntu]
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg

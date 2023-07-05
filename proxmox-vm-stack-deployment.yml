@@ -442,6 +442,7 @@
         - neofetch
         - glusterfs-server
         - glusterfs-client
+        - policycoreutils
         state: present
       when:
         - ansible_facts.os_family == "RedHat"
@@ -873,27 +874,6 @@
 - hosts: git
   become: true
   tasks:
-    - name: Install required packages for Gitlab install [Debian/Ubuntu]
-      apt:
-        name:
-        - openssh-server
-        - perl
-        - tzdata
-        state: present
-      when:
-        - ansible_facts.os_family == "Debian"
-
-    - name: Install required packages for Gitlab install [CentOS/Rocky]
-      dnf:
-        name: 
-        - openssh-server
-        - perl
-        - tzdata
-        - policycoreutils
-        state: present
-      when:
-        - ansible_facts.os_family == "RedHat"
-
     - name: Add Gitlab Repository [Debian/Ubuntu]
       shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
       when:
@@ -904,13 +884,17 @@
       when:
         - ansible_facts.os_family == "RedHat"
 
-    - name: Install Gitlab with external URL set [Debian/Ubuntu]
-      shell: sudo EXTERNAL_URL="https://gitlab.beckettcloud.com" apt-get install gitlab-ee
+    - name: Install Gitlab [Debian/Ubuntu]
+      apt:
+        name: gitlab-ee
+        state: present
       when:
         - ansible_facts.os_family == "Debian"
- 
-    - name: Install Gitlab with external URL set [CentOS/Rocky]
-      shell: sudo EXTERNAL_URL="https://gitlab.beckettcloud.com" dnf install -y gitlab-ee
+
+    - name: Install Gitlab [CentOS/Rocky]
+      dnf:
+        name: gitlab-ee
+        state: present
       when:
         - ansible_facts.os_family == "RedHat"
 

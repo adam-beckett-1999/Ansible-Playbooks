@@ -588,6 +588,62 @@
         opts: rw,sync,hard
         state: mounted
 
+##################################################### SNAPSHOT ########################################################
+
+- name: Snapshot all VMs after initial configuration before applications and services are installed and started
+  hosts: proxmox_servers
+  become: true
+  tasks:  
+    - name: Take a snapshot of VM-LB-01 with final configuration completed
+      proxmox:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vm_id: 200
+        snapshot_name: "Post-update-early-configuration/Pre-service-install"
+        state: present
+
+    - name: Take a snapshot of VM-SWARM-01 with final configuration completed
+      proxmox:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vm_id: 201
+        snapshot_name: "Post-update-early-configuration/Pre-service-install"
+        state: present
+    
+    - name: Take a snapshot of VM-SWARM-02 with final configuration completed
+      proxmox:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vm_id: 202
+        snapshot_name: "Post-update-early-configuration/Pre-service-install"
+        state: present
+    
+    - name: Take a snapshot of VM-SWARM-03 with final configuration completed
+      proxmox:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vm_id: 203
+        snapshot_name: "Post-update-early-configuration/Pre-service-install"
+        state: present
+    
+    - name: Take a snapshot of VM-GIT-01 with final configuration completed
+      proxmox:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vm_id: 204
+        snapshot_name: "Post-update-early-configuration/Pre-service-install"
+        state: present
+
 ################################################# INSTALL GLUSTERFS ##################################################
 
 - hosts: docker_vms
@@ -925,3 +981,59 @@
         test_command: 'exit (Get-Service -Name Netlogon).Status -ne "Running"'
       when:
         - ansible_facts.os_family == "Windows"
+
+##################################################### SNAPSHOT ########################################################
+
+- name: Snapshot all VMs after all configuration has been completed and they are ready for active deployment
+  hosts: proxmox_servers
+  become: true
+  tasks:  
+    - name: Take a snapshot of VM-LB-01 with final configuration completed
+      proxmox:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vm_id: 200
+        snapshot_name: "Post-configuration/Ready-for-service"
+        state: present
+
+    - name: Take a snapshot of VM-SWARM-01 with final configuration completed
+      proxmox:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vm_id: 201
+        snapshot_name: "Post-configuration/Ready-for-service"
+        state: present
+    
+    - name: Take a snapshot of VM-SWARM-02 with final configuration completed
+      proxmox:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vm_id: 202
+        snapshot_name: "Post-configuration/Ready-for-service"
+        state: present
+    
+    - name: Take a snapshot of VM-SWARM-03 with final configuration completed
+      proxmox:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vm_id: 203
+        snapshot_name: "Post-configuration/Ready-for-service"
+        state: present
+    
+    - name: Take a snapshot of VM-GIT-01 with final configuration completed
+      proxmox:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vm_id: 204
+        snapshot_name: "Post-configuration/Ready-for-service"
+        state: present

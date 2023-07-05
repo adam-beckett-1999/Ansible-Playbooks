@@ -66,6 +66,22 @@
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+    - name: Clone template to VM-GIT-01
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        clone: template
+        vmid: 1000
+        name: VM-GIT-01
+        newid: 204
+        storage: pool-1
+        format: raw
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
 ########################################################### UPDATE VIRTUAL-MACHINES CONFIGURATIONS ############################################################
     - name: Edit VM-LB-01 with new cloud-init parameters
       community.general.proxmox_kvm:
@@ -75,7 +91,7 @@
         api_host: phs-hv-01
         name: VM-LB-01
         tags: load-balancer,docker
-        cores: 2
+        cores: 4
         memory: 2048
         citype: nocloud
         ciuser: "{{ username }}"
@@ -98,7 +114,7 @@
         api_host: phs-hv-01
         name: VM-SWARM-01
         tags: docker,media-management,app-server
-        cores: 2
+        cores: 4
         memory: 4096
         citype: nocloud
         ciuser: "{{ username }}"
@@ -121,7 +137,7 @@
         api_host: phs-hv-01
         name: VM-SWARM-02
         tags: docker,web-services,smart-home,app-server
-        cores: 2
+        cores: 4
         memory: 4096
         citype: nocloud
         ciuser: "{{ username }}"
@@ -144,7 +160,7 @@
         api_host: phs-hv-01
         name: VM-SWARM-03
         tags: docker,rev-proxy,monitoring,app-server
-        cores: 2
+        cores: 4
         memory: 4096
         citype: nocloud
         ciuser: "{{ username }}"
@@ -154,6 +170,29 @@
         nameservers: 192.168.0.210
         ipconfig: 
           ipconfig0: gw=192.168.0.1,ip=192.168.0.163/24
+        update: true
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+    - name: Edit VM-GIT-01 with new cloud-init parameters
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-GIT-01
+        tags: gitlab,app-server
+        cores: 4
+        memory: 4096
+        citype: nocloud
+        ciuser: "{{ username }}"
+        cipassword: "{{ password }}"
+        sshkeys: "{{ sshkeys }}"
+        searchdomains: 'homelab.internal'
+        nameservers: 192.168.0.210
+        ipconfig: 
+          ipconfig0: gw=192.168.0.1,ip=192.168.0.164/24
         update: true
         timeout: 300
     - name: Pause for 10 seconds
@@ -212,6 +251,19 @@
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+    - name: Re-size VM-GIT-01 disk
+      community.general.proxmox_disk:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-GIT-01
+        disk: scsi0
+        size: 50G
+        state: resized
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
 ################################################################### START VIRTUAL-MACHINES ####################################################################
     - name: Start VM-LB-01
       community.general.proxmox_kvm:
@@ -247,6 +299,15 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         name: VM-SWARM-03
+        state: started
+        timeout: 300
+    - name: Start VM-GIT-01
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-GIT-01
         state: started
         timeout: 300
     - name: Pause for 5 minutes

@@ -1,6 +1,5 @@
-############################################################# CLONE VIRTUAL-MACHINES FROM TEMPLATE ############################################################
-
-- hosts: proxmox_servers
+- name: Clone VMs from existing templates
+  hosts: proxmox_servers
   become: true
   tasks:    
     - name: Clone template to VM-LB-01
@@ -93,9 +92,10 @@
       ansible.builtin.pause:
         seconds: 10
 
-########################################################### UPDATE VIRTUAL-MACHINES CONFIGURATIONS ############################################################
 
-- hosts: proxmox_servers
+
+- name: Update VM configurations with correct hardware assignment and cloud-init variables
+  hosts: proxmox_servers
   become: true
   tasks:    
     - name: Edit VM-LB-01 with new cloud-init parameters
@@ -223,9 +223,10 @@
       ansible.builtin.pause:
         seconds: 10
 
-################################################################ RESIZE VIRTUAL-MACHINE DISKS #################################################################
 
-- hosts: proxmox_servers
+
+- name: Resize VM disks to the required size
+  hosts: proxmox_servers
   become: true
   tasks:    
     - name: Re-size VM-LB-01 disk
@@ -303,9 +304,9 @@
       ansible.builtin.pause:
         seconds: 10
 
-################################################################### START VIRTUAL-MACHINES ####################################################################
 
-- hosts: proxmox_servers
+- name: Start virtual machines
+  hosts: proxmox_servers
   become: true
   tasks:    
     - name: Start VM-LB-01
@@ -362,9 +363,10 @@
       ansible.builtin.pause:
         seconds: 300
 
-################################################## UPDATE PACKAGES ###################################################
 
-- hosts: docker_vms,app_vms
+
+- name: Install updates on newly created VMs
+  hosts: docker_vms,app_vms
   become: true
   tasks:
     - name: Preliminary checks [Debian/Ubuntu]
@@ -392,9 +394,10 @@
       when:
         - ansible_facts.os_family == "RedHat"
 
-############################ INSTALL BASE PACKAGES [qemu-guest-agent, cockpit & addons, etc] ########################
 
-- hosts: docker_vms,app_vms
+
+- name: Install base packages and requirements, setup cockpit with plugins and ensure qemu-guest-agent is working
+  hosts: docker_vms,app_vms
   become: true
   tasks:
     - name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
@@ -520,9 +523,10 @@
       when:
         - ansible_facts.os_family == "RedHat"
 
-############################################### CONFIGURE SNMPD & TEST ###############################################
 
-- hosts: docker_vms,app_vms
+
+- name: Configure SNMP service and test to ensure it reports correctly
+  hosts: docker_vms,app_vms
   become: true
   tasks:
     - name: Install pysnmp for testing SNMP on hosts
@@ -555,9 +559,10 @@
       debug:
         var: response
 
-################################################ CONFIGURE NETWORK SHARES ############################################
 
-- hosts: docker_vms,app_vms
+
+- name: Create mountpoint and mount network shares
+  hosts: docker_vms,app_vms
   become: true
   tasks:
     - name: Create NAS-01 local directory
@@ -588,7 +593,7 @@
         opts: rw,sync,hard
         state: mounted
 
-##################################################### SNAPSHOT ########################################################
+
 
 - name: Snapshot all VMs after initial configuration before applications and services are installed and started
   hosts: proxmox_servers
@@ -599,7 +604,7 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        vm_id: 200
+        vmid: 200
         snapname: "Post-update-early-configuration/Pre-service-install"
         state: present
 
@@ -608,7 +613,7 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        vm_id: 201
+        vmid: 201
         snapname: "Post-update-early-configuration/Pre-service-install"
         state: present
     
@@ -617,7 +622,7 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        vm_id: 202
+        vmid: 202
         snapname: "Post-update-early-configuration/Pre-service-install"
         state: present
     
@@ -626,7 +631,7 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        vm_id: 203
+        vmid: 203
         snapname: "Post-update-early-configuration/Pre-service-install"
         state: present
     
@@ -635,13 +640,13 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        vm_id: 204
+        vmid: 204
         snapname: "Post-update-early-configuration/Pre-service-install"
         state: present
 
-################################################# INSTALL GLUSTERFS ##################################################
 
-- hosts: docker_vms
+- name: Install glusterFS/glusterd and create directory for brick
+  hosts: docker_vms
   become: true
   tasks:
     - name: Start glusterd service
@@ -655,9 +660,10 @@
         path: /glusterfs/bricks/gv0
         state: directory
 
-########################################### INSTALL DOCKER & PYTHON MODULE ###########################################
 
-- hosts: docker_vms
+
+- name: Install docker and docker python module on docker VMs
+  hosts: docker_vms
   become: true
   tasks:    
     - name: Add Docker GPG Key [Debian/Ubuntu]
@@ -722,9 +728,10 @@
         enabled: true
         daemon_reload: true
 
-########################################## CREATE GLUSTERFS VOLUME AND MOUNT #########################################
 
-- hosts: loadbalancer
+
+- name: Create mountpoint and glusterFS volume, and mount to host machine
+  hosts: loadbalancer
   become: true
   tasks:
     - name: Create a trusted storage pool
@@ -766,9 +773,10 @@
         fstype: glusterfs
         state: mounted
 
-####################################### DEPLOY NGINX LOADBALANCER & PORTAINER ########################################
 
-- hosts: loadbalancer
+
+- name: Deploy docker containers for portainer, NGINX and file manager on the loadbalancer node
+  hosts: loadbalancer
   become: true
   tasks:
     - name: Spin-up a Portainer instance for management of Swarm
@@ -819,9 +827,10 @@
           TZ: "Europe/London"
         restart_policy: always
 
-################################################# MOUNT GLUSTERFS VOLUME ##############################################
 
-- hosts: swarm_manager
+
+- name: Create mountpoint and mount glusterFS volume
+  hosts: swarm_manager
   become: true
   tasks:
     - name: Create mountpoint for Gluster volume
@@ -836,9 +845,10 @@
         fstype: glusterfs
         state: mounted
 
-################################################### DEPLOY DOCKER SWARM ###############################################
 
-- hosts: swarm_manager
+
+- name: Initialize docker swarm and grab the join token
+  hosts: swarm_manager
   become: true
   tasks:
     - name: Check if Swarm has already been Initialized
@@ -859,9 +869,10 @@
       shell: docker swarm join-token --quiet worker
       register: worker_token
 
-################################################## ADD NODES TO SWARM #################################################
 
-- hosts: swarm_nodes
+
+- name: Add nodes to the docker swarm
+  hosts: swarm_nodes
   become: true
   tasks:
     - name: Add Workers to the Swarm
@@ -871,9 +882,10 @@
         join_token: "{{ hostvars[groups['swarm_manager'][0]]['worker_token']['stdout'] }}"
         remote_addrs: [ "{{ hostvars[groups['swarm_manager'][0]]['ansible_default_ipv4']['address'] }}:2377" ]
 
-################################################ MOUNT GLUSTERFS VOLUME ###############################################
 
-- hosts: swarm_nodes
+
+- name: Create mountpoint and mount glusterFS volume
+  hosts: swarm_nodes
   become: true
   tasks:
     - name: Create mountpoint for Gluster volume
@@ -888,9 +900,10 @@
         fstype: glusterfs
         state: mounted
 
-############################################### DEPLOY PORTAINER AGENT ################################################
 
-- hosts: swarm_manager
+
+- name: Create the portainer agent network and deploy the portainer agent
+  hosts: swarm_manager
   become: true
   tasks:
     - name: Create the portainer_agent_network
@@ -920,9 +933,10 @@
             target: /var/lib/docker/volumes
             type: bind
 
-################################################## GITLAB INSTALL ####################################################
 
-- hosts: git
+
+- name: Setup repository and install Gitlab
+  hosts: git
   become: true
   tasks:
     - name: Add Gitlab Repository [Debian/Ubuntu]
@@ -958,9 +972,10 @@
     - name: Restart Gitlab to update the changes
       shell: gitlab-ctl restart
 
-###################################################### REBOOT ########################################################
 
-- hosts: docker_vms,app_vms
+
+- name: Reboot all VMs to finish updates and ensure all services run correctly
+  hosts: docker_vms,app_vms
   become: true
   tasks:
     - name: Reboot systems [Linux]
@@ -977,7 +992,7 @@
       when:
         - ansible_facts.os_family == "Windows"
 
-##################################################### SNAPSHOT ########################################################
+
 
 - name: Snapshot all VMs after all configuration has been completed and they are ready for active deployment
   hosts: proxmox_servers
@@ -988,7 +1003,7 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        vm_id: 200
+        vmid: 200
         snapname: "Post-configuration/Ready-for-service"
         state: present
 
@@ -997,7 +1012,7 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        vm_id: 201
+        vmid: 201
         snapname: "Post-configuration/Ready-for-service"
         state: present
     
@@ -1006,7 +1021,7 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        vm_id: 202
+        vmid: 202
         snapname: "Post-configuration/Ready-for-service"
         state: present
     
@@ -1015,7 +1030,7 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        vm_id: 203
+        vmid: 203
         snapname: "Post-configuration/Ready-for-service"
         state: present
     
@@ -1024,6 +1039,6 @@
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        vm_id: 204
+        vmid: 204
         snapname: "Post-configuration/Ready-for-service"
         state: present

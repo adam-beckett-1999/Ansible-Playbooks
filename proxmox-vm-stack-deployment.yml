@@ -667,3 +667,19 @@
           - source: //var/lib/docker/volumes
             target: /var/lib/docker/volumes
             type: bind
+###################################################### REBOOT ########################################################
+- hosts: docker_vms,app_vms
+  become: true
+  tasks:
+    - name: Reboot systems [Linux]
+      reboot:
+        post_reboot_delay: 60
+        test_command: uptime
+      when:
+        - ansible_facts.os_family == "Debian" or ansible_facts.os_family == "RedHat"
+    - name: Reboot systems [Windows]
+      ansible.windows.win_reboot:
+        post_reboot_delay: 60
+        test_command: 'exit (Get-Service -Name Netlogon).Status -ne "Running"'
+      when:
+        - ansible_facts.os_family == "Windows"

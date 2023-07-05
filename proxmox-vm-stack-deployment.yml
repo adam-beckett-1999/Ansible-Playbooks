@@ -934,6 +934,10 @@
       when:
         - ansible_facts.os_family == "RedHat"
 
+    - name: Pause for 60 seconds
+      ansible.builtin.pause:
+        seconds: 60
+
     - name: Install Gitlab [Debian/Ubuntu]
       apt:
         name: gitlab-ee
@@ -947,6 +951,10 @@
         state: present
       when:
         - ansible_facts.os_family == "RedHat"
+    
+    - name: Pause for 5 minutes
+      ansible.builtin.pause:
+        seconds: 300
 
     - name: Change External URL in Gitlab config file
       ansible.builtin.lineinfile:

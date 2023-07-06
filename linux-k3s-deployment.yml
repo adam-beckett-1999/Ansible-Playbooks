@@ -206,19 +206,25 @@
         - ansible_facts.os_family == "RedHat"
         
     - name: Add the Helm repository for Rancher and dependencies
-      command: helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+      shell: |
+            helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
             
     - name: Download Cert-Manager
-      command: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.crds.yaml
+      shell: |
+            kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.crds.yaml
 
     - name: Add Jetstack repository
-      command: helm repo add jetstack https://charts.jetstack.io
+      shell: |
+            helm repo add jetstack https://charts.jetstack.io
             
     - name: Update helm repositories
-      command: helm repo update
+      shell: |
+            helm repo update
 
     - name: Install Cert-Manager
-      command: helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0
+      shell: |
+            helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0
 
     - name: Add the Helm repository for Rancher and dependencies
-      command: helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"
+      shell: |
+            helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"

@@ -1,0 +1,194 @@
+- name: Download and configure K3S on the VMs
+  hosts: k3s_vms
+  become: true
+  tasks:
+    - name: Download k3s binary x64
+      get_url:
+        url: https://github.com/k3s-io/k3s/releases/download/v1.25.11+k3s1/k3s
+        checksum: sha256:https://github.com/k3s-io/k3s/releases/download/v1.25.11+k3s1/sha256sum-amd64.txt
+        dest: /usr/local/bin/k3s
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Enable IPv4 forwarding
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: "1"
+        state: present
+        reload: yes
+
+    - name: Enable IPv6 forwarding
+      sysctl:
+        name: net.ipv6.conf.all.forwarding
+        value: "1"
+        state: present
+        reload: yes
+    
+    - name: Add br_netfilter to /etc/modules-load.d/ [CentOS/Rocky]
+      copy:
+        content: "br_netfilter"
+        dest: /etc/modules-load.d/br_netfilter.conf
+        mode: "u=rw,g=,o="
+      when: ansible_facts.os_family == "RedHat"
+
+    - name: Load br_netfilter [CentOS/Rocky]
+      modprobe:
+        name: br_netfilter
+        state: present
+      when: ansible_facts.os_family == "RedHat"
+
+    - name: Set bridge-nf-call-iptables (just to be sure) [CentOS/Rocky]
+      sysctl:
+        name: "{{ item }}"
+        value: "1"
+        state: present
+        reload: yes
+      when: ansible_facts.os_family == "RedHat"
+      loop:
+        - net.bridge.bridge-nf-call-iptables
+        - net.bridge.bridge-nf-call-ip6tables
+
+    - name: Add /usr/local/bin to sudo secure_path [CentOS/Rocky]
+      lineinfile:
+        line: 'Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin'
+        regexp: "Defaults(\\s)*secure_path(\\s)*="
+        state: present
+        insertafter: EOF
+        path: /etc/sudoers
+        validate: 'visudo -cf %s'
+      when: ansible_facts.os_family == "RedHat"
+
+
+
+- name: Deploy the K3S service on the master node and grab the join token for worker nodes
+  hosts: k3s_master
+  become: true
+  tasks:
+    - name: Copy K3s service file
+      register: k3s_service
+      template:
+        src: "/home/abeckett/k3s.service.j2"
+        dest: "/etc/systemd/system/k3s.service"
+        remote_src: no
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Enable and check K3s service
+      systemd:
+        name: k3s
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
+
+    - name: Wait for node-token
+      wait_for:
+        path: "/var/lib/rancher/k3s/server/node-token"
+
+    - name: Register node-token file access mode
+      stat:
+        path: "/var/lib/rancher/k3s/server/node-token"
+      register: p
+
+    - name: Change file access node-token
+      file:
+        path: "/var/lib/rancher/k3s/server/node-token"
+        mode: "g+rx,o+rx"
+
+    - name: Read node-token from master
+      slurp:
+        path: "/var/lib/rancher/k3s/server/node-token"
+      register: node_token
+
+    - name: Store Master node-token
+      set_fact:
+        token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+
+    - name: Restore node-token file access
+      file:
+        path: "/var/lib/rancher/k3s/server/node-token"
+        mode: "{{ p.stat.mode }}"
+    
+    - name: Create directory .kube
+      file:
+        path: ~abeckett/.kube
+        state: directory
+        owner: "abeckett"
+        mode: "u=rwx,g=rx,o="
+
+    - name: Copy config file to user home directory
+      copy:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: ~abeckett/.kube/config
+        remote_src: yes
+        owner: "abeckett"
+        mode: "u=rw,g=,o="
+
+    - name: Replace https://localhost:6443 by https://192.168.0.165:6443
+      command: >-
+        k3s kubectl config set-cluster default
+          --server=https://192.168.0.165:6443
+          --kubeconfig ~abeckett/.kube/config
+      changed_when: true
+
+    - name: Create kubectl symlink
+      file:
+        src: /usr/local/bin/k3s
+        dest: /usr/local/bin/kubectl
+        state: link
+
+    - name: Create crictl symlink
+      file:
+        src: /usr/local/bin/k3s
+        dest: /usr/local/bin/crictl
+        state: link
+
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+
+
+- name: Deploy the K3S service on worker nodes and join to the cluster
+  hosts: k3s_nodes
+  become: true
+  tasks:
+    - name: Copy K3s service file
+      template:
+        src: "/home/abeckett/k3s-node.service.j2"
+        dest: "/etc/systemd/system/k3s-node.service"
+        remote_src: no
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Enable and check K3s service
+      systemd:
+        name: k3s-node
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
+
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+
+
+- name: Deploy Rancher
+  hosts: k3s_master
+  become: true
+  tasks:
+    - name: Add the Helm repository for Rancher and dependencies
+      shell: |
+            helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+            kubectl create namespace cattle-system
+            kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.crds.yaml
+            helm repo add jetstack https://charts.jetstack.io
+            helm repo update
+            helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0
+
+    - name: Add the Helm repository for Rancher and dependencies
+      shell: |
+            helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"

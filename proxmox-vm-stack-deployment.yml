@@ -1384,6 +1384,17 @@
   hosts: k3s_master
   become: true
   tasks:
+    - name: Add Helm install repository
+      shell: |
+            curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+    - name: Install Helm [Debian/Ubuntu]
+      apt:
+        name:
+        - helm
+        state: present
+      when:
+        - ansible_facts.os_family == "Debian"
     - name: Add the Helm repository for Rancher and dependencies
       shell: |
             helm repo add rancher-latest https://releases.rancher.com/server-charts/latest

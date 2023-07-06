@@ -87,7 +87,7 @@
       ansible.builtin.pause:
         seconds: 10
 
-    - name: Clone template to VM-K8S-01-MASTER
+    - name: Clone template to VM-K3S-01-MASTER
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
@@ -95,7 +95,7 @@
         api_host: phs-hv-01
         clone: template
         vmid: 1000
-        name: VM-K8S-01-MASTER
+        name: VM-K3S-01-MASTER
         newid: 205
         storage: pool-1
         format: raw
@@ -104,7 +104,7 @@
       ansible.builtin.pause:
         seconds: 10
     
-    - name: Clone template to VM-K8S-02-WORKER
+    - name: Clone template to VM-K3S-02-WORKER
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
@@ -112,7 +112,7 @@
         api_host: phs-hv-01
         clone: template
         vmid: 1000
-        name: VM-K8S-02-WORKER
+        name: VM-K3S-02-WORKER
         newid: 206
         storage: pool-1
         format: raw
@@ -121,7 +121,7 @@
       ansible.builtin.pause:
         seconds: 10
 
-    - name: Clone template to VM-K8S-03-WORKER
+    - name: Clone template to VM-K3S-03-WORKER
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
@@ -129,7 +129,7 @@
         api_host: phs-hv-01
         clone: template
         vmid: 1000
-        name: VM-K8S-03-WORKER
+        name: VM-K3S-03-WORKER
         newid: 207
         storage: pool-1
         format: raw
@@ -264,13 +264,13 @@
       ansible.builtin.pause:
         seconds: 10
     
-    - name: Edit VM-K8S-01-MASTER with new cloud-init parameters
+    - name: Edit VM-K3S-01-MASTER with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: VM-K8S-01-MASTER
+        name: VM-K3S-01-MASTER
         tags: kubernetes,app-server,master
         cores: 4
         memory: 4096
@@ -288,13 +288,13 @@
       ansible.builtin.pause:
         seconds: 10
 
-    - name: Edit VM-K8S-02-WORKER with new cloud-init parameters
+    - name: Edit VM-K3S-02-WORKER with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: VM-K8S-02-WORKER
+        name: VM-K3S-02-WORKER
         tags: kubernetes,app-server,worker
         cores: 4
         memory: 4096
@@ -312,13 +312,13 @@
       ansible.builtin.pause:
         seconds: 10
 
-    - name: Edit VM-K8S-03-WORKER with new cloud-init parameters
+    - name: Edit VM-K3S-03-WORKER with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: VM-K8S-03-WORKER
+        name: VM-K3S-03-WORKER
         tags: kubernetes,app-server,worker
         cores: 4
         memory: 4096
@@ -412,12 +412,12 @@
       ansible.builtin.pause:
         seconds: 10
 
-    - name: Re-size VM-K8S-01-MASTER disk
+    - name: Re-size VM-K3S-01-MASTER disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: VM-K8S-01-MASTER
+        name: VM-K3S-01-MASTER
         disk: scsi0
         size: 50G
         state: resized
@@ -426,12 +426,12 @@
       ansible.builtin.pause:
         seconds: 10
 
-    - name: Re-size VM-K8S-02-WORKER disk
+    - name: Re-size VM-K3S-02-WORKER disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: VM-K8S-02-WORKER
+        name: VM-K3S-02-WORKER
         disk: scsi0
         size: 50G
         state: resized
@@ -440,12 +440,12 @@
       ansible.builtin.pause:
         seconds: 10
 
-    - name: Re-size VM-K8S-03-WORKER disk
+    - name: Re-size VM-K3S-03-WORKER disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: VM-K8S-03-WORKER
+        name: VM-K3S-03-WORKER
         disk: scsi0
         size: 50G
         state: resized
@@ -510,33 +510,33 @@
         state: started
         timeout: 300
     
-    - name: Start VM-K8S-01-MASTER
+    - name: Start VM-K3S-01-MASTER
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: VM-K8S-01-MASTER
+        name: VM-K3S-01-MASTER
         state: started
         timeout: 300
 
-    - name: Start VM-K8S-02-WORKER
+    - name: Start VM-K3S-02-WORKER
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: VM-K8S-02-WORKER
+        name: VM-K3S-02-WORKER
         state: started
         timeout: 300
 
-    - name: Start VM-K8S-03-WORKER
+    - name: Start VM-K3S-03-WORKER
       community.general.proxmox_kvm:
         node: phs-hv-01
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
-        name: VM-K8S-03-WORKER
+        name: VM-K3S-03-WORKER
         state: started
         timeout: 300
 
@@ -547,7 +547,7 @@
 
 
 - name: Install updates on newly created VMs
-  hosts: docker_vms,k8s_vms,app_vms
+  hosts: docker_vms,k3s_vms,app_vms
   become: true
   tasks:
     - name: Preliminary checks [Debian/Ubuntu]
@@ -578,7 +578,7 @@
 
 
 - name: Install base packages and requirements, setup cockpit with plugins and ensure qemu-guest-agent is working
-  hosts: docker_vms,k8s_vms,app_vms
+  hosts: docker_vms,k3s_vms,app_vms
   become: true
   tasks:
     - name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
@@ -707,7 +707,7 @@
 
 
 - name: Configure SNMP service and test to ensure it reports correctly
-  hosts: docker_vms,k8s_vms,app_vms
+  hosts: docker_vms,k3s_vms,app_vms
   become: true
   tasks:
     - name: Install pysnmp for testing SNMP on hosts
@@ -743,7 +743,7 @@
 
 
 - name: Create mountpoint and mount network shares
-  hosts: docker_vms,k8s_vms,app_vms
+  hosts: docker_vms,k3s_vms,app_vms
   become: true
   tasks:
     - name: Create NAS-01 local directory
@@ -780,7 +780,7 @@
   hosts: proxmox_servers
   become: true
   tasks:  
-    - name: Take a snapshot of VM-LB-01 with final configuration completed
+    - name: Take a snapshot of VM-LB-01 with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
@@ -789,7 +789,7 @@
         snapname: Post-update-early-configuration
         state: present
 
-    - name: Take a snapshot of VM-SWARM-01 with final configuration completed
+    - name: Take a snapshot of VM-SWARM-01 with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
@@ -798,7 +798,7 @@
         snapname: Post-update-early-configuration
         state: present
     
-    - name: Take a snapshot of VM-SWARM-02 with final configuration completed
+    - name: Take a snapshot of VM-SWARM-02 with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
@@ -807,7 +807,7 @@
         snapname: Post-update-early-configuration
         state: present
     
-    - name: Take a snapshot of VM-SWARM-03 with final configuration completed
+    - name: Take a snapshot of VM-SWARM-03 with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
@@ -816,7 +816,7 @@
         snapname: Post-update-early-configuration
         state: present
     
-    - name: Take a snapshot of VM-GIT-01 with final configuration completed
+    - name: Take a snapshot of VM-GIT-01 with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
@@ -825,7 +825,7 @@
         snapname: Post-update-early-configuration
         state: present
     
-    - name: Take a snapshot of VM-K8S-01-MASTER with final configuration completed
+    - name: Take a snapshot of VM-K3S-01-MASTER with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
@@ -834,7 +834,7 @@
         snapname: Post-update-early-configuration
         state: present
     
-    - name: Take a snapshot of VM-K8S-02-WORKER with final configuration completed
+    - name: Take a snapshot of VM-K3S-02-WORKER with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
@@ -843,7 +843,7 @@
         snapname: Post-update-early-configuration
         state: present
 
-    - name: Take a snapshot of VM-K8S-03-WORKER with final configuration completed
+    - name: Take a snapshot of VM-K3S-03-WORKER with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
@@ -1191,6 +1191,182 @@
 
 
 
+- name: 
+  hosts: k3s_vms
+  become: true
+  tasks:
+    - name: Download k3s binary x64
+      get_url:
+        url: https://github.com/k3s-io/k3s/releases/download/v1.25.11+k3s1/k3s
+        checksum: sha256:https://github.com/k3s-io/k3s/releases/download/v1.25.11+k3s1/sha256sum-amd64.txt
+        dest: /usr/local/bin/k3s
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Enable IPv4 forwarding
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: "1"
+        state: present
+        reload: yes
+
+    - name: Enable IPv6 forwarding
+      sysctl:
+        name: net.ipv6.conf.all.forwarding
+        value: "1"
+        state: present
+        reload: yes
+    
+    - name: Add br_netfilter to /etc/modules-load.d/ [CentOS/Rocky]
+      copy:
+        content: "br_netfilter"
+        dest: /etc/modules-load.d/br_netfilter.conf
+        mode: "u=rw,g=,o="
+      when: ansible_facts.os_family == "RedHat"
+
+    - name: Load br_netfilter [CentOS/Rocky]
+      modprobe:
+        name: br_netfilter
+        state: present
+      when: ansible_facts.os_family == "RedHat"
+
+    - name: Set bridge-nf-call-iptables (just to be sure) [CentOS/Rocky]
+      sysctl:
+        name: "{{ item }}"
+        value: "1"
+        state: present
+        reload: yes
+      when: ansible_facts.os_family == "RedHat"
+      loop:
+        - net.bridge.bridge-nf-call-iptables
+        - net.bridge.bridge-nf-call-ip6tables
+
+    - name: Add /usr/local/bin to sudo secure_path [CentOS/Rocky]
+      lineinfile:
+        line: 'Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin'
+        regexp: "Defaults(\\s)*secure_path(\\s)*="
+        state: present
+        insertafter: EOF
+        path: /etc/sudoers
+        validate: 'visudo -cf %s'
+      when: ansible_facts.os_family == "RedHat"
+
+
+
+- name: 
+  hosts: k3s_master
+  become: true
+  tasks:
+    - name: Copy K3s service file
+      register: k3s_service
+      template:
+        src: "k3s.service.j2"
+        dest: "/etc/systemd/system/k3s.service"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Enable and check K3s service
+      systemd:
+        name: k3s
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
+
+    - name: Wait for node-token
+      wait_for:
+        path: "/var/lib/rancher/k3s/server/node-token"
+
+    - name: Register node-token file access mode
+      stat:
+        path: "/var/lib/rancher/k3s/server/node-token"
+      register: p
+
+    - name: Change file access node-token
+      file:
+        path: "/var/lib/rancher/k3s/server/node-token"
+        mode: "g+rx,o+rx"
+
+    - name: Read node-token from master
+      slurp:
+        path: "/var/lib/rancher/k3s/server/node-token"
+      register: node_token
+
+    - name: Store Master node-token
+      set_fact:
+        token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+
+    - name: Restore node-token file access
+      file:
+        path: "/var/lib/rancher/k3s/server/node-token"
+        mode: "{{ p.stat.mode }}"
+    
+    - name: Create directory .kube
+      file:
+        path: ~abeckett/.kube
+        state: directory
+        owner: "abeckett"
+        mode: "u=rwx,g=rx,o="
+
+    - name: Copy config file to user home directory
+      copy:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: ~abeckett/.kube/config
+        remote_src: yes
+        owner: "abeckett"
+        mode: "u=rw,g=,o="
+
+    - name: Replace https://localhost:6443 by https://192.168.0.165:6443
+      command: >-
+        k3s kubectl config set-cluster default
+          --server=https://192.168.0.165:6443
+          --kubeconfig ~abeckett/.kube/config
+      changed_when: true
+
+    - name: Create kubectl symlink
+      file:
+        src: /usr/local/bin/k3s
+        dest: /usr/local/bin/kubectl
+        state: link
+
+    - name: Create crictl symlink
+      file:
+        src: /usr/local/bin/k3s
+        dest: /usr/local/bin/crictl
+        state: link
+
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+
+
+- name: 
+  hosts: k3s_nodes
+  become: true
+  tasks:
+    - name: Copy K3s service file
+      template:
+        src: "k3s-node.service.j2"
+        dest: "/etc/systemd/system/k3s-node.service"
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Enable and check K3s service
+      systemd:
+        name: k3s-node
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
+
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+
+
 - name: Reboot all VMs to finish updates and ensure all services run correctly
   hosts: docker_vms,app_vms
   become: true
@@ -1250,5 +1426,32 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         vmid: 204
+        snapname: Post-configuration
+        state: present
+
+    - name: Take a snapshot of VM-K8S-01-MASTER with final configuration completed
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 205
+        snapname: Post-configuration
+        state: present
+    
+    - name: Take a snapshot of VM-K8S-02-WORKER with final configuration completed
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 206
+        snapname: Post-configuration
+        state: present
+
+    - name: Take a snapshot of VM-K8S-03-WORKER with final configuration completed
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 207
         snapname: Post-configuration
         state: present

@@ -1405,10 +1405,6 @@
       when:
         - ansible_facts.os_family == "RedHat"
         
-    - name: Pause for 30 seconds
-      ansible.builtin.pause:
-        seconds: 30
-        
     - name: Add the Helm repository for Rancher and dependencies
       command: helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
             

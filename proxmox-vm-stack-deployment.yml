@@ -1191,7 +1191,7 @@
 
 
 
-- name: 
+- name: Download and configure K3S on the VMs
   hosts: k3s_vms
   become: true
   tasks:
@@ -1254,7 +1254,7 @@
 
 
 
-- name: 
+- name: Deploy the K3S service on the master node and grab the join token for worker nodes
   hosts: k3s_master
   become: true
   tasks:
@@ -1342,7 +1342,7 @@
 
 
 
-- name: 
+- name: Deploy the K3S service on worker nodes and join to the cluster
   hosts: k3s_nodes
   become: true
   tasks:
@@ -1364,6 +1364,25 @@
     - name: Pause for 10 seconds
       ansible.builtin.pause:
         seconds: 10
+
+
+
+- name: Deploy Rancher
+  hosts: k3s_master
+  become: true
+  tasks:
+    - name: Add the Helm repository for Rancher and dependencies
+      shell: |
+            helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+            kubectl create namespace cattle-system
+            kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.crds.yaml
+            helm repo add jetstack https://charts.jetstack.io
+            helm repo update
+            helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0
+
+    - name: Add the Helm repository for Rancher and dependencies
+      shell: |
+            helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165.sslip.io --set replicas=1 --set bootstrapPassword="{{ password }}"
 
 
 

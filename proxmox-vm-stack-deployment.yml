@@ -249,7 +249,7 @@
         name: VM-GIT-01
         tags: gitlab,app-server
         cores: 4
-        memory: 4096
+        memory: 2048
         citype: nocloud
         ciuser: "{{ username }}"
         cipassword: "{{ password }}"

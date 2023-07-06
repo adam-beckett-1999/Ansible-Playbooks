@@ -546,6 +546,17 @@
 
 
 
+- name: Reboot all VMs to ensure that processes are cleared from install
+  hosts: docker_vms,k3s_vms,app_vms
+  become: true
+  tasks:
+    - name: Reboot systems [Linux]
+      reboot:
+        post_reboot_delay: 60
+        test_command: uptime
+
+
+
 - name: Install updates on newly created VMs
   hosts: docker_vms,k3s_vms,app_vms
   become: true
@@ -1387,15 +1398,13 @@
 
 
 - name: Reboot all VMs to finish updates and ensure all services run correctly
-  hosts: docker_vms,app_vms
+  hosts: docker_vms,k3s_vms,app_vms
   become: true
   tasks:
     - name: Reboot systems [Linux]
       reboot:
         post_reboot_delay: 60
         test_command: uptime
-      when:
-        - ansible_facts.os_family == "Debian" or ansible_facts.os_family == "RedHat"
 
 
 

@@ -222,9 +222,7 @@
             helm repo update
 
     - name: Install Cert-Manager
-      shell: |
-            helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0
+      command: helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0
 
     - name: Add the Helm repository for Rancher and dependencies
-      shell: |
-            helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"
+      command: helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"

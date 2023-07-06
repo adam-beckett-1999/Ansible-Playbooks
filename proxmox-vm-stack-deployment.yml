@@ -1407,18 +1407,30 @@
       when:
         - ansible_facts.os_family == "RedHat"
         
+    - name: Pause for 30 seconds
+      ansible.builtin.pause:
+        seconds: 30
+        
     - name: Add the Helm repository for Rancher and dependencies
-      shell: |
-            helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
-            kubectl create namespace cattle-system
-            kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.crds.yaml
-            helm repo add jetstack https://charts.jetstack.io
-            helm repo update
-            helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0
+      command: helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+            
+    - name: Create namespace
+      command: kubectl create namespace cattle-system
+            
+    - name: Download Cert-Manager
+      command: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.crds.yaml
+
+    - name: Add Jetstack repository
+      command: helm repo add jetstack https://charts.jetstack.io
+            
+    - name: Update helm repositories
+      command: helm repo update
+
+    - name: Install Cert-Manager
+      command: helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0
 
     - name: Add the Helm repository for Rancher and dependencies
-      shell: |
-            helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"
+      command: helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"
 
 
 

@@ -1382,7 +1382,7 @@
 
     - name: Add the Helm repository for Rancher and dependencies
       shell: |
-            helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165.sslip.io --set replicas=1 --set bootstrapPassword="{{ password }}"
+            helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"
 
 
 

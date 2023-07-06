@@ -1272,7 +1272,7 @@
     - name: Copy K3s service file
       register: k3s_service
       template:
-        src: "k3s.service.j2"
+        src: "/home/abeckett/k3s.service.j2"
         dest: "/etc/systemd/system/k3s.service"
         remote_src: no
         owner: root
@@ -1360,7 +1360,7 @@
   tasks:
     - name: Copy K3s service file
       template:
-        src: "k3s-node.service.j2"
+        src: "/home/abeckett/k3s-node.service.j2"
         dest: "/etc/systemd/system/k3s-node.service"
         remote_src: no
         owner: root

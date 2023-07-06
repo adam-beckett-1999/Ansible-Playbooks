@@ -87,6 +87,57 @@
       ansible.builtin.pause:
         seconds: 10
 
+    - name: Clone template to VM-K8S-01-MASTER
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        clone: template
+        vmid: 1000
+        name: VM-K8S-01-MASTER
+        newid: 205
+        storage: pool-1
+        format: raw
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+    
+    - name: Clone template to VM-K8S-02-WORKER
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        clone: template
+        vmid: 1000
+        name: VM-K8S-02-WORKER
+        newid: 206
+        storage: pool-1
+        format: raw
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Clone template to VM-K8S-03-WORKER
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        clone: template
+        vmid: 1000
+        name: VM-K8S-03-WORKER
+        newid: 207
+        storage: pool-1
+        format: raw
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
 
 
 - name: Update VM configurations with correct hardware assignment and cloud-init variables
@@ -100,7 +151,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         name: VM-LB-01
-        tags: load-balancer,docker,cockpit
+        tags: load-balancer,docker,glusterfs
         cores: 4
         memory: 2048
         citype: nocloud
@@ -124,7 +175,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         name: VM-SWARM-01
-        tags: docker,app-server,cockpit
+        tags: docker,app-server,glusterfs
         cores: 4
         memory: 4096
         citype: nocloud
@@ -148,7 +199,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         name: VM-SWARM-02
-        tags: docker,app-server,cockpit
+        tags: docker,app-server,glusterfs
         cores: 4
         memory: 4096
         citype: nocloud
@@ -172,7 +223,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         name: VM-SWARM-03
-        tags: docker,app-server,cockpit
+        tags: docker,app-server,glusterfs
         cores: 4
         memory: 4096
         citype: nocloud
@@ -196,7 +247,7 @@
         api_password: "{{ proxmox_password }}"
         api_host: phs-hv-01
         name: VM-GIT-01
-        tags: gitlab,app-server,cockpit
+        tags: gitlab,app-server
         cores: 4
         memory: 4096
         citype: nocloud
@@ -207,6 +258,78 @@
         nameservers: 192.168.0.210
         ipconfig: 
           ipconfig0: gw=192.168.0.1,ip=192.168.0.164/24
+        update: true
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+    
+    - name: Edit VM-K8S-01-MASTER with new cloud-init parameters
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-K8S-01-MASTER
+        tags: kubernetes,app-server,master
+        cores: 4
+        memory: 4096
+        citype: nocloud
+        ciuser: "{{ username }}"
+        cipassword: "{{ password }}"
+        sshkeys: "{{ sshkeys }}"
+        searchdomains: 'homelab.internal'
+        nameservers: 192.168.0.210
+        ipconfig: 
+          ipconfig0: gw=192.168.0.1,ip=192.168.0.165/24
+        update: true
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Edit VM-K8S-02-WORKER with new cloud-init parameters
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-K8S-02-WORKER
+        tags: kubernetes,app-server,worker
+        cores: 4
+        memory: 4096
+        citype: nocloud
+        ciuser: "{{ username }}"
+        cipassword: "{{ password }}"
+        sshkeys: "{{ sshkeys }}"
+        searchdomains: 'homelab.internal'
+        nameservers: 192.168.0.210
+        ipconfig: 
+          ipconfig0: gw=192.168.0.1,ip=192.168.0.166/24
+        update: true
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Edit VM-K8S-03-WORKER with new cloud-init parameters
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-K8S-03-WORKER
+        tags: kubernetes,app-server,worker
+        cores: 4
+        memory: 4096
+        citype: nocloud
+        ciuser: "{{ username }}"
+        cipassword: "{{ password }}"
+        sshkeys: "{{ sshkeys }}"
+        searchdomains: 'homelab.internal'
+        nameservers: 192.168.0.210
+        ipconfig: 
+          ipconfig0: gw=192.168.0.1,ip=192.168.0.167/24
         update: true
         timeout: 300
     - name: Pause for 10 seconds
@@ -289,6 +412,49 @@
       ansible.builtin.pause:
         seconds: 10
 
+    - name: Re-size VM-K8S-01-MASTER disk
+      community.general.proxmox_disk:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-K8S-01-MASTER
+        disk: scsi0
+        size: 50G
+        state: resized
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Re-size VM-K8S-02-WORKER disk
+      community.general.proxmox_disk:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-K8S-02-WORKER
+        disk: scsi0
+        size: 50G
+        state: resized
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Re-size VM-K8S-03-WORKER disk
+      community.general.proxmox_disk:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-K8S-03-WORKER
+        disk: scsi0
+        size: 50G
+        state: resized
+        timeout: 300
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+
 
 - name: Start virtual machines
   hosts: proxmox_servers
@@ -343,6 +509,36 @@
         name: VM-GIT-01
         state: started
         timeout: 300
+    
+    - name: Start VM-K8S-01-MASTER
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-K8S-01-MASTER
+        state: started
+        timeout: 300
+
+    - name: Start VM-K8S-02-WORKER
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-K8S-02-WORKER
+        state: started
+        timeout: 300
+
+    - name: Start VM-K8S-03-WORKER
+      community.general.proxmox_kvm:
+        node: phs-hv-01
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        name: VM-K8S-03-WORKER
+        state: started
+        timeout: 300
 
     - name: Pause for 5 minutes
       ansible.builtin.pause:
@@ -351,7 +547,7 @@
 
 
 - name: Install updates on newly created VMs
-  hosts: docker_vms,app_vms
+  hosts: docker_vms,k8s_vms,app_vms
   become: true
   tasks:
     - name: Preliminary checks [Debian/Ubuntu]
@@ -382,7 +578,7 @@
 
 
 - name: Install base packages and requirements, setup cockpit with plugins and ensure qemu-guest-agent is working
-  hosts: docker_vms,app_vms
+  hosts: docker_vms,k8s_vms,app_vms
   become: true
   tasks:
     - name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
@@ -511,7 +707,7 @@
 
 
 - name: Configure SNMP service and test to ensure it reports correctly
-  hosts: docker_vms,app_vms
+  hosts: docker_vms,k8s_vms,app_vms
   become: true
   tasks:
     - name: Install pysnmp for testing SNMP on hosts
@@ -547,7 +743,7 @@
 
 
 - name: Create mountpoint and mount network shares
-  hosts: docker_vms,app_vms
+  hosts: docker_vms,k8s_vms,app_vms
   become: true
   tasks:
     - name: Create NAS-01 local directory
@@ -628,6 +824,34 @@
         vmid: 204
         snapname: Post-update-early-configuration
         state: present
+    
+    - name: Take a snapshot of VM-K8S-01-MASTER with final configuration completed
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 205
+        snapname: Post-update-early-configuration
+        state: present
+    
+    - name: Take a snapshot of VM-K8S-02-WORKER with final configuration completed
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 206
+        snapname: Post-update-early-configuration
+        state: present
+
+    - name: Take a snapshot of VM-K8S-03-WORKER with final configuration completed
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 207
+        snapname: Post-update-early-configuration
+        state: present
+
 
 
 - name: Install glusterFS/glusterd and create directory for brick

@@ -190,6 +190,7 @@
         name:
         - helm
         state: present
+        update_cache: yes
       when:
         - ansible_facts.os_family == "Debian"
 
@@ -198,6 +199,7 @@
         name:
         - helm
         state: present
+        update_cache: yes
       when:
         - ansible_facts.os_family == "RedHat"
         

@@ -1326,8 +1326,12 @@
         src: /etc/rancher/k3s/k3s.yaml
         dest: ~abeckett/.kube/config
         remote_src: yes
-        owner: "abeckett"
-        mode: "600"
+        owner: abeckett
+        mode: '600'
+    
+    - name: Export Kubeconfig
+      shell: |
+            export KUBECONFIG=~/.kube/config
 
     - name: Replace https://localhost:6443 by https://192.168.0.165:6443
       command: >-

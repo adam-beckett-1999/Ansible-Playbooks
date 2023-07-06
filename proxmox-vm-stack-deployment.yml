@@ -1331,9 +1331,7 @@
 
     - name: Replace https://localhost:6443 by https://192.168.0.165:6443
       command: >-
-        k3s kubectl config set-cluster default
-          --server=https://192.168.0.165:6443
-          --kubeconfig ~abeckett/.kube/config
+        k3s kubectl config set-cluster default --server=https://192.168.0.165:6443 --kubeconfig ~abeckett/.kube/config
       changed_when: true
 
     - name: Create kubectl symlink

@@ -66,7 +66,7 @@
         state: directory
     - name: Mount Gluster volume
       ansible.posix.mount:
-        src: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:/gv0"
+        src: "{{ ansible_host }}:/gv0"
         path: /mnt/gluster
         fstype: glusterfs
         state: mounted
@@ -79,7 +79,7 @@
         state: directory
     - name: Mount Gluster volume
       ansible.posix.mount:
-        src: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:/gv0"
+        src: "{{ ansible_host }}:/gv0"
         path: /mnt/gluster
         fstype: glusterfs
         state: mounted

@@ -1,4 +1,4 @@
-- hosts: "*"
+- hosts: "glusterfs_servers"
   become: true
   tasks:
     - name: Install software-properties-common [Debian/Ubuntu]
@@ -35,7 +35,7 @@
       ansible.builtin.file:
         path: /glusterfs/bricks/gv0
         state: directory
-- hosts: "*"
+- hosts: "glusterfs_node_1"
   become: true
   tasks:
     - name: Create a trusted storage pool
@@ -74,7 +74,7 @@
         state: mounted
 
 ### mount to next node ###
-- hosts: "*"                                                  ### COPY PASTE THIS SECTION AND CONFIGURE FOR INDIVIDUAL 
+- hosts: "glusterfs_node_2"                                   ### COPY PASTE THIS SECTION AND CONFIGURE FOR INDIVIDUAL 
   become: true                                                ### NODES BASED ON THE NUMBER SETUP IN CREATE STAGE
   tasks:
     - name: Create mountpoint for Gluster volume
@@ -88,7 +88,7 @@
         fstype: glusterfs
         state: mounted
 ### mount to next node ###
-- hosts: "*"
+- hosts: "glusterfs_node_3"
   become: true
   tasks:
     - name: Create mountpoint for Gluster volume
@@ -102,7 +102,7 @@
         fstype: glusterfs
         state: mounted
 ### mount to next node ###
-- hosts: "*"
+- hosts: "glusterfs_node_4"
   become: true
   tasks:
     - name: Create mountpoint for Gluster volume

@@ -1,32 +1,8 @@
-- name: Install glusterfs/glusterd and create directory for brick
+- name: Start glusterfs/glusterd and create directory for brick
   hosts: glusterfs_servers                                          # Your inventory file should contain 3 host groups
   become: true                                                      # [glusterfs_servers] containing all machines running glusterfs
   tasks:                                                            # [glusterfs_primary_node] which will be used to initialize the gluster filesystem
-    - name: Install software-properties-common [Debian/Ubuntu]      # [glusterfs_connected_nodes] which are the nodes which will connect to the primary
-      apt:
-        name:
-        - software-properties-common
-        state: present
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install GlusterFS [Debian/Ubuntu]
-      apt:
-        name:
-        - glusterfs-server
-        - glusterfs-client
-        state: present
-        update_cache: yes
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install GlusterFS [CentOS/Rocky]
-      dnf:
-        name: 
-        - glusterfs-server
-        - glusterfs-client
-        state: present
-      when:
-        - ansible_facts.os_family == "RedHat"
-    - name: Start glusterd service
+    - name: Start glusterd service                                  # [glusterfs_connected_nodes] which are the nodes which will connect to the primary
       systemd:
         name: glusterd
         enabled: yes

@@ -7,13 +7,7 @@
         name: 
           - pyyaml
           - jsonpatch
-
-    - name: Install Python3 [Debian/Ubuntu]
-      apt:
-        name: python3
-        state: present
-      when:
-        - ansible_facts.os_family == "Debian"
+          - kubernetes
 
     - name: Download k3s binary x64
       get_url:
@@ -249,7 +243,7 @@
     #  shell: |
     #        helm repo update
 
-    - name: Deploy latest version of Prometheus chart inside monitoring namespace (and create it)
+    - name: Deploy latest version of Cert-Manager chart inside cert-manager namespace (and create it)
       kubernetes.core.helm:
         update_repo_cache: true
         name: cert-manager
@@ -261,7 +255,7 @@
     #- name: Install Cert-Manager
     #  command: helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0
 
-    - name: Deploy latest version of Prometheus chart inside monitoring namespace (and create it)
+    - name: Deploy latest version of Rancher chart inside cattle-system namespace (and create it)
       kubernetes.core.helm:
         update_repo_cache: true
         name: rancher

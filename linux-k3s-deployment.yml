@@ -2,6 +2,10 @@
   hosts: k3s_vms
   become: true
   tasks:
+    - name: Install PyYAML for Helm
+      pip:
+        name: pyyaml
+
     - name: Download k3s binary x64
       get_url:
         url: https://github.com/k3s-io/k3s/releases/download/v1.25.11+k3s1/k3s

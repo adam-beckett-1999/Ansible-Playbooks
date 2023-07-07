@@ -750,7 +750,7 @@
       ansible.builtin.file:
         path: /glusterfs/bricks/gv0
         state: directory
-- name: Create mountpoint and glusterFS volume, and mount to host machine
+- name: Create mountpoint and glusterFS volume and initialize
   hosts: loadbalancer
   become: true
   tasks:
@@ -777,18 +777,8 @@
       gluster.gluster.gluster_volume:
         state: started
         name: gv0
-    - name: Create mountpoint for Gluster volume
-      ansible.builtin.file:
-        path: /mnt/gluster
-        state: directory
-    - name: Mount Gluster volume
-      ansible.posix.mount:
-        src: "{{ ansible_host }}:/gv0"
-        path: /mnt/gluster
-        fstype: glusterfs
-        state: mounted
 - name: Create mountpoint and mount glusterFS volume
-  hosts: swarm_manager
+  hosts: loadbalancer,swarm_manager,swarm_nodes
   become: true
   tasks:
     - name: Create mountpoint for Gluster volume
@@ -800,21 +790,7 @@
         src: "{{ ansible_host }}:/gv0"
         path: /mnt/gluster
         fstype: glusterfs
-        state: mounted
-- name: Create mountpoint and mount glusterFS volume
-  hosts: swarm_nodes
-  become: true
-  tasks:
-    - name: Create mountpoint for Gluster volume
-      ansible.builtin.file:
-        path: /mnt/gluster
-        state: directory
-    - name: Mount Gluster volume
-      ansible.posix.mount:
-        src: "{{ ansible_host }}:/gv0"
-        path: /mnt/gluster
-        fstype: glusterfs
-        state: mounted        
+        state: mounted       
 
 #DOCKER INSTALL, CONFIGURATION AND SWARM INITIALIZATION
 - name: Install docker and docker python module on docker VMs

@@ -15,15 +15,11 @@
   hosts: glusterfs_primary_node
   become: true
   tasks:
-    - name: Create List of nodes to be added to the Trusted Storage Pool
-      set_fact: storagepoolnodelist={%for host in groups['glusterfs_connected_nodes']%}- {{hostvars[host].ansible_eth0.ipv4.address}}{% if not loop.last %}{% endif %}{% endfor %}
-    - name: Create List of nodes to be added to the Cluster
-      set_fact: clusternodelist={%for host in groups['glusterfs_servers']%}- {{hostvars[host].ansible_eth0.ipv4.address}}{% if not loop.last %}{% endif %}{% endfor %}  
-    - name: Create a Trusted Storage Pool
+    - name: Create a trusted storage pool
       gluster.gluster.gluster_peer:
         state: present
         nodes:
-          - "{{ storagepoolnodelist }}"
+          - #ips
     - name: Create GlusterFS volume
       gluster.gluster.gluster_volume:
         state: present
@@ -31,7 +27,7 @@
         replicas: 4                                                 # Change this depending on the number of servers in the cluster
         bricks: /glusterfs/bricks/gv0
         cluster:
-          - "{{ clusternodelist }}"
+          - #ips
         force: true
       run_once: true
     - name: Start GlusterFS volume

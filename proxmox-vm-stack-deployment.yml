@@ -15,10 +15,9 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 10 seconds
+    - name: Pause for 5 seconds
       ansible.builtin.pause:
-        seconds: 10
-
+        seconds: 5
     - name: Clone template to VM-SWARM-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -32,10 +31,9 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 10 seconds
+    - name: Pause for 5 seconds
       ansible.builtin.pause:
-        seconds: 10
-
+        seconds: 5
     - name: Clone template to VM-SWARM-02
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -49,10 +47,9 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 10 seconds
+    - name: Pause for 5 seconds
       ansible.builtin.pause:
-        seconds: 10
-
+        seconds: 5
     - name: Clone template to VM-SWARM-03
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -66,10 +63,9 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 10 seconds
+    - name: Pause for 5 seconds
       ansible.builtin.pause:
-        seconds: 10
-
+        seconds: 5
     - name: Clone template to VM-GIT-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -83,10 +79,9 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 10 seconds
+    - name: Pause for 5 seconds
       ansible.builtin.pause:
-        seconds: 10
-
+        seconds: 5
     - name: Clone template to VM-K3S-01-MASTER
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -100,10 +95,9 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 10 seconds
+    - name: Pause for 5 seconds
       ansible.builtin.pause:
-        seconds: 10
-    
+        seconds: 5
     - name: Clone template to VM-K3S-02-WORKER
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -117,10 +111,9 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 10 seconds
+    - name: Pause for 5 seconds
       ansible.builtin.pause:
-        seconds: 10
-
+        seconds: 5
     - name: Clone template to VM-K3S-03-WORKER
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -134,9 +127,9 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 10 seconds
+    - name: Pause for 5 seconds
       ansible.builtin.pause:
-        seconds: 10
+        seconds: 5
 
 
 
@@ -164,10 +157,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.160/24
         update: true
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Edit VM-SWARM-01 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -188,10 +177,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.161/24
         update: true
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Edit VM-SWARM-02 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -212,10 +197,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.162/24
         update: true
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Edit VM-SWARM-03 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -236,10 +217,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.163/24
         update: true
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Edit VM-GIT-01 with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -260,10 +237,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.164/24
         update: true
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-    
     - name: Edit VM-K3S-01-MASTER with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -284,10 +257,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.165/24
         update: true
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Edit VM-K3S-02-WORKER with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -308,10 +277,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.166/24
         update: true
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Edit VM-K3S-03-WORKER with new cloud-init parameters
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -332,9 +297,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.167/24
         update: true
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
 
 
 
@@ -352,10 +314,6 @@
         size: 50G
         state: resized
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Re-size VM-SWARM-01 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -366,10 +324,6 @@
         size: 50G
         state: resized
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Re-size VM-SWARM-02 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -380,10 +334,6 @@
         size: 50G
         state: resized
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Re-size VM-SWARM-03 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -394,10 +344,6 @@
         size: 50G
         state: resized
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Re-size VM-GIT-01 disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -408,10 +354,6 @@
         size: 50G
         state: resized
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Re-size VM-K3S-01-MASTER disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -422,10 +364,6 @@
         size: 50G
         state: resized
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Re-size VM-K3S-02-WORKER disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -436,10 +374,6 @@
         size: 50G
         state: resized
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: Re-size VM-K3S-03-WORKER disk
       community.general.proxmox_disk:
         api_user: "{{ proxmox_user }}"
@@ -450,9 +384,6 @@
         size: 50G
         state: resized
         timeout: 300
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
 
 
 
@@ -469,7 +400,6 @@
         name: VM-LB-01
         state: started
         timeout: 300
-
     - name: Start VM-SWARM-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -479,7 +409,6 @@
         name: VM-SWARM-01
         state: started
         timeout: 300
-
     - name: Start VM-SWARM-02
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -489,7 +418,6 @@
         name: VM-SWARM-02
         state: started
         timeout: 300
-
     - name: Start VM-SWARM-03
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -499,7 +427,6 @@
         name: VM-SWARM-03
         state: started
         timeout: 300
-
     - name: Start VM-GIT-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -509,7 +436,6 @@
         name: VM-GIT-01
         state: started
         timeout: 300
-    
     - name: Start VM-K3S-01-MASTER
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -519,7 +445,6 @@
         name: VM-K3S-01-MASTER
         state: started
         timeout: 300
-
     - name: Start VM-K3S-02-WORKER
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -529,7 +454,6 @@
         name: VM-K3S-02-WORKER
         state: started
         timeout: 300
-
     - name: Start VM-K3S-03-WORKER
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -539,7 +463,6 @@
         name: VM-K3S-03-WORKER
         state: started
         timeout: 300
-
     - name: Pause for 5 minutes
       ansible.builtin.pause:
         seconds: 300

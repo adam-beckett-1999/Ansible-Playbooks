@@ -1,31 +1,7 @@
-########################################### INSTALL SNMPD, CONFIGURE & TEST ###########################################
-- name: Playbook for configuration of SNMP on linux based hosts
-  hosts: "*"
+- name: Configure SNMP service and test to ensure it reports correctly
+  hosts: swarm_vms,k3s_vms,app_vms
   become: true
   tasks:
-    - name: Update cache & install SNMP packages [Debian/Ubuntu]
-      apt:
-        name:
-          - snmpd
-          - snmp
-          - libsnmp-dev
-          - python3-setuptools
-          - python3-pip
-        state: latest
-        update_cache: yes
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Update cache & install SNMP packages [CentOS/Rocky]
-      dnf:
-        name:
-          - net-snmp
-          - net-snmp-utils
-          - python3-setuptools
-          - python3-pip
-        state: latest
-        update_cache: yes
-      when:
-        - ansible_facts.os_family == "RedHat"
     - name: Install pysnmp for testing SNMP on hosts
       pip:
         name: pysnmp

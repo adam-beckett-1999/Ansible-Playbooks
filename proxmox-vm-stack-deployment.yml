@@ -1208,8 +1208,16 @@
   tasks:
     - name: Add abeckett to the sudoers group
       user:
-        name: abeckett
-        group: sudo
+        name: "{{ username }}"
+        groups: 
+          - sudo
+        append: true
+
+    - name: Make sudo without password for {{ sudo_user }} user
+      copy:
+        dest: /etc/sudoers.d/80-ansible-sudo-user
+        content: "{{ username }} ALL=(ALL) NOPASSWD:ALL"
+        mode: 0440
 
     - name: Install dependencies
       pip:

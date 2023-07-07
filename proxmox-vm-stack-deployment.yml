@@ -1206,6 +1206,13 @@
   hosts: k3s_vms
   become: true
   tasks:
+    - name: Install dependencies
+      pip:
+        name: 
+          - pyyaml
+          - jsonpatch
+          - kubernetes
+
     - name: Download k3s binary x64
       get_url:
         url: https://github.com/k3s-io/k3s/releases/download/v1.25.11+k3s1/k3s
@@ -1328,7 +1335,7 @@
         remote_src: yes
         owner: abeckett
         mode: '600'
-    
+
     - name: Export Kubeconfig
       shell: |
             export KUBECONFIG=~/.kube/config
@@ -1408,31 +1415,62 @@
         update_cache: yes
       when:
         - ansible_facts.os_family == "RedHat"
-        
+    
     - name: Add the Helm repository for Rancher and dependencies
-      shell: |
-            helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
-            
+      kubernetes.core.helm_repository:
+        name: rancher-latest
+        repo_url: https://releases.rancher.com/server-charts/latest
+
     - name: Download Cert-Manager
       shell: |
-            kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.crds.yaml
+            kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.4/cert-manager.crds.yaml
 
     - name: Add Jetstack repository
-      shell: |
-            helm repo add jetstack https://charts.jetstack.io
+      kubernetes.core.helm_repository:
+        name: jetstack
+        repo_url: https://charts.jetstack.io
+
+    #- name: Add Jetstack repository
+    #  shell: |
+    #        helm repo add jetstack https://charts.jetstack.io
             
-    - name: Update helm repositories
-      shell: |
-            helm repo update
+    #- name: Update helm repositories
+    #  shell: |
+    #        helm repo update
 
-    - name: Install Cert-Manager
-      shell: |
-            helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0
+    - name: Deploy latest version of Cert-Manager chart inside cert-manager namespace (and create it)
+      kubernetes.core.helm:
+        update_repo_cache: true
+        name: cert-manager
+        chart_ref: jetstack/cert-manager
+        chart_version: v1.11.4
+        release_namespace: cert-manager
+        create_namespace: true
 
-    - name: Add the Helm repository for Rancher and dependencies
-      shell: |
-            helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"
+    #- name: Install Cert-Manager
+    #  command: helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0
 
+    - name: Deploy latest version of Rancher chart inside cattle-system namespace (and create it)
+      kubernetes.core.helm:
+        update_repo_cache: true
+        name: rancher
+        chart_ref: rancher-latest/rancher
+        release_namespace: cattle-system
+        values:
+          - hostname: 192.168.0.165
+          - bootstrapPassword: "{{ password }}"
+        #set_values:
+        #  - value: hostname=192.168.0.165
+        #  - value_type: string
+        #  - value: replicas=1
+        #  - value_type: string
+        #  - value: bootstrapPassword="{{ password }}"
+        #  - value_type: string
+
+
+    #- name: Add the Helm repository for Rancher and dependencies
+    #  command: helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"
+    
 
 
 - name: Reboot all VMs to finish updates and ensure all services run correctly

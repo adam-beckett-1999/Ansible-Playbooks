@@ -71,16 +71,16 @@
 - name: Deploy the K3S service on the master node and grab the join token for worker nodes
   hosts: k3s_master
   vars:
-  server_init_args: >-
-    {% if groups['master'] | length > 1 %}
-      {% if ansible_hostname == hostvars[groups['k3s_master'][0]]['ansible_hostname'] %}
-        --cluster-init
-      {% else %}
-        --server https://{{ hostvars[groups['k3s_master'][0]].k3s_node_ip | split(",") | first | ansible.utils.ipwrap }}:6443
+    server_init_args: >-
+      {% if groups['master'] | length > 1 %}
+        {% if ansible_hostname == hostvars[groups['k3s_master'][0]]['ansible_hostname'] %}
+          --cluster-init
+        {% else %}
+          --server https://{{ hostvars[groups['k3s_master'][0]].k3s_node_ip | split(",") | first | ansible.utils.ipwrap }}:6443
+        {% endif %}
+        --token {{ k3s_token }}
       {% endif %}
-      --token {{ k3s_token }}
-    {% endif %}
-    {{ extra_server_args | default('') }}
+      {{ extra_server_args | default('') }}
   become: true
   tasks:
     - name: Clean previous runs of k3s-init

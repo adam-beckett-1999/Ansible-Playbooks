@@ -50,7 +50,7 @@
       gluster.gluster.gluster_volume:
         state: present
         name: gv0
-        replicas: 4 # number of replicas based on number of servers in gluster trusted pool
+        replicas: 4                                     # Change this depending on the number of servers in the cluster
         bricks: /glusterfs/bricks/gv0
         cluster:
           - "{{ clusternodelist }}"

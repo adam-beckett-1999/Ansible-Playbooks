@@ -72,7 +72,7 @@
   hosts: k3s_master
   vars:
     server_init_args: >-
-      {% if groups['master'] | length > 1 %}
+      {% if groups['k3s_master'] | length > 1 %}
         {% if ansible_hostname == hostvars[groups['k3s_master'][0]]['ansible_hostname'] %}
           --cluster-init
         {% else %}

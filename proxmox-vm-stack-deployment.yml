@@ -1270,20 +1270,21 @@
         validate: 'visudo -cf %s'
       when: ansible_facts.os_family == "RedHat"
 
-vars:
-  server_init_args: >-
-    {% if groups['master'] | length > 1 %}
-      {% if ansible_hostname == hostvars[groups['k3s_master'][0]]['ansible_hostname'] %}
-        --cluster-init
-      {% else %}
-        --server https://{{ hostvars[groups['k3s_master'][0]].k3s_node_ip | split(",") | first | ansible.utils.ipwrap }}:6443
-      {% endif %}
-      --token {{ k3s_token }}
-    {% endif %}
-    {{ extra_server_args | default('') }}
+
 
 - name: Deploy the K3S service on the master node and grab the join token for worker nodes
   hosts: k3s_master
+  vars:
+    server_init_args: >-
+      {% if groups['k3s_master'] | length > 1 %}
+        {% if ansible_hostname == hostvars[groups['k3s_master'][0]]['ansible_hostname'] %}
+          --cluster-init
+        {% else %}
+          --server https://{{ hostvars[groups['k3s_master'][0]].k3s_node_ip | split(",") | first | ansible.utils.ipwrap }}:6443
+        {% endif %}
+        --token {{ k3s_token }}
+      {% endif %}
+      {{ extra_server_args | default('') }}
   become: true
   tasks:
     - name: Clean previous runs of k3s-init
@@ -1313,7 +1314,7 @@ vars:
           command:
             cmd: k3s kubectl get nodes -l "node-role.kubernetes.io/master=true" -o=jsonpath="{.items[*].metadata.name}"
           register: nodes
-          until: nodes.rc == 0 and (nodes.stdout.split() | length) == (groups['master'] | length)
+          until: nodes.rc == 0 and (nodes.stdout.split() | length) == (groups['k3s_master'] | length)
           retries: "{{ retry_count | default(20) }}"
           delay: 10
           changed_when: false
@@ -1393,7 +1394,8 @@ vars:
 
     - name: Export Kubeconfig
       shell: |
-            export KUBECONFIG=~/.kube/config
+            export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+            export KUBECONFIG=/home/abeckett/.kube/config
 
     - name: Replace https://localhost:6443 with https://192.168.0.165:6443
       command: >-
@@ -1436,10 +1438,6 @@ vars:
       loop_control:
         label: "{{ item.path }}"
 
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
 
 
 - name: Deploy the K3S service on worker nodes and join to the cluster
@@ -1461,10 +1459,6 @@ vars:
         daemon_reload: yes
         state: restarted
         enabled: yes
-
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
 
 
 

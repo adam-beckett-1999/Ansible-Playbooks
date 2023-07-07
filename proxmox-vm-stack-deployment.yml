@@ -1,3 +1,4 @@
+#CREATE, CONFIGURE AND START VMS
 - name: Clone VMs from existing templates
   hosts: proxmox_servers
   become: true
@@ -130,9 +131,6 @@
     - name: Pause for 5 seconds
       ansible.builtin.pause:
         seconds: 5
-
-
-
 - name: Update VM configurations with correct hardware assignment and cloud-init variables
   hosts: proxmox_servers
   become: true
@@ -297,9 +295,6 @@
           ipconfig0: gw=192.168.0.1,ip=192.168.0.167/24
         update: true
         timeout: 300
-
-
-
 - name: Resize VM disks to the required size
   hosts: proxmox_servers
   become: true
@@ -384,9 +379,6 @@
         size: 50G
         state: resized
         timeout: 300
-
-
-
 - name: Start virtual machines
   hosts: proxmox_servers
   become: true
@@ -466,9 +458,6 @@
     - name: Pause for 5 minutes
       ansible.builtin.pause:
         seconds: 300
-
-
-
 - name: Reboot all VMs to ensure that processes are cleared from install
   hosts: swarm_vms,k3s_vms,app_vms
   become: true
@@ -480,6 +469,7 @@
 
 
 
+#INITIAL STANDARDISED UPDATES, PACKAGE INSTALLS AND CONFIGURATION
 - name: Install updates on newly created VMs
   hosts: swarm_vms,k3s_vms,app_vms
   become: true
@@ -491,7 +481,6 @@
         mode: 0755
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Install all updates [Debian/Ubuntu]
       apt:
         update_cache: yes
@@ -499,7 +488,6 @@
         autoclean: yes
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Upgrade all packages and install kernel updates [CentOS/Rocky]
       dnf:
         update_cache: yes
@@ -508,9 +496,6 @@
         state: latest
       when:
         - ansible_facts.os_family == "RedHat"
-
-
-
 - name: Install base packages and requirements, setup cockpit with plugins and ensure qemu-guest-agent is working
   hosts: swarm_vms,k3s_vms,app_vms
   become: true
@@ -539,7 +524,6 @@
         state: present
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Install required base-packages (qemu-guest-agent, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [CentOS/Rocky]
       dnf:
         name: 
@@ -564,14 +548,12 @@
         state: present
       when:
         - ansible_facts.os_family == "RedHat"
-
     - name: Install cockpit navigator plugin [Debian/Ubuntu]
       apt:
         deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
         state: present
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Install cockpit navigator plugin [CentOS/Rocky]
       dnf:
         name: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.8/cockpit-navigator-0.5.8-2.el8.noarch.rpm
@@ -579,14 +561,12 @@
         disable_gpg_check: True
       when:
         - ansible_facts.os_family == "RedHat"
-
     - name: Install cockpit file sharing plugin [Debian/Ubuntu]
       apt:
         deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
         state: present
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Install cockpit file sharing plugin [CentOS/Rocky]
       dnf:
         name: https://github.com/45Drives/cockpit-file-sharing/releases/download/v2.4.5/cockpit-file-sharing-2.4.5-1.el8.noarch.rpm
@@ -594,13 +574,11 @@
         disable_gpg_check: True
       when:
         - ansible_facts.os_family == "RedHat"
-
     - name: Start qemu-guest-agent service
       systemd:
         name: qemu-guest-agent
         enabled: yes
         state: started
-
     - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
       copy:
         dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
@@ -609,12 +587,10 @@
           unmanaged-devices=none
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Create fake network interface to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
       ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Start cockpit service [Debian/Ubuntu]
       systemd:
         name: cockpit
@@ -623,23 +599,18 @@
         masked: no
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Enable cockpit.socket [CentOS/Rocky]
       systemd:
         name: cockpit.socket
         enabled: yes
       when:
         - ansible_facts.os_family == "RedHat"
-
     - name: Start cockpit [CentOS/Rocky]
       systemd:
         name: cockpit
         state: started
       when:
         - ansible_facts.os_family == "RedHat"
-
-
-
 - name: Configure SNMP service and test to ensure it reports correctly
   hosts: swarm_vms,k3s_vms,app_vms
   become: true
@@ -647,35 +618,27 @@
     - name: Install pysnmp for testing SNMP on hosts
       pip:
         name: pysnmp
-
     - name: Configure SNMP server
       copy: src=/home/abeckett/snmpd.conf dest=/etc/snmp/snmpd.conf owner=root group=root mode=600
-
     - name: Start and enable SNMPd systemd service.
       systemd:
         name: snmpd
         state: started
         enabled: true
         daemon_reload: true
-
     - name: Restart SNMPd systemd service if already running.
       systemd:
         name: snmpd
         state: restarted
-
     - name: Test that SNMP is working
       community.general.snmp_facts:
         host: '{{ inventory_hostname }}'
         version: v2c
         community: BCloudHomelab
       register: response
-
     - name: Print the results of the test
       debug:
         var: response
-
-
-
 - name: Create mountpoint and mount network shares
   hosts: swarm_vms,k3s_vms,app_vms
   become: true
@@ -684,7 +647,6 @@
       ansible.builtin.file:
         path: /nas-01
         state: directory
-
     - name: Mount NAS-01 network share
       ansible.posix.mount:
         src: NAS-01.homelab.internal:/volume1/Media
@@ -693,12 +655,10 @@
         boot: true
         opts: rw,sync,hard
         state: mounted
-
     - name: Create STORAGE-01 local directory
       ansible.builtin.file:
         path: /storage-01
         state: directory
-
     - name: Mount STORAGE-01 network share
       ansible.posix.mount:
         src: STORAGE-01.homelab.internal:/mnt/user/media
@@ -710,6 +670,7 @@
 
 
 
+#SNAPSHOT
 - name: Snapshot all VMs after initial configuration before applications and services are installed and started
   hosts: proxmox_servers
   become: true
@@ -722,7 +683,6 @@
         vmid: 200
         snapname: Post-update-early-configuration
         state: present
-
     - name: Take a snapshot of VM-SWARM-01 with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -731,7 +691,6 @@
         vmid: 201
         snapname: Post-update-early-configuration
         state: present
-    
     - name: Take a snapshot of VM-SWARM-02 with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -740,7 +699,6 @@
         vmid: 202
         snapname: Post-update-early-configuration
         state: present
-    
     - name: Take a snapshot of VM-SWARM-03 with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -749,7 +707,6 @@
         vmid: 203
         snapname: Post-update-early-configuration
         state: present
-    
     - name: Take a snapshot of VM-GIT-01 with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -758,7 +715,6 @@
         vmid: 204
         snapname: Post-update-early-configuration
         state: present
-    
     - name: Take a snapshot of VM-K3S-01-MASTER with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -767,7 +723,6 @@
         vmid: 205
         snapname: Post-update-early-configuration
         state: present
-    
     - name: Take a snapshot of VM-K3S-02-WORKER with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -776,7 +731,6 @@
         vmid: 206
         snapname: Post-update-early-configuration
         state: present
-
     - name: Take a snapshot of VM-K3S-03-WORKER with early configuration before role setup
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -788,7 +742,8 @@
 
 
 
-- name: Install glusterFS/glusterd and create directory for brick
+#GLUSTERFS ON DOCKER SWARM VMS
+- name: Start glusterfs/glusterd service and create directory for brick
   hosts: swarm_vms
   become: true
   tasks:
@@ -797,14 +752,79 @@
         name: glusterd
         enabled: yes
         state: started
-
     - name: Create GlusterFS brick-1 directory
       ansible.builtin.file:
         path: /glusterfs/bricks/gv0
         state: directory
+- name: Create mountpoint and glusterFS volume, and mount to host machine
+  hosts: loadbalancer
+  become: true
+  tasks:
+    - name: Create List of nodes to be added to the Trusted Storage Pool
+      set_fact: storagepoolnodelist={%for host in groups['glusterfs_connected_nodes']%}- {{hostvars[host].ansible_eth0.ipv4.address}}{% if not loop.last %}{% endif %}{% endfor %}
+    - name: Create List of nodes to be added to the Cluster
+      set_fact: clusternodelist={%for host in groups['glusterfs_servers']%}- {{hostvars[host].ansible_eth0.ipv4.address}}{% if not loop.last %}{% endif %}{% endfor %}  
+    - name: Create a trusted storage pool
+      gluster.gluster.gluster_peer:
+        state: present
+        nodes:
+          - "{{ storagepoolnodelist }}"
+    - name: Create GlusterFS volume
+      gluster.gluster.gluster_volume:
+        state: present
+        name: gv0
+        replicas: 4
+        bricks: /glusterfs/bricks/gv0
+        cluster:
+          - "{{ clusternodelist }}"
+        force: true
+      run_once: true
+    - name: Start GlusterFS volume
+      gluster.gluster.gluster_volume:
+        state: started
+        name: gv0
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: "{{ ansible_host }}:/gv0"
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+- name: Create mountpoint and mount glusterFS volume
+  hosts: swarm_manager
+  become: true
+  tasks:
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: "{{ ansible_host }}:/gv0"
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted
+- name: Create mountpoint and mount glusterFS volume
+  hosts: swarm_nodes
+  become: true
+  tasks:
+    - name: Create mountpoint for Gluster volume
+      ansible.builtin.file:
+        path: /mnt/gluster
+        state: directory
+    - name: Mount Gluster volume
+      ansible.posix.mount:
+        src: "{{ ansible_host }}:/gv0"
+        path: /mnt/gluster
+        fstype: glusterfs
+        state: mounted        
 
 
 
+#DOCKER INSTALL, CONFIGURATION AND SWARM INITIALIZATION
 - name: Install docker and docker python module on docker VMs
   hosts: swarm_vms
   become: true
@@ -815,14 +835,12 @@
         state: present
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Add Docker Repository [Debian/Ubuntu]
       apt_repository:
         repo: deb https://download.docker.com/linux/ubuntu focal stable
         state: present
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Add Docker Repository [CentOS/Rocky]
       shell: |
         dnf install -y yum-utils
@@ -831,7 +849,6 @@
         warn: no
       when:
         - ansible_facts.os_family == "RedHat"
-
     - name: Install the latest version of Docker Engine and containerd [Debian/Ubuntu]
       apt:
         name:
@@ -842,7 +859,6 @@
         update_cache: true
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Install the latest version of Docker Engine and containerd [CentOS/Rocky]
       dnf:
         name:
@@ -853,71 +869,48 @@
         update_cache: true
       when:
         - ansible_facts.os_family == "RedHat"
-
     - name: Add the admin user to the docker group
       user:
         name: "{{ username }}"
         groups: docker
         append: yes
-
     - name: Install Docker Module for Python
       pip:
         name: docker
-
     - name: Start and enable Docker systemd service.
       systemd:
         name: docker
         state: started
         enabled: true
         daemon_reload: true
-
-
-
-- name: Create mountpoint and glusterFS volume, and mount to host machine
-  hosts: loadbalancer
+- name: Initialize docker swarm and grab the join token
+  hosts: swarm_manager
   become: true
   tasks:
-    - name: Create a trusted storage pool
-      gluster.gluster.gluster_peer:
+    - name: Check if Swarm has already been Initialized
+      shell: docker node ls
+      register: swarm_status
+      ignore_errors: true
+    - name: Initialize Docker Swarm
+      docker_swarm:
         state: present
-        nodes:
-          - 192.168.0.161
-          - 192.168.0.162
-          - 192.168.0.163
-
-    - name: Create GlusterFS volume
-      gluster.gluster.gluster_volume:
-        state: present
-        name: gv0
-        replicas: 4
-        bricks: /glusterfs/bricks/gv0
-        cluster:
-          - 192.168.0.160
-          - 192.168.0.161
-          - 192.168.0.162
-          - 192.168.0.163
-        force: true
+      when: swarm_status.rc != 0
       run_once: true
-
-    - name: Start GlusterFS volume
-      gluster.gluster.gluster_volume:
-        state: started
-        name: gv0
-
-    - name: Create mountpoint for Gluster volume
-      ansible.builtin.file:
-        path: /mnt/gluster
-        state: directory
-
-    - name: Mount Gluster volume
-      ansible.posix.mount:
-        src: "{{ ansible_host }}:/gv0"
-        path: /mnt/gluster
-        fstype: glusterfs
-        state: mounted
-
-
-
+    - name: Change task-history limit to 0
+      shell: docker swarm update --task-history-limit 0
+    - name: Get the worker join-token
+      shell: docker swarm join-token --quiet worker
+      register: worker_token
+- name: Add nodes to the docker swarm
+  hosts: swarm_nodes
+  become: true
+  tasks:
+    - name: Add Workers to the Swarm
+      community.docker.docker_swarm:
+        state: join
+        advertise_addr: "{{ ansible_host }}"
+        join_token: "{{ hostvars[groups['swarm_manager'][0]]['worker_token']['stdout'] }}"
+        remote_addrs: [ "{{ hostvars[groups['swarm_manager'][0]]['ansible_default_ipv4']['address'] }}:2377" ]
 - name: Deploy docker containers for portainer, NGINX and file manager on the loadbalancer node
   hosts: loadbalancer
   become: true
@@ -936,7 +929,6 @@
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
           - portainer_data:/data
-
     - name: Deploy NGINX load-balancer
       community.docker.docker_container:
         name: Load-Balancer
@@ -953,7 +945,6 @@
         - 14000-14020:14000-14020
         - 15000-15020:15000-15020
         restart_policy: always
-
     - name: Deploy File-Manager for GlusterFS volume
       community.docker.docker_container:
         name: File-Manager
@@ -969,82 +960,6 @@
           PGID: "1000"
           TZ: "Europe/London"
         restart_policy: always
-
-
-
-- name: Create mountpoint and mount glusterFS volume
-  hosts: swarm_manager
-  become: true
-  tasks:
-    - name: Create mountpoint for Gluster volume
-      ansible.builtin.file:
-        path: /mnt/gluster
-        state: directory
-
-    - name: Mount Gluster volume
-      ansible.posix.mount:
-        src: "{{ ansible_host }}:/gv0"
-        path: /mnt/gluster
-        fstype: glusterfs
-        state: mounted
-
-
-
-- name: Initialize docker swarm and grab the join token
-  hosts: swarm_manager
-  become: true
-  tasks:
-    - name: Check if Swarm has already been Initialized
-      shell: docker node ls
-      register: swarm_status
-      ignore_errors: true
-
-    - name: Initialize Docker Swarm
-      docker_swarm:
-        state: present
-      when: swarm_status.rc != 0
-      run_once: true
-
-    - name: Change task-history limit to 0
-      shell: docker swarm update --task-history-limit 0
-
-    - name: Get the worker join-token
-      shell: docker swarm join-token --quiet worker
-      register: worker_token
-
-
-
-- name: Add nodes to the docker swarm
-  hosts: swarm_nodes
-  become: true
-  tasks:
-    - name: Add Workers to the Swarm
-      community.docker.docker_swarm:
-        state: join
-        advertise_addr: "{{ ansible_host }}"
-        join_token: "{{ hostvars[groups['swarm_manager'][0]]['worker_token']['stdout'] }}"
-        remote_addrs: [ "{{ hostvars[groups['swarm_manager'][0]]['ansible_default_ipv4']['address'] }}:2377" ]
-
-
-
-- name: Create mountpoint and mount glusterFS volume
-  hosts: swarm_nodes
-  become: true
-  tasks:
-    - name: Create mountpoint for Gluster volume
-      ansible.builtin.file:
-        path: /mnt/gluster
-        state: directory
-
-    - name: Mount Gluster volume
-      ansible.posix.mount:
-        src: "{{ ansible_host }}:/gv0"
-        path: /mnt/gluster
-        fstype: glusterfs
-        state: mounted
-
-
-
 - name: Create the portainer agent network and deploy the portainer agent
   hosts: swarm_manager
   become: true
@@ -1053,7 +968,6 @@
       docker_network:
         name: portainer_agent_network
         driver: overlay
-
     - name: Start portainer_agent service
       docker_swarm_service:
         name: portainer_agent
@@ -1078,6 +992,7 @@
 
 
 
+#INSTALL AND CONFIGURE GITLAB
 - name: Setup repository and install Gitlab
   hosts: git
   become: true
@@ -1086,45 +1001,39 @@
       shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Add Gitlab Repository [CentOS/Rocky]
       shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash
       when:
         - ansible_facts.os_family == "RedHat"
-
     - name: Pause for 60 seconds
       ansible.builtin.pause:
         seconds: 60
-
     - name: Install Gitlab [Debian/Ubuntu]
       apt:
         name: gitlab-ee
         state: present
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Install Gitlab [CentOS/Rocky]
       dnf:
         name: gitlab-ee
         state: present
       when:
         - ansible_facts.os_family == "RedHat"
-    
-    - name: Pause for 5 minutes
+    - name: Pause for 3 minutes
       ansible.builtin.pause:
-        seconds: 300
-
+        seconds: 180
     - name: Change External URL in Gitlab config file
       ansible.builtin.lineinfile:
         path: /etc/gitlab/gitlab.rb
         regexp: '^external_url.*$'
         line: 'external_url "http://gitlab.beckettcloud.com"'
-    
     - name: Restart Gitlab to update the changes
       shell: gitlab-ctl restart
 
 
 
+#INSTALL AND CONFIGURE K3S
 - name: Download and configure K3S on the VMs
   hosts: k3s_vms
   become: true
@@ -1135,20 +1044,17 @@
         groups: 
           - sudo
         append: true
-
     - name: Make sudo without password for {{ sudo_user }} user
       copy:
         dest: /etc/sudoers.d/80-ansible-sudo-user
         content: "{{ username }} ALL=(ALL) NOPASSWD:ALL"
         mode: 0440
-
     - name: Install dependencies
       pip:
         name: 
           - pyyaml
           - jsonpatch
           - kubernetes
-
     - name: Download k3s binary x64
       get_url:
         url: https://github.com/k3s-io/k3s/releases/download/v1.25.11+k3s1/k3s
@@ -1157,34 +1063,29 @@
         owner: root
         group: root
         mode: 0755
-
     - name: Enable IPv4 forwarding
       sysctl:
         name: net.ipv4.ip_forward
         value: "1"
         state: present
         reload: yes
-
     - name: Enable IPv6 forwarding
       sysctl:
         name: net.ipv6.conf.all.forwarding
         value: "1"
         state: present
         reload: yes
-    
     - name: Add br_netfilter to /etc/modules-load.d/ [CentOS/Rocky]
       copy:
         content: "br_netfilter"
         dest: /etc/modules-load.d/br_netfilter.conf
         mode: "u=rw,g=,o="
       when: ansible_facts.os_family == "RedHat"
-
     - name: Load br_netfilter [CentOS/Rocky]
       modprobe:
         name: br_netfilter
         state: present
       when: ansible_facts.os_family == "RedHat"
-
     - name: Set bridge-nf-call-iptables (just to be sure) [CentOS/Rocky]
       sysctl:
         name: "{{ item }}"
@@ -1195,7 +1096,6 @@
       loop:
         - net.bridge.bridge-nf-call-iptables
         - net.bridge.bridge-nf-call-ip6tables
-
     - name: Add /usr/local/bin to sudo secure_path [CentOS/Rocky]
       lineinfile:
         line: 'Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin'
@@ -1205,9 +1105,6 @@
         path: /etc/sudoers
         validate: 'visudo -cf %s'
       when: ansible_facts.os_family == "RedHat"
-
-
-
 - name: Deploy the K3S service on the master node and grab the join token for worker nodes
   hosts: k3s_master
   vars:
@@ -1228,14 +1125,12 @@
         name: k3s-init
         state: stopped
       failed_when: false
-
     - name: Clean previous runs of k3s-init
       command: systemctl reset-failed k3s-init
       failed_when: false
       changed_when: false
       args:
         warn: false
-
     - name: Init cluster inside the transient k3s-init service
       command:
         cmd: "systemd-run -p RestartSec=2 \
@@ -1243,7 +1138,6 @@
                           --unit=k3s-init \
                           k3s server {{ server_init_args }}"
         creates: "/etc/systemd/system/k3s.service"
-
     - name: Verification
       block:
         - name: Verify that all nodes actually joined (check k3s-init.service if this fails)
@@ -1267,7 +1161,6 @@
             state: stopped
           failed_when: false
       when: not ansible_check_mode
-
     - name: Copy K3s service file
       register: k3s_service
       template:
@@ -1277,49 +1170,40 @@
         owner: root
         group: root
         mode: 0644
-
     - name: Enable and check K3s service
       systemd:
         name: k3s
         daemon_reload: yes
         state: restarted
         enabled: yes
-
     - name: Wait for node-token
       wait_for:
         path: "/var/lib/rancher/k3s/server/node-token"
-
     - name: Register node-token file access mode
       stat:
         path: "/var/lib/rancher/k3s/server/node-token"
       register: p
-
     - name: Change file access node-token
       file:
         path: "/var/lib/rancher/k3s/server/node-token"
         mode: "g+rx,o+rx"
-
     - name: Read node-token from master
       slurp:
         path: "/var/lib/rancher/k3s/server/node-token"
       register: node_token
-
     - name: Store Master node-token
       set_fact:
         token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
-
     - name: Restore node-token file access
       file:
         path: "/var/lib/rancher/k3s/server/node-token"
         mode: "{{ p.stat.mode }}"
-    
     - name: Create directory .kube
       file:
         path: /home/abeckett/.kube
         state: directory
         owner: "abeckett"
         mode: "u=rwx,g=rx,o="
-
     - name: Copy config file to user home directory
       copy:
         src: /etc/rancher/k3s/k3s.yaml
@@ -1327,43 +1211,36 @@
         remote_src: yes
         owner: abeckett
         mode: '600'
-
     - name: Export Kubeconfig
       shell: |
             export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
             export KUBECONFIG=/home/abeckett/.kube/config
-
     - name: Replace https://localhost:6443 with https://192.168.0.165:6443
       command: >-
         k3s kubectl config set-cluster default 
           --server=https://192.168.0.165:6443
           --kubeconfig /home/abeckett/.kube/config
       changed_when: true
-
     - name: Create kubectl symlink
       file:
         src: /usr/local/bin/k3s
         dest: /usr/local/bin/kubectl
         state: link
-
     - name: Create crictl symlink
       file:
         src: /usr/local/bin/k3s
         dest: /usr/local/bin/crictl
         state: link
-
     - name: Get contents of manifests folder
       find:
         paths: /var/lib/rancher/k3s/server/manifests
         file_type: file
       register: k3s_server_manifests
-
     - name: Get sub dirs of manifests folder
       find:
         paths: /var/lib/rancher/k3s/server/manifests
         file_type: directory
       register: k3s_server_manifests_directories
-
     - name: Remove manifests and folders that are only needed for bootstrapping cluster so k3s doesn't auto apply on start
       file:
         path: "{{ item.path }}"
@@ -1373,9 +1250,6 @@
         - "{{ k3s_server_manifests_directories.files }}"
       loop_control:
         label: "{{ item.path }}"
-
-
-
 - name: Deploy the K3S service on worker nodes and join to the cluster
   hosts: k3s_nodes
   become: true
@@ -1388,16 +1262,12 @@
         owner: root
         group: root
         mode: 0755
-
     - name: Enable and check K3s service
       systemd:
         name: k3s-node
         daemon_reload: yes
         state: restarted
         enabled: yes
-
-
-
 - name: Deploy Rancher
   hosts: k3s_master
   become: true
@@ -1406,7 +1276,6 @@
       shell: |
             curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
             echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-
     - name: Install Helm [Debian/Ubuntu]
       apt:
         name:
@@ -1415,7 +1284,6 @@
         update_cache: yes
       when:
         - ansible_facts.os_family == "Debian"
-
     - name: Install Helm [CentOS/Rocky]
       dnf:
         name:
@@ -1424,16 +1292,13 @@
         update_cache: yes
       when:
         - ansible_facts.os_family == "RedHat"
-    
     - name: Add the Helm repository for Rancher and dependencies
       kubernetes.core.helm_repository:
         name: rancher-latest
         repo_url: https://releases.rancher.com/server-charts/latest
-
     - name: Download Cert-Manager
       shell: |
             kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.4/cert-manager.crds.yaml
-
     - name: Add Jetstack repository
       kubernetes.core.helm_repository:
         name: jetstack
@@ -1476,12 +1341,12 @@
         #  - value: bootstrapPassword="{{ password }}"
         #  - value_type: string
 
-
     #- name: Add the Helm repository for Rancher and dependencies
     #  command: helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"
     
 
 
+#REBOOT
 - name: Reboot all VMs to finish updates and ensure all services run correctly
   hosts: swarm_vms,k3s_vms,app_vms
   become: true
@@ -1493,6 +1358,7 @@
 
 
 
+#SNAPSHOT
 - name: Snapshot all VMs after all configuration has been completed and they are ready for active deployment
   hosts: proxmox_servers
   become: true
@@ -1505,7 +1371,6 @@
         vmid: 200
         snapname: Post-configuration
         state: present
-
     - name: Take a snapshot of VM-SWARM-01 with final configuration completed
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -1514,7 +1379,6 @@
         vmid: 201
         snapname: Post-configuration
         state: present
-    
     - name: Take a snapshot of VM-SWARM-02 with final configuration completed
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -1523,7 +1387,6 @@
         vmid: 202
         snapname: Post-configuration
         state: present
-    
     - name: Take a snapshot of VM-SWARM-03 with final configuration completed
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -1532,7 +1395,6 @@
         vmid: 203
         snapname: Post-configuration
         state: present
-    
     - name: Take a snapshot of VM-GIT-01 with final configuration completed
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -1541,7 +1403,6 @@
         vmid: 204
         snapname: Post-configuration
         state: present
-
     - name: Take a snapshot of VM-K8S-01-MASTER with final configuration completed
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -1550,7 +1411,6 @@
         vmid: 205
         snapname: Post-configuration
         state: present
-    
     - name: Take a snapshot of VM-K8S-02-WORKER with final configuration completed
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"
@@ -1559,7 +1419,6 @@
         vmid: 206
         snapname: Post-configuration
         state: present
-
     - name: Take a snapshot of VM-K8S-03-WORKER with final configuration completed
       community.general.proxmox_snap:
         api_user: "{{ proxmox_user }}"

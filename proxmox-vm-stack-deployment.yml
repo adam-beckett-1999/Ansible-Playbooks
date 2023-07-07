@@ -1206,6 +1206,11 @@
   hosts: k3s_vms
   become: true
   tasks:
+    - name: Add abeckett to the sudoers group
+      user:
+        name: abeckett
+        group: sudo
+
     - name: Install dependencies
       pip:
         name: 

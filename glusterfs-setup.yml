@@ -1,4 +1,3 @@
-################################################# INSTALL GLUSTERFS ##################################################
 - hosts: "*"
   become: true
   tasks:
@@ -36,8 +35,6 @@
       ansible.builtin.file:
         path: /glusterfs/bricks/gv0
         state: directory
-
-########################################## CREATE GLUSTERFS VOLUME AND MOUNT #########################################
 - hosts: "*"
   become: true
   tasks:

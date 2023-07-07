@@ -1,5 +1,5 @@
-################################################ DEPLOY DOCKER SWARM #################################################
-- hosts: "*" # swarm manager/s
+- name: Initialize docker swarm and grab the join token
+  hosts: swarm_manager
   become: true
   tasks:
     - name: Check if Swarm has already been Initialized
@@ -16,8 +16,8 @@
     - name: Get the worker join-token
       shell: docker swarm join-token --quiet worker
       register: worker_token
-
-- hosts: "*" # swarm node/s
+- name: Add nodes to the docker swarm
+  hosts: swarm_nodes
   become: true
   tasks:
     - name: Add Workers to the Swarm

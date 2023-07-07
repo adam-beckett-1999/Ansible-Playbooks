@@ -1,4 +1,4 @@
-- hosts: docker_vms,app_vms
+- hosts: docker_vms,old_app_vms
   become: true
   tasks:
     - name: Preliminary checks [Debian/Ubuntu]

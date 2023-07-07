@@ -470,7 +470,7 @@
 
 
 - name: Reboot all VMs to ensure that processes are cleared from install
-  hosts: docker_vms,k3s_vms,app_vms
+  hosts: swarm_vms,k3s_vms,app_vms
   become: true
   tasks:
     - name: Reboot systems [Linux]
@@ -481,7 +481,7 @@
 
 
 - name: Install updates on newly created VMs
-  hosts: docker_vms,k3s_vms,app_vms
+  hosts: swarm_vms,k3s_vms,app_vms
   become: true
   tasks:
     - name: Preliminary checks [Debian/Ubuntu]
@@ -512,7 +512,7 @@
 
 
 - name: Install base packages and requirements, setup cockpit with plugins and ensure qemu-guest-agent is working
-  hosts: docker_vms,k3s_vms,app_vms
+  hosts: swarm_vms,k3s_vms,app_vms
   become: true
   tasks:
     - name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
@@ -641,7 +641,7 @@
 
 
 - name: Configure SNMP service and test to ensure it reports correctly
-  hosts: docker_vms,k3s_vms,app_vms
+  hosts: swarm_vms,k3s_vms,app_vms
   become: true
   tasks:
     - name: Install pysnmp for testing SNMP on hosts
@@ -677,7 +677,7 @@
 
 
 - name: Create mountpoint and mount network shares
-  hosts: docker_vms,k3s_vms,app_vms
+  hosts: swarm_vms,k3s_vms,app_vms
   become: true
   tasks:
     - name: Create NAS-01 local directory
@@ -789,7 +789,7 @@
 
 
 - name: Install glusterFS/glusterd and create directory for brick
-  hosts: docker_vms
+  hosts: swarm_vms
   become: true
   tasks:
     - name: Start glusterd service
@@ -806,7 +806,7 @@
 
 
 - name: Install docker and docker python module on docker VMs
-  hosts: docker_vms
+  hosts: swarm_vms
   become: true
   tasks:    
     - name: Add Docker GPG Key [Debian/Ubuntu]
@@ -1483,7 +1483,7 @@
 
 
 - name: Reboot all VMs to finish updates and ensure all services run correctly
-  hosts: docker_vms,k3s_vms,app_vms
+  hosts: swarm_vms,k3s_vms,app_vms
   become: true
   tasks:
     - name: Reboot systems [Linux]

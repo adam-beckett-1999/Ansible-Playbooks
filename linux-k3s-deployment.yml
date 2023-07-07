@@ -2,7 +2,7 @@
   hosts: k3s_vms
   become: true
   tasks:
-    - name: Install PyYAML for Helm
+    - name: Install dependencies
       pip:
         name: 
           - pyyaml
@@ -217,18 +217,9 @@
         name: rancher-latest
         repo_url: https://releases.rancher.com/server-charts/latest
 
-    #- name: Add the Helm repository for Rancher and dependencies
-    #  shell: |
-    #        helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
-
     - name: Download Cert-Manager
-      kubernetes.core.k8s:
-        state: present
-        src: https://github.com/cert-manager/cert-manager/releases/download/v1.11.4/cert-manager.crds.yaml
-
-    #- name: Download Cert-Manager
-    #  shell: |
-    #        kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.4/cert-manager.crds.yaml
+      shell: |
+            kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.4/cert-manager.crds.yaml
 
     - name: Add Jetstack repository
       kubernetes.core.helm_repository:

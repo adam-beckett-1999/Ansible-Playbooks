@@ -1,4 +1,5 @@
-- hosts: "glusterfs_servers"                                        # Your inventory file should contain 3 host groups
+- name: Install glusterFS/glusterd and create directory for brick
+  hosts: "glusterfs_servers"                                        # Your inventory file should contain 3 host groups
   become: true                                                      # [glusterfs_servers] containing all machines running glusterfs
   tasks:                                                            # [glusterfs_primary_node] which will be used to initialize the gluster filesystem
     - name: Install software-properties-common [Debian/Ubuntu]      # [glusterfs_connected_nodes] which are the nodes which will connect to the primary
@@ -34,7 +35,8 @@
       ansible.builtin.file:
         path: /glusterfs/bricks/gv0
         state: directory
-- hosts: "glusterfs_primary_node"
+- name: Create mountpoint and glusterFS volume, and mount to primary node
+  hosts: "glusterfs_primary_node"
   become: true
   tasks:
     - name: Create List of nodes to be added to the Trusted Storage Pool
@@ -70,7 +72,8 @@
         path: /mnt/gluster
         fstype: glusterfs
         state: mounted
-- hosts: "glusterfs_connected_nodes"
+- name: Create mountpoint and mount glusterFS volume on connected nodes
+  hosts: "glusterfs_connected_nodes"
   become: true
   tasks:
     - name: Create mountpoint for Gluster volume

@@ -1,33 +1,6 @@
 - hosts: "*"
   become: true
   tasks:
-    - name: Install required system packages [Debian/Ubuntu]
-      apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - python3-pip
-          - virtualenv
-          - python3-setuptools
-        state: latest
-        update_cache: true
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install required system packages [CentOS/Rocky]
-      dnf:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - software-properties-common
-          - python3-pip
-          - virtualenv
-          - python3-setuptools
-        state: latest
-        update_cache: true
-      when:
-        - ansible_facts.os_family == "RedHat"
     - name: Add Docker GPG Key [Debian/Ubuntu]
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg

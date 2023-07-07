@@ -1,4 +1,5 @@
-- hosts: "swarm_vms,k3s_vms,app_vms"
+- name: Install base packages and requirements, setup cockpit with plugins and ensure qemu-guest-agent is working
+  hosts: "swarm_vms,k3s_vms,app_vms"
   become: true
   tasks:    
     - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common) [Debian/Ubuntu]
@@ -9,6 +10,19 @@
         - cifs-utils
         - nfs-common
         - keyutils
+        - snmpd
+        - snmp
+        - libsnmp-dev
+        - software-properties-common
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - python3-pip
+        - virtualenv
+        - python3-setuptools
+        - neofetch
+        - glusterfs-server
+        - glusterfs-client
         state: present
       when:
         - ansible_facts.os_family == "Debian"
@@ -20,6 +34,19 @@
         - nfs-common
         - keyutils
         - epel-release
+        - net-snmp
+        - net-snmp-utils
+        - software-properties-common
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - python3-pip
+        - virtualenv
+        - python3-setuptools
+        - neofetch
+        - glusterfs-server
+        - glusterfs-client
+        - policycoreutils
         state: present
       when:
         - ansible_facts.os_family == "RedHat"

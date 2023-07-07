@@ -15,7 +15,7 @@
     - name: Check if a reboot is required
       register: reboot_required_file
       stat: path=/var/run/reboot-required get_md5=no
-    - name: Reboot the Debian or Ubuntu server
+    - name: Is reboot required?
       debug:
         msg: "Reboot is required on {{ inventory_hostname }}"
       when: reboot_required_file.stat.exists

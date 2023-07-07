@@ -1,7 +1,7 @@
-- hosts: "glusterfs_servers"
-  become: true
-  tasks:
-    - name: Install software-properties-common [Debian/Ubuntu]
+- hosts: "glusterfs_servers"                                        # Your inventory file should contain 3 host groups
+  become: true                                                      # [glusterfs_servers] containing all machines running glusterfs
+  tasks:                                                            # [glusterfs_primary_node] which will be used to initialize the gluster filesystem
+    - name: Install software-properties-common [Debian/Ubuntu]      # [glusterfs_connected_nodes] which are the nodes which will connect to the primary
       apt:
         name:
         - software-properties-common
@@ -50,7 +50,7 @@
       gluster.gluster.gluster_volume:
         state: present
         name: gv0
-        replicas: 4                                                                           # Change this depending on the number of servers in the cluster
+        replicas: 4                                                 # Change this depending on the number of servers in the cluster
         bricks: /glusterfs/bricks/gv0
         cluster:
           - "{{ clusternodelist }}"

@@ -66,7 +66,11 @@
         validate: 'visudo -cf %s'
       when: ansible_facts.os_family == "RedHat"
 
-vars:
+
+
+- name: Deploy the K3S service on the master node and grab the join token for worker nodes
+  hosts: k3s_master
+  vars:
   server_init_args: >-
     {% if groups['master'] | length > 1 %}
       {% if ansible_hostname == hostvars[groups['k3s_master'][0]]['ansible_hostname'] %}
@@ -77,9 +81,6 @@ vars:
       --token {{ k3s_token }}
     {% endif %}
     {{ extra_server_args | default('') }}
-
-- name: Deploy the K3S service on the master node and grab the join token for worker nodes
-  hosts: k3s_master
   become: true
   tasks:
     - name: Clean previous runs of k3s-init

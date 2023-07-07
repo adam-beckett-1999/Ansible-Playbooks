@@ -1,5 +1,5 @@
 - name: Install base packages and requirements, setup cockpit with plugins and ensure qemu-guest-agent is working
-  hosts: "swarm_vms,k3s_vms,app_vms"
+  hosts: swarm_vms,k3s_vms,app_vms
   become: true
   tasks:    
     - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common) [Debian/Ubuntu]

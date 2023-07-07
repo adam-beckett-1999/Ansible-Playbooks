@@ -1,5 +1,5 @@
 #CREATE, CONFIGURE AND START VMS
-- name: Clone VMs from existing templates
+- name: Clone VMs from templates
   hosts: proxmox_servers
   become: true
   tasks:    
@@ -467,8 +467,6 @@
         post_reboot_delay: 60
         test_command: uptime
 
-
-
 #INITIAL STANDARDISED UPDATES, PACKAGE INSTALLS AND CONFIGURATION
 - name: Install updates on newly created VMs
   hosts: swarm_vms,k3s_vms,app_vms
@@ -668,8 +666,6 @@
         opts: rw,sync,hard
         state: mounted
 
-
-
 #SNAPSHOT
 - name: Snapshot all VMs after initial configuration before applications and services are installed and started
   hosts: proxmox_servers
@@ -739,8 +735,6 @@
         vmid: 207
         snapname: Post-update-early-configuration
         state: present
-
-
 
 #GLUSTERFS ON DOCKER SWARM VMS
 - name: Start glusterfs/glusterd service and create directory for brick
@@ -821,8 +815,6 @@
         path: /mnt/gluster
         fstype: glusterfs
         state: mounted        
-
-
 
 #DOCKER INSTALL, CONFIGURATION AND SWARM INITIALIZATION
 - name: Install docker and docker python module on docker VMs
@@ -990,8 +982,6 @@
             target: /var/lib/docker/volumes
             type: bind
 
-
-
 #INSTALL AND CONFIGURE GITLAB
 - name: Setup repository and install Gitlab
   hosts: git
@@ -1030,8 +1020,6 @@
         line: 'external_url "http://gitlab.beckettcloud.com"'
     - name: Restart Gitlab to update the changes
       shell: gitlab-ctl restart
-
-
 
 #INSTALL AND CONFIGURE K3S
 - name: Download and configure K3S on the VMs
@@ -1344,8 +1332,6 @@
     #- name: Add the Helm repository for Rancher and dependencies
     #  command: helm install rancher rancher-latest/rancher --namespace cattle-system --set hostname=192.168.0.165 --set replicas=1 --set bootstrapPassword="{{ password }}"
     
-
-
 #REBOOT
 - name: Reboot all VMs to finish updates and ensure all services run correctly
   hosts: swarm_vms,k3s_vms,app_vms
@@ -1355,8 +1341,6 @@
       reboot:
         post_reboot_delay: 60
         test_command: uptime
-
-
 
 #SNAPSHOT
 - name: Snapshot all VMs after all configuration has been completed and they are ready for active deployment

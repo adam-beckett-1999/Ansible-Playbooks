@@ -190,7 +190,8 @@
 
     - name: Export Kubeconfig
       shell: |
-            export KUBECONFIG=~/.kube/config
+            export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+            export KUBECONFIG=/home/abeckett/.kube/config
 
     - name: Replace https://localhost:6443 with https://192.168.0.165:6443
       command: >-
@@ -233,10 +234,6 @@
       loop_control:
         label: "{{ item.path }}"
 
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
-
 
 
 - name: Deploy the K3S service on worker nodes and join to the cluster
@@ -258,10 +255,6 @@
         daemon_reload: yes
         state: restarted
         enabled: yes
-
-    - name: Pause for 10 seconds
-      ansible.builtin.pause:
-        seconds: 10
 
 
 

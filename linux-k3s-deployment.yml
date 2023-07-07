@@ -4,7 +4,9 @@
   tasks:
     - name: Install PyYAML for Helm
       pip:
-        name: pyyaml
+        name: 
+          - pyyaml
+          - jsonpatch
 
     - name: Install Python3 [Debian/Ubuntu]
       apt:

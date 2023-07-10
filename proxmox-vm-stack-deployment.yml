@@ -1031,6 +1031,8 @@
     - name: Print returned information
       ansible.builtin.debug:
         msg: "{{ k3s_cluster }}"
+    - name: Install the portainer agent on the master node for management
+      shell: kubectl apply -f https://downloads.portainer.io/ce2-18/portainer-agent-k8s-nodeport.yaml
 
 
 #REBOOT

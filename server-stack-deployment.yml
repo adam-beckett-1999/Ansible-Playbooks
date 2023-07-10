@@ -3,6 +3,7 @@
     - virtual-machine-create
 - hosts: virtual_machines
   roles:
+    - update
     - base-packages
     - snmp-configure
     - network-share-mount

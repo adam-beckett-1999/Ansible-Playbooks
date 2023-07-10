@@ -2,28 +2,6 @@
   reboot:
     post_reboot_delay: 60
     test_command: uptime
-- name: Preliminary checks [Debian/Ubuntu]
-  file:
-    path: /var/lib/apt/lists/
-    state: directory
-    mode: 0755
-  when:
-    - ansible_facts.os_family == "Debian"
-- name: Install all updates [Debian/Ubuntu]
-  apt:
-    update_cache: yes
-    upgrade: dist
-    autoclean: yes
-  when:
-    - ansible_facts.os_family == "Debian"
-- name: Upgrade all packages and install kernel updates [CentOS/Rocky]
-  dnf:
-    update_cache: yes
-    update_only: yes
-    name: '*'
-    state: latest
-  when:
-    - ansible_facts.os_family == "RedHat"
 - name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
   apt:
     name:

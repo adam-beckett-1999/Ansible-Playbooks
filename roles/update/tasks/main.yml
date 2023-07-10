@@ -1,0 +1,36 @@
+- name: Preliminary checks [Debian/Ubuntu]
+  file:
+    path: /var/lib/apt/lists/
+    state: directory
+    mode: 0755
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Install all updates [Debian/Ubuntu]
+  apt:
+    update_cache: yes
+    upgrade: dist
+    autoremove: yes
+    autoclean: yes
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Upgrade all packages and install kernel updates [CentOS/Rocky]
+  dnf:
+    update_cache: yes
+    update_only: yes
+    name: '*'
+    state: latest
+  when:
+    - ansible_facts.os_family == "RedHat"
+- name: Remove packages not needed anymore [CentOS/Rocky]
+  dnf:
+    autoremove: yes
+  when:
+    - ansible_facts.os_family == "RedHat"
+- name: Install all critical and security updates [Windows]
+  win_updates:
+    category_names:
+    - CriticalUpdates
+    - SecurityUpdates
+    state: installed
+  when:
+    - ansible_facts.os_family == "Windows"

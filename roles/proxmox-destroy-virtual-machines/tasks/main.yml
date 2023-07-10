@@ -4,5 +4,5 @@
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
     api_host: phs-hv-01
-    name: VM-LB-01
+    name: "{{ vm_name }}"
     state: absent

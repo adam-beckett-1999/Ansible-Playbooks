@@ -1,5 +1,17 @@
 - hosts: proxmox_servers
   roles:
+    - proxmox-create-from-clone
+  vars:
+    template_id: 1000
+    vm_name: VM-LB-01
+    vm_id: 200
+    tags: load-balancer,docker,glusterfs
+    cores: 4
+    memory: 2048
+    ip_address: gw=192.168.0.1,ip=192.168.0.160/24
+    disk_size: 50G
+- hosts: proxmox_servers
+  roles:
     - virtual-machine-create
 - hosts: virtual_machines
   roles:

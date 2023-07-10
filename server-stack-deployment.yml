@@ -2,13 +2,25 @@
   roles:
     - virtual-machine-create
 - hosts: virtual_machines
+  roles:
     - base-packages
     - snmp-configure
     - network-share-mount
 - hosts: proxmox_servers
+  roles:
     - pre-config-snapshot
+- hosts: swarm_vms
+  roles:
+    - glusterfs-service
+- hosts: loadbalancer
+  roles:
     - glusterfs-configure
+- hosts: swarm_vms
+  roles:
+    - glusterfs-mount
     - docker-install
+- hosts: swarm_vms
+  roles:
     - docker-swarm-deployment
     - gitlab-install
     - linux-reboot

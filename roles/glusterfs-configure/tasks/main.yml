@@ -1,18 +1,5 @@
-- name: Start glusterfs/glusterd service and create directory for brick
-  hosts: swarm_vms
-  become: true
-  tasks:
-    - name: Start glusterd service
-      systemd:
-        name: glusterd
-        enabled: yes
-        state: started
-    - name: Create GlusterFS brick-1 directory
-      ansible.builtin.file:
-        path: /glusterfs/bricks/gv0
-        state: directory
 - name: Create mountpoint and glusterFS volume and initialize
-  hosts: loadbalancer
+  hosts: '*'
   become: true
   tasks:
     - name: Create a trusted storage pool
@@ -39,17 +26,3 @@
       gluster.gluster.gluster_volume:
         state: started
         name: gv0
-- name: Create mountpoint and mount glusterFS volume
-  hosts: loadbalancer,swarm_manager,swarm_nodes
-  become: true
-  tasks:
-    - name: Create mountpoint for Gluster volume
-      ansible.builtin.file:
-        path: /mnt/gluster
-        state: directory
-    - name: Mount Gluster volume
-      ansible.posix.mount:
-        src: "{{ ansible_host }}:/gv0"
-        path: /mnt/gluster
-        fstype: glusterfs
-        state: mounted

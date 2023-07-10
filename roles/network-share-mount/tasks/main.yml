@@ -1,7 +1,7 @@
 - name: Create mountpoint and mount network shares
   hosts: swarm_vms,k3s_vms,app_vms
   become: true
-  tasks:   
+  tasks:
     - name: Create NAS-01 local directory
       ansible.builtin.file:
         path: /nas-01

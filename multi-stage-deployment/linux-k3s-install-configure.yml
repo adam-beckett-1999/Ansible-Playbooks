@@ -14,7 +14,7 @@
 - name: Install K3S on the worker VMs
   hosts: k3s_nodes
   vars: 
-    - k3s_token
+    k3s_token:
   become: true
   tasks:
     - name: Install K3S on the workers

@@ -1,7 +1,3 @@
-- name: Reboot systems [Linux]
-  reboot:
-    post_reboot_delay: 60
-    test_command: uptime
 - name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
   apt:
     name:

@@ -3,6 +3,7 @@
     - virtual-machine-create
 - hosts: virtual_machines
   roles:
+    - reboot
     - update
     - base-packages
     - snmp-configure
@@ -37,7 +38,7 @@
     - gitlab-install
 - hosts: virtual_machines
   roles: 
-    - linux-reboot
+    - reboot
 - hosts: proxmox_servers
   roles:
     - post-config-snapshot

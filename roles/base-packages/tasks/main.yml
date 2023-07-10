@@ -1,8 +1,30 @@
-- name: Install base packages and requirements, setup cockpit with plugins and ensure qemu-guest-agent is working
+- name: Install updates and packages on newly created VMs
   hosts: swarm_vms,k3s_vms,app_vms
   become: true
-  tasks:    
-    - name: Install required base-packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common) [Debian/Ubuntu]
+  tasks:
+    - name: Preliminary checks [Debian/Ubuntu]
+      file:
+        path: /var/lib/apt/lists/
+        state: directory
+        mode: 0755
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Install all updates [Debian/Ubuntu]
+      apt:
+        update_cache: yes
+        upgrade: dist
+        autoclean: yes
+      when:
+        - ansible_facts.os_family == "Debian"
+    - name: Upgrade all packages and install kernel updates [CentOS/Rocky]
+      dnf:
+        update_cache: yes
+        update_only: yes
+        name: '*'
+        state: latest
+      when:
+        - ansible_facts.os_family == "RedHat"
+    - name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
       apt:
         name:
         - qemu-guest-agent
@@ -26,7 +48,7 @@
         state: present
       when:
         - ansible_facts.os_family == "Debian"
-    - name: Install required base-packages (qemu-guest-agent, cifs-utils, nfs-common) [CentOS/Rocky]
+    - name: Install required base-packages (qemu-guest-agent, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [CentOS/Rocky]
       dnf:
         name: 
         - qemu-guest-agent
@@ -76,6 +98,11 @@
         disable_gpg_check: True
       when:
         - ansible_facts.os_family == "RedHat"
+    - name: Start qemu-guest-agent service
+      systemd:
+        name: qemu-guest-agent
+        enabled: yes
+        state: started
     - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
       copy:
         dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
@@ -88,11 +115,6 @@
       ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
       when:
         - ansible_facts.os_family == "Debian"
-    - name: Start qemu-guest-agent service
-      systemd:
-        name: qemu-guest-agent
-        enabled: yes
-        state: started
     - name: Start cockpit service [Debian/Ubuntu]
       systemd:
         name: cockpit

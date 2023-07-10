@@ -1,7 +1,7 @@
 - name: Install docker and docker python module on docker VMs
   hosts: swarm_vms
   become: true
-  tasks:
+  tasks:    
     - name: Add Docker GPG Key [Debian/Ubuntu]
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg

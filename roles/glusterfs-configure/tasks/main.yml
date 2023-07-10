@@ -1,8 +1,8 @@
-- name: Start glusterfs/glusterd and create directory for brick
-  hosts: glusterfs_servers                                          # Your inventory file should contain 3 host groups
-  become: true                                                      # [glusterfs_servers] containing all machines running glusterfs
-  tasks:                                                            # [glusterfs_primary_node] which will be used to initialize the gluster filesystem
-    - name: Start glusterd service                                  # [glusterfs_connected_nodes] which are the nodes which will connect to the primary
+- name: Start glusterfs/glusterd service and create directory for brick
+  hosts: swarm_vms
+  become: true
+  tasks:
+    - name: Start glusterd service
       systemd:
         name: glusterd
         enabled: yes
@@ -11,8 +11,8 @@
       ansible.builtin.file:
         path: /glusterfs/bricks/gv0
         state: directory
-- name: Create mountpoint and glusterfs volume, and mount to primary node
-  hosts: glusterfs_primary_node
+- name: Create mountpoint and glusterFS volume and initialize
+  hosts: loadbalancer
   become: true
   tasks:
     - name: Create a trusted storage pool
@@ -26,7 +26,7 @@
       gluster.gluster.gluster_volume:
         state: present
         name: gv0
-        replicas: 4                                                 # Change this depending on the number of servers in the cluster
+        replicas: 4
         bricks: /glusterfs/bricks/gv0
         cluster:
           - VM-LB-01
@@ -39,18 +39,8 @@
       gluster.gluster.gluster_volume:
         state: started
         name: gv0
-    - name: Create mountpoint for Gluster volume
-      ansible.builtin.file:
-        path: /mnt/gluster
-        state: directory
-    - name: Mount Gluster volume
-      ansible.posix.mount:
-        src: "{{ ansible_host }}:/gv0"
-        path: /mnt/gluster
-        fstype: glusterfs
-        state: mounted
-- name: Create mountpoint and mount glusterfs volume on connected nodes
-  hosts: glusterfs_connected_nodes
+- name: Create mountpoint and mount glusterFS volume
+  hosts: loadbalancer,swarm_manager,swarm_nodes
   become: true
   tasks:
     - name: Create mountpoint for Gluster volume

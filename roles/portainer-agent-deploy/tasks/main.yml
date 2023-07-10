@@ -1,5 +1,5 @@
 - name: Create the portainer agent network and deploy the portainer agent
-  hosts: swarm_manager
+  hosts: '*'
   become: true
   tasks:
     - name: Create the portainer_agent_network

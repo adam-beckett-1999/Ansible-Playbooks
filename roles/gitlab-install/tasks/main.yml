@@ -1,5 +1,5 @@
 - name: Setup repository and install Gitlab
-  hosts: git
+  hosts: '*'
   become: true
   tasks:
     - name: Add Gitlab Repository [Debian/Ubuntu]

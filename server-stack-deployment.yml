@@ -28,8 +28,15 @@
 - hosts: loadbalancer
   roles: 
     - loadbalancer-configure
-
-
+- hosts: swarm_manager
+  roles: 
+    - portainer-agent-deploy
+- hosts: git
+  roles: 
     - gitlab-install
+- hosts: virtual_machines
+  roles: 
     - linux-reboot
+- hosts: proxmox_servers
+  roles:
     - post-config-snapshot

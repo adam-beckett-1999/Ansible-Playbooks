@@ -1,5 +1,5 @@
 - name: Configure SNMP service and test to ensure it reports correctly
-  hosts: swarm_vms,k3s_vms,app_vms
+  hosts: '*'
   become: true
   tasks:
     - name: Install pysnmp for testing SNMP on hosts

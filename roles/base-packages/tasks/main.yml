@@ -1,5 +1,5 @@
 - name: Install updates and packages on newly created VMs
-  hosts: swarm_vms,k3s_vms,app_vms
+  hosts: '*'
   become: true
   tasks:
     - name: Reboot systems [Linux]

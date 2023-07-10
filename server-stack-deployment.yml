@@ -1,9 +1,11 @@
-- hosts: "*"
+- hosts: proxmox_servers
   roles:
     - virtual-machine-create
+- hosts: virtual_machines
     - base-packages
     - snmp-configure
     - network-share-mount
+- hosts: proxmox_servers
     - pre-config-snapshot
     - glusterfs-configure
     - docker-install

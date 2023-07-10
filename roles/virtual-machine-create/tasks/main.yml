@@ -1,5 +1,5 @@
 - name: Clone VMs from templates
-  hosts: proxmox_servers
+  hosts: '*'
   become: true
   tasks:    
     - name: Clone template to VM-LB-01

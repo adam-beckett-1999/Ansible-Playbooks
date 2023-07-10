@@ -1,58 +1,54 @@
-- name: Install docker and docker python module on docker VMs
-  hosts: '*'
-  become: true
-  tasks:    
-    - name: Add Docker GPG Key [Debian/Ubuntu]
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Add Docker Repository [Debian/Ubuntu]
-      apt_repository:
-        repo: deb https://download.docker.com/linux/ubuntu focal stable
-        state: present
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Add Docker Repository [CentOS/Rocky]
-      shell: |
-        dnf install -y yum-utils
-        yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-      args:
-        warn: no
-      when:
-        - ansible_facts.os_family == "RedHat"
-    - name: Install the latest version of Docker Engine and containerd [Debian/Ubuntu]
-      apt:
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-        state: latest
-        update_cache: true
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install the latest version of Docker Engine and containerd [CentOS/Rocky]
-      dnf:
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-        state: latest
-        update_cache: true
-      when:
-        - ansible_facts.os_family == "RedHat"
-    - name: Add the admin user to the docker group
-      user:
-        name: "{{ username }}"
-        groups: docker
-        append: yes
-    - name: Install Docker Module for Python
-      pip:
-        name: docker
-    - name: Start and enable Docker systemd service.
-      systemd:
-        name: docker
-        state: started
-        enabled: true
-        daemon_reload: true
+- name: Add Docker GPG Key [Debian/Ubuntu]
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Add Docker Repository [Debian/Ubuntu]
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu focal stable
+    state: present
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Add Docker Repository [CentOS/Rocky]
+  shell: |
+    dnf install -y yum-utils
+    yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  args:
+    warn: no
+  when:
+    - ansible_facts.os_family == "RedHat"
+- name: Install the latest version of Docker Engine and containerd [Debian/Ubuntu]
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: latest
+    update_cache: true
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Install the latest version of Docker Engine and containerd [CentOS/Rocky]
+  dnf:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: latest
+    update_cache: true
+  when:
+    - ansible_facts.os_family == "RedHat"
+- name: Add the admin user to the docker group
+  user:
+    name: "{{ username }}"
+    groups: docker
+    append: yes
+- name: Install Docker Module for Python
+  pip:
+    name: docker
+- name: Start and enable Docker systemd service.
+  systemd:
+    name: docker
+    state: started
+    enabled: true
+    daemon_reload: true

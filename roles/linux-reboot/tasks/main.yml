@@ -1,8 +1,4 @@
-- name: Reboot all VMs to finish updates and ensure all services run correctly
-  hosts: '*'
-  become: true
-  tasks:
-    - name: Reboot systems [Linux]
-      reboot:
-        post_reboot_delay: 60
-        test_command: uptime
+- name: Reboot systems [Linux]
+  reboot:
+    post_reboot_delay: 60
+    test_command: uptime

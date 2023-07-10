@@ -1,141 +1,137 @@
-- name: Install updates and packages on newly created VMs
-  hosts: '*'
-  become: true
-  tasks:
-    - name: Reboot systems [Linux]
-      reboot:
-        post_reboot_delay: 60
-        test_command: uptime
-    - name: Preliminary checks [Debian/Ubuntu]
-      file:
-        path: /var/lib/apt/lists/
-        state: directory
-        mode: 0755
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install all updates [Debian/Ubuntu]
-      apt:
-        update_cache: yes
-        upgrade: dist
-        autoclean: yes
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Upgrade all packages and install kernel updates [CentOS/Rocky]
-      dnf:
-        update_cache: yes
-        update_only: yes
-        name: '*'
-        state: latest
-      when:
-        - ansible_facts.os_family == "RedHat"
-    - name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
-      apt:
-        name:
-        - qemu-guest-agent
-        - cockpit
-        - cifs-utils
-        - nfs-common
-        - keyutils
-        - snmpd
-        - snmp
-        - libsnmp-dev
-        - software-properties-common
-        - apt-transport-https
-        - ca-certificates
-        - curl
-        - python3-pip
-        - virtualenv
-        - python3-setuptools
-        - neofetch
-        - glusterfs-server
-        - glusterfs-client
-        state: present
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install required base-packages (qemu-guest-agent, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [CentOS/Rocky]
-      dnf:
-        name: 
-        - qemu-guest-agent
-        - cifs-utils
-        - nfs-common
-        - keyutils
-        - epel-release
-        - net-snmp
-        - net-snmp-utils
-        - software-properties-common
-        - apt-transport-https
-        - ca-certificates
-        - curl
-        - python3-pip
-        - virtualenv
-        - python3-setuptools
-        - neofetch
-        - glusterfs-server
-        - glusterfs-client
-        - policycoreutils
-        state: present
-      when:
-        - ansible_facts.os_family == "RedHat"
-    - name: Install cockpit navigator plugin [Debian/Ubuntu]
-      apt:
-        deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
-        state: present
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install cockpit navigator plugin [CentOS/Rocky]
-      dnf:
-        name: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.8/cockpit-navigator-0.5.8-2.el8.noarch.rpm
-        state: present
-        disable_gpg_check: True
-      when:
-        - ansible_facts.os_family == "RedHat"
-    - name: Install cockpit file sharing plugin [Debian/Ubuntu]
-      apt:
-        deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
-        state: present
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Install cockpit file sharing plugin [CentOS/Rocky]
-      dnf:
-        name: https://github.com/45Drives/cockpit-file-sharing/releases/download/v2.4.5/cockpit-file-sharing-2.4.5-1.el8.noarch.rpm
-        state: present
-        disable_gpg_check: True
-      when:
-        - ansible_facts.os_family == "RedHat"
-    - name: Start qemu-guest-agent service
-      systemd:
-        name: qemu-guest-agent
-        enabled: yes
-        state: started
-    - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
-      copy:
-        dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
-        content: |
-          [keyfile]
-          unmanaged-devices=none
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Create fake network interface to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
-      ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Start cockpit service [Debian/Ubuntu]
-      systemd:
-        name: cockpit
-        enabled: yes
-        state: started
-        masked: no
-      when:
-        - ansible_facts.os_family == "Debian"
-    - name: Enable cockpit.socket [CentOS/Rocky]
-      systemd:
-        name: cockpit.socket
-        enabled: yes
-      when:
-        - ansible_facts.os_family == "RedHat"
-    - name: Start cockpit [CentOS/Rocky]
-      systemd:
-        name: cockpit
-        state: started
-      when:
-        - ansible_facts.os_family == "RedHat"
+- name: Reboot systems [Linux]
+  reboot:
+    post_reboot_delay: 60
+    test_command: uptime
+- name: Preliminary checks [Debian/Ubuntu]
+  file:
+    path: /var/lib/apt/lists/
+    state: directory
+    mode: 0755
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Install all updates [Debian/Ubuntu]
+  apt:
+    update_cache: yes
+    upgrade: dist
+    autoclean: yes
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Upgrade all packages and install kernel updates [CentOS/Rocky]
+  dnf:
+    update_cache: yes
+    update_only: yes
+    name: '*'
+    state: latest
+  when:
+    - ansible_facts.os_family == "RedHat"
+- name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
+  apt:
+    name:
+    - qemu-guest-agent
+    - cockpit
+    - cifs-utils
+    - nfs-common
+    - keyutils
+    - snmpd
+    - snmp
+    - libsnmp-dev
+    - software-properties-common
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - python3-pip
+    - virtualenv
+    - python3-setuptools
+    - neofetch
+    - glusterfs-server
+    - glusterfs-client
+    state: present
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Install required base-packages (qemu-guest-agent, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [CentOS/Rocky]
+  dnf:
+    name: 
+    - qemu-guest-agent
+    - cifs-utils
+    - nfs-common
+    - keyutils
+    - epel-release
+    - net-snmp
+    - net-snmp-utils
+    - software-properties-common
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - python3-pip
+    - virtualenv
+    - python3-setuptools
+    - neofetch
+    - glusterfs-server
+    - glusterfs-client
+    - policycoreutils
+    state: present
+  when:
+    - ansible_facts.os_family == "RedHat"
+- name: Install cockpit navigator plugin [Debian/Ubuntu]
+  apt:
+    deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
+    state: present
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Install cockpit navigator plugin [CentOS/Rocky]
+  dnf:
+    name: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.8/cockpit-navigator-0.5.8-2.el8.noarch.rpm
+    state: present
+    disable_gpg_check: True
+  when:
+    - ansible_facts.os_family == "RedHat"
+- name: Install cockpit file sharing plugin [Debian/Ubuntu]
+  apt:
+    deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
+    state: present
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Install cockpit file sharing plugin [CentOS/Rocky]
+  dnf:
+    name: https://github.com/45Drives/cockpit-file-sharing/releases/download/v2.4.5/cockpit-file-sharing-2.4.5-1.el8.noarch.rpm
+    state: present
+    disable_gpg_check: True
+  when:
+    - ansible_facts.os_family == "RedHat"
+- name: Start qemu-guest-agent service
+  systemd:
+    name: qemu-guest-agent
+    enabled: yes
+    state: started
+- name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
+  copy:
+    dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
+    content: |
+      [keyfile]
+      unmanaged-devices=none
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Create fake network interface to fix issue with NetworkManager and Cockpit [Debian/Ubuntu]
+  ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Start cockpit service [Debian/Ubuntu]
+  systemd:
+    name: cockpit
+    enabled: yes
+    state: started
+    masked: no
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Enable cockpit.socket [CentOS/Rocky]
+  systemd:
+    name: cockpit.socket
+    enabled: yes
+  when:
+    - ansible_facts.os_family == "RedHat"
+- name: Start cockpit [CentOS/Rocky]
+  systemd:
+    name: cockpit
+    state: started
+  when:
+    - ansible_facts.os_family == "RedHat"

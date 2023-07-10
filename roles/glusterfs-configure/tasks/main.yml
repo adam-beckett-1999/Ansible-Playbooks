@@ -1,28 +1,24 @@
-- name: Create mountpoint and glusterFS volume and initialize
-  hosts: '*'
-  become: true
-  tasks:
-    - name: Create a trusted storage pool
-      gluster.gluster.gluster_peer:
-        state: present
-        nodes:
-          - VM-SWARM-01.homelab.internal
-          - VM-SWARM-02.homelab.internal
-          - VM-SWARM-03.homelab.internal
-    - name: Create GlusterFS volume
-      gluster.gluster.gluster_volume:
-        state: present
-        name: gv0
-        replicas: 4
-        bricks: /glusterfs/bricks/gv0
-        cluster:
-          - VM-LB-01
-          - VM-SWARM-01.homelab.internal
-          - VM-SWARM-02.homelab.internal
-          - VM-SWARM-03.homelab.internal
-        force: true
-      run_once: true
-    - name: Start GlusterFS volume
-      gluster.gluster.gluster_volume:
-        state: started
-        name: gv0
+- name: Create a trusted storage pool
+  gluster.gluster.gluster_peer:
+    state: present
+    nodes:
+      - VM-SWARM-01.homelab.internal
+      - VM-SWARM-02.homelab.internal
+      - VM-SWARM-03.homelab.internal
+- name: Create GlusterFS volume
+  gluster.gluster.gluster_volume:
+    state: present
+    name: gv0
+    replicas: 4
+    bricks: /glusterfs/bricks/gv0
+    cluster:
+      - VM-LB-01
+      - VM-SWARM-01.homelab.internal
+      - VM-SWARM-02.homelab.internal
+      - VM-SWARM-03.homelab.internal
+    force: true
+  run_once: true
+- name: Start GlusterFS volume
+  gluster.gluster.gluster_volume:
+    state: started
+    name: gv0

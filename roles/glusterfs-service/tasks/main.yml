@@ -1,13 +1,9 @@
-- name: Start glusterfs/glusterd service and create directory for brick
-  hosts: '*'
-  become: true
-  tasks:
-    - name: Start glusterd service
-      systemd:
-        name: glusterd
-        enabled: yes
-        state: started
-    - name: Create GlusterFS brick-1 directory
-      ansible.builtin.file:
-        path: /glusterfs/bricks/gv0
-        state: directory
+- name: Start glusterd service
+  systemd:
+    name: glusterd
+    enabled: yes
+    state: started
+- name: Create GlusterFS brick-1 directory
+  ansible.builtin.file:
+    path: /glusterfs/bricks/gv0
+    state: directory

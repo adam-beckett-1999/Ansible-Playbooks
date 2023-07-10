@@ -1,6 +1,3 @@
-- hosts: docker_vms,swarm_vms
-  become: true
-  tasks:
-    - name: Prune docker images that are unused and dangling
-      community.docker.docker_prune:
-        images: true
+- name: Prune docker images that are unused and dangling
+  community.docker.docker_prune:
+    images: true

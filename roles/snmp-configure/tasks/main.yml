@@ -1,29 +1,25 @@
-- name: Configure SNMP service and test to ensure it reports correctly
-  hosts: '*'
-  become: true
-  tasks:
-    - name: Install pysnmp for testing SNMP on hosts
-      pip:
-        name: pysnmp
-    - name: Configure SNMP server
-      copy: src=/home/abeckett/snmpd.conf dest=/etc/snmp/snmpd.conf owner=root group=root mode=600
-    - name: Start and enable SNMPd systemd service.
-      systemd:
-        name: snmpd
-        state: started
-        enabled: true
-        daemon_reload: true
-    - name: Restart SNMPd systemd service if already running.
-      systemd:
-        name: snmpd
-        state: restarted
-    - name: Test that SNMP is working
-      community.general.snmp_facts:
-        host: '{{ inventory_hostname }}'
-        version: v2c
-        community: BCloudHomelab
-      register: response
-    - name: Print the results of the test
-      debug:
-        var: response
+- name: Install pysnmp for testing SNMP on hosts
+  pip:
+    name: pysnmp
+- name: Configure SNMP server
+  copy: src=/home/abeckett/snmpd.conf dest=/etc/snmp/snmpd.conf owner=root group=root mode=600
+- name: Start and enable SNMPd systemd service.
+  systemd:
+    name: snmpd
+    state: started
+    enabled: true
+    daemon_reload: true
+- name: Restart SNMPd systemd service if already running.
+  systemd:
+    name: snmpd
+    state: restarted
+- name: Test that SNMP is working
+  community.general.snmp_facts:
+    host: '{{ inventory_hostname }}'
+    version: v2c
+    community: BCloudHomelab
+  register: response
+- name: Print the results of the test
+  debug:
+    var: response
 

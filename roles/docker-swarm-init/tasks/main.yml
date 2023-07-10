@@ -1,18 +1,14 @@
-- name: Initialize docker swarm and grab the join token
-  hosts: '*'
-  become: true
-  tasks:
-    - name: Check if Swarm has already been Initialized
-      shell: docker node ls
-      register: swarm_status
-      ignore_errors: true
-    - name: Initialize Docker Swarm
-      docker_swarm:
-        state: present
-      when: swarm_status.rc != 0
-      run_once: true
-    - name: Change task-history limit to 0
-      shell: docker swarm update --task-history-limit 0
-    - name: Get the worker join-token
-      shell: docker swarm join-token --quiet worker
-      register: worker_token
+- name: Check if Swarm has already been Initialized
+  shell: docker node ls
+  register: swarm_status
+  ignore_errors: true
+- name: Initialize Docker Swarm
+  docker_swarm:
+    state: present
+  when: swarm_status.rc != 0
+  run_once: true
+- name: Change task-history limit to 0
+  shell: docker swarm update --task-history-limit 0
+- name: Get the worker join-token
+  shell: docker swarm join-token --quiet worker
+  register: worker_token

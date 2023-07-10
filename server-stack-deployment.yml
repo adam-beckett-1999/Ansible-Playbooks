@@ -19,9 +19,17 @@
   roles:
     - glusterfs-mount
     - docker-install
-- hosts: swarm_vms
+- hosts: swarm_manager
   roles:
-    - docker-swarm-deployment
+    - docker-swarm-init
+- hosts: swarm_nodes
+  roles: 
+    - docker-swarm-join
+- hosts: loadbalancer
+  roles: 
+    - loadbalancer-configure
+
+
     - gitlab-install
     - linux-reboot
     - post-config-snapshot

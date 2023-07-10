@@ -421,8 +421,3 @@
     - name: Pause for 5 minutes
       ansible.builtin.pause:
         seconds: 300
-- name: Reboot all VMs to ensure that processes are cleared from install
-  hosts: swarm_vms,k3s_vms,app_vms
-  become: true
-  tasks:
-    

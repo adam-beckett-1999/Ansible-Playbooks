@@ -1,4 +1,4 @@
-- name: Install K3S on the master VM
+- name: Install K3S on the master node
   hosts: k3s_master
   become: true
   tasks:
@@ -11,23 +11,21 @@
     - name: Print returned information
       ansible.builtin.debug:
         msg: "{{ k3s_token['content'] }}"
-- name: Install K3S on the worker VMs
+- name: Install K3S on the worker nodes
   hosts: k3s_nodes
-  vars: 
-    k3s_token:
   become: true
   tasks:
     - name: Install K3S on the workers
-      shell: "curl -sfL https://get.k3s.io | K3S_URL=https://{{ hostvars[groups['k3s_master'][0]]['ansible_default_ipv4']['address'] }}:6443 K3S_TOKEN={{ node-token['content'] }} sh -"
+      shell: "curl -sfL https://get.k3s.io | K3S_URL=https://{{ hostvars[groups['k3s_master'][0]]['ansible_default_ipv4']['address'] }}:6443 K3S_TOKEN={{ k3s_token['content'] }} sh -"
 - name: Check K3S service and get cluster status
   hosts: k3s_master
   become: true
   tasks:
-    - name: Run kubectl status command to check that VMs joined correctly
+    - name: Run kubectl status command to check that nodes joined correctly
       shell: kubectl get nodes
       register: k3s_cluster
     - name: Print returned information
       ansible.builtin.debug:
         msg: "{{ k3s_cluster }}"
-    - name: Install the portainer agent on the master VM for management
+    - name: Install the portainer agent on the master node for management
       shell: kubectl apply -f https://downloads.portainer.io/ce2-18/portainer-agent-k8s-nodeport.yaml

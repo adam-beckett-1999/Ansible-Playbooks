@@ -1,4 +1,0 @@
-- name: Reboot systems [Linux]
-  reboot:
-    post_reboot_delay: 60
-    test_command: uptime

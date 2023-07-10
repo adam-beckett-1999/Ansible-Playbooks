@@ -1,0 +1,13 @@
+- hosts: "*"
+  roles:
+    - virtual-machine-create
+    - base-packages
+    - snmp-configure
+    - network-share-mount
+    - pre-config-snapshot
+    - glusterfs-configure
+    - docker-install
+    - docker-swarm-deployment
+    - gitlab-install
+    - linux-reboot
+    - post-config-snapshot

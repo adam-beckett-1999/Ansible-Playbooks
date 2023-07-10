@@ -992,40 +992,6 @@
     - name: Restart Gitlab to update the changes
       shell: gitlab-ctl restart
 
-#INSTALL AND CONFIGURE K3S
-- name: Install K3S on the master node
-  hosts: k3s_master
-  become: true
-  tasks:
-    - name: Install K3S on the master VM
-      shell: curl -sfL https://get.k3s.io | sh -
-    - name: Get the token and register it
-      ansible.builtin.slurp:
-        src: "/var/lib/rancher/k3s/server/node-token"
-      register: k3s_token
-    - name: Print returned information
-      ansible.builtin.debug:
-        msg: "{{ k3s_token['content'] }}"
-- name: Install K3S on the worker nodes
-  hosts: k3s_nodes
-  become: true
-  tasks:
-    - name: Install K3S on the workers
-      shell: curl -sfL https://get.k3s.io | K3S_URL=https://192.168.0.165:6443 K3S_TOKEN="{{ hostvars[groups['k3s_master'][0]]['k3s_token']['content'] }}" sh -
-- name: Check K3S service and get cluster status
-  hosts: k3s_master
-  become: true
-  tasks:
-    - name: Run kubectl status command to check that nodes joined correctly
-      shell: kubectl get nodes
-      register: k3s_cluster
-    - name: Print returned information
-      ansible.builtin.debug:
-        msg: "{{ k3s_cluster }}"
-    - name: Install the portainer agent on the master node for management
-      shell: kubectl apply -f https://downloads.portainer.io/ce2-18/portainer-agent-k8s-nodeport.yaml
-
-
 #REBOOT
 - name: Reboot all VMs to finish updates and ensure all services run correctly
   hosts: swarm_vms,k3s_vms,app_vms

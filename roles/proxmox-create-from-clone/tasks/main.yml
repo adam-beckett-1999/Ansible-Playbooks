@@ -1,13 +1,13 @@
 - name: Clone virtual-machine template to new VM
   community.general.proxmox_kvm:
-    node: phs-hv-01 # name of proxmox node where vm will be deployed
+    node: phs-hv-01
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
     api_host: phs-hv-01
     clone: template
-    vmid: "{{ template_id }}" # id of vm template (1000, 1001, 1002, 1003)
-    name: "{{ vm_name }}" # name of newly cloned vm
-    newid: "{{ vm_id }}" # id of newly cloned vm
+    vmid: "{{ template_id }}"
+    name: "{{ vm_name }}"
+    newid: "{{ vm_id }}"
     storage: pool-1 
     format: raw
     timeout: 300
@@ -18,17 +18,17 @@
     api_password: "{{ proxmox_password }}"
     api_host: phs-hv-01
     name: "{{ vm_name }}"
-    tags: "{{ tags }}" # vm tags shown in proxmox web-ui
-    cores: "{{ cores }}" # number of CPU cores
-    memory: "{{ memory }}" # amount of memory in MBs e.g 2048,4096,8192
+    tags: "{{ tags }}"
+    cores: "{{ cores }}"
+    memory: "{{ memory }}"
     citype: nocloud
-    ciuser: "{{ username }}" # cloud-init username
-    cipassword: "{{ password }}" # cloud-init password
-    sshkeys: "{{ sshkeys }}" # public ssh key for user
+    ciuser: "{{ username }}"
+    cipassword: "{{ password }}"
+    sshkeys: "{{ sshkeys }}"
     searchdomains: 'homelab.internal'
-    nameservers: 192.168.0.210,192.168.0.1
+    nameservers: 192.168.0.210
     ipconfig: 
-      ipconfig0: "{{ ip_address }}" # change ip= section with static ip [gw=192.168.0.1,ip=192.168.0.161/24]
+      ipconfig0: "{{ ip_address }}"
     update: true
     timeout: 300
 - name: Re-size cloned virtual-machine disk
@@ -38,7 +38,7 @@
     api_host: phs-hv-01
     name: "{{ vm_name }}"
     disk: scsi0
-    size: "{{ disk_size }}" # resizes the virtual machine disk to the size stated here, format in 10G (10GB), 100G (100GB), 1000G (1TB)
+    size: "{{ disk_size }}"
     state: resized
     timeout: 300
 - name: Start cloned virtual-machine

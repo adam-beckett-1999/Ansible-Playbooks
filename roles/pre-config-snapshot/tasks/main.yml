@@ -1,0 +1,68 @@
+- name: Snapshot all VMs after initial configuration before applications and services are installed and started
+  hosts: proxmox_servers
+  become: true
+  tasks:  
+    - name: Take a snapshot of VM-LB-01 with early configuration before role setup
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 200
+        snapname: Post-update-early-configuration
+        state: present
+    - name: Take a snapshot of VM-SWARM-01 with early configuration before role setup
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 201
+        snapname: Post-update-early-configuration
+        state: present
+    - name: Take a snapshot of VM-SWARM-02 with early configuration before role setup
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 202
+        snapname: Post-update-early-configuration
+        state: present
+    - name: Take a snapshot of VM-SWARM-03 with early configuration before role setup
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 203
+        snapname: Post-update-early-configuration
+        state: present
+    - name: Take a snapshot of VM-GIT-01 with early configuration before role setup
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 204
+        snapname: Post-update-early-configuration
+        state: present
+    - name: Take a snapshot of VM-K3S-01-MASTER with early configuration before role setup
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 205
+        snapname: Post-update-early-configuration
+        state: present
+    - name: Take a snapshot of VM-K3S-02-WORKER with early configuration before role setup
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 206
+        snapname: Post-update-early-configuration
+        state: present
+    - name: Take a snapshot of VM-K3S-03-WORKER with early configuration before role setup
+      community.general.proxmox_snap:
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        api_host: phs-hv-01
+        vmid: 207
+        snapname: Post-update-early-configuration
+        state: present

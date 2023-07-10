@@ -998,6 +998,25 @@
     - name: Restart Gitlab to update the changes
       shell: gitlab-ctl restart
 
+#INSTALL AND CONFIGURE K3S
+- name: Install K3S on the master node
+  hosts: k3s_master
+  tasks:
+    - name: Install K3S using the official install script to properly pre-configure the service for the master node
+      shell: curl -sfL https://get.k3s.io | sh -
+    - name: Get the node token and register it
+      ansible.builtin.slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      register: k3s_token
+    - name: Print returned information
+      ansible.builtin.debug:
+        msg: "{{ k3s_token }}"
+- name: Install K3S on the worker nodes
+  tasks:
+    - name: Install K3S using the official install script to properly pre-configure the service for worker nodes, with the node token supplied by the master
+      shell: curl -sfL https://get.k3s.io | K3S_URL="https://{{ hostvars[groups['k3s_master'][0]]['ansible_default_ipv4']['address'] }}:6443" K3S_TOKEN="{{ node-token }}" sh -
+
+
 #REBOOT
 - name: Reboot all VMs to finish updates and ensure all services run correctly
   hosts: swarm_vms,k3s_vms,app_vms

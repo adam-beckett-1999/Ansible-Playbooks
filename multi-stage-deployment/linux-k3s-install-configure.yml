@@ -1,18 +1,19 @@
-- name: Install K3S on the master node
+- name: Install K3S on the master VM
   hosts: k3s_master
   become: true
   tasks:
-    - name: Install K3S on the master node
+    - name: Install K3S on the master VM
       shell: curl -sfL https://get.k3s.io | sh -
-    - name: Get the node token and register it
+    - name: Get the token and register it
       ansible.builtin.slurp:
-        src: /var/lib/rancher/k3s/server/node-token
+        src: "/var/lib/rancher/k3s/server/node-token"
       register: k3s_token
     - name: Print returned information
       ansible.builtin.debug:
         msg: "{{ k3s_token['content'] }}"
-- name: Install K3S on the worker nodes
+- name: Install K3S on the worker VMs
   hosts: k3s_nodes
+  vars: k3s_token
   become: true
   tasks:
     - name: Install K3S on the workers
@@ -21,11 +22,11 @@
   hosts: k3s_master
   become: true
   tasks:
-    - name: Run kubectl status command to check that nodes joined correctly
+    - name: Run kubectl status command to check that VMs joined correctly
       shell: kubectl get nodes
       register: k3s_cluster
     - name: Print returned information
       ansible.builtin.debug:
         msg: "{{ k3s_cluster }}"
-    - name: Install the portainer agent on the master node for management
+    - name: Install the portainer agent on the master VM for management
       shell: kubectl apply -f https://downloads.portainer.io/ce2-18/portainer-agent-k8s-nodeport.yaml

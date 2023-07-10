@@ -972,9 +972,6 @@
       shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash
       when:
         - ansible_facts.os_family == "RedHat"
-    - name: Pause for 60 seconds
-      ansible.builtin.pause:
-        seconds: 60
     - name: Install Gitlab [Debian/Ubuntu]
       apt:
         name: gitlab-ee
@@ -987,9 +984,6 @@
         state: present
       when:
         - ansible_facts.os_family == "RedHat"
-    - name: Pause for 3 minutes
-      ansible.builtin.pause:
-        seconds: 180
     - name: Change External URL in Gitlab config file
       ansible.builtin.lineinfile:
         path: /etc/gitlab/gitlab.rb
@@ -1004,9 +998,6 @@
   tasks:
     - name: Install K3S using the official install script to properly pre-configure the service for the master node
       shell: curl -sfL https://get.k3s.io | sh -
-    - name: Pause for 2 minutes
-      ansible.builtin.pause:
-        seconds: 120
     - name: Get the node token and register it
       ansible.builtin.slurp:
         src: /var/lib/rancher/k3s/server/node-token
@@ -1019,9 +1010,6 @@
   tasks:
     - name: Install K3S using the official install script to properly pre-configure the service for worker nodes, with the node token supplied by the master
       shell: curl -sfL https://get.k3s.io | K3S_URL="https://{{ hostvars[groups['k3s_master'][0]]['ansible_default_ipv4']['address'] }}:6443" K3S_TOKEN="{{ node-token['content'] }}" sh -
-    - name: Pause for 2 minutes
-      ansible.builtin.pause:
-        seconds: 120
 - name: Check K3S service and get cluster status
   hosts: k3s_master
   tasks:

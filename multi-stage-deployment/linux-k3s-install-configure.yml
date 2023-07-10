@@ -15,7 +15,7 @@
   hosts: k3s_nodes
   become: true
   tasks:
-    - name: Install K3S on the worker node
+    - name: Install K3S on the workers
       shell: "curl -sfL https://get.k3s.io | K3S_URL=https://{{ hostvars[groups['k3s_master'][0]]['ansible_default_ipv4']['address'] }}:6443 K3S_TOKEN={{ node-token['content'] }} sh -"
 - name: Check K3S service and get cluster status
   hosts: k3s_master

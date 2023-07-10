@@ -56,12 +56,3 @@
         state: started
         enabled: true
         daemon_reload: true
-    - name: Reboot systems
-      reboot:
-        post_reboot_delay: 60
-        test_command: uptime
-      when:
-        - ansible_facts.os_family == "Debian" or ansible_facts.os_family == "RedHat"
-    - name: Pause for 1 minute
-      ansible.builtin.pause:
-        seconds: 60

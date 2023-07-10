@@ -19,7 +19,9 @@
       gluster.gluster.gluster_peer:
         state: present
         nodes:
-          - #ips
+          - VM-SWARM-01.homelab.internal
+          - VM-SWARM-02.homelab.internal
+          - VM-SWARM-03.homelab.internal
     - name: Create GlusterFS volume
       gluster.gluster.gluster_volume:
         state: present
@@ -27,7 +29,10 @@
         replicas: 4                                                 # Change this depending on the number of servers in the cluster
         bricks: /glusterfs/bricks/gv0
         cluster:
-          - #ips
+          - VM-LB-01
+          - VM-SWARM-01.homelab.internal
+          - VM-SWARM-02.homelab.internal
+          - VM-SWARM-03.homelab.internal
         force: true
       run_once: true
     - name: Start GlusterFS volume

@@ -12,7 +12,88 @@
     disk_size: 50G
 - hosts: proxmox_servers
   roles:
-    - virtual-machine-create
+    - proxmox-create-from-clone
+  vars:
+    template_id: 1000
+    vm_name: VM-SWARM-01
+    vm_id: 201
+    tags: docker,app-server,glusterfs
+    cores: 4
+    memory: 4096
+    ip_address: gw=192.168.0.1,ip=192.168.0.161/24
+    disk_size: 50G
+- hosts: proxmox_servers
+  roles:
+    - proxmox-create-from-clone
+  vars:
+    template_id: 1000
+    vm_name: VM-SWARM-02
+    vm_id: 202
+    tags: docker,app-server,glusterfs
+    cores: 4
+    memory: 4096
+    ip_address: gw=192.168.0.1,ip=192.168.0.162/24
+    disk_size: 50G
+- hosts: proxmox_servers
+  roles:
+    - proxmox-create-from-clone
+  vars:
+    template_id: 1000
+    vm_name: VM-SWARM-03
+    vm_id: 203
+    tags: docker,app-server,glusterfs
+    cores: 4
+    memory: 4096
+    ip_address: gw=192.168.0.1,ip=192.168.0.163/24
+    disk_size: 50G
+- hosts: proxmox_servers
+  roles:
+    - proxmox-create-from-clone
+  vars:
+    template_id: 1000
+    vm_name: VM-GIT-01
+    vm_id: 204
+    tags: gitlab,app-server
+    cores: 4
+    memory: 2048
+    ip_address: gw=192.168.0.1,ip=192.168.0.164/24
+    disk_size: 50G
+- hosts: proxmox_servers
+  roles:
+    - proxmox-create-from-clone
+  vars:
+    template_id: 1000
+    vm_name: VM-K3S-01-MASTER
+    vm_id: 205
+    tags: kubernetes,app-server,master
+    cores: 4
+    memory: 4096
+    ip_address: gw=192.168.0.1,ip=192.168.0.165/24
+    disk_size: 50G
+- hosts: proxmox_servers
+  roles:
+    - proxmox-create-from-clone
+  vars:
+    template_id: 1000
+    vm_name: VM-K3S-02-WORKER
+    vm_id: 206
+    tags: kubernetes,app-server,worker
+    cores: 4
+    memory: 4096
+    ip_address: gw=192.168.0.1,ip=192.168.0.166/24
+    disk_size: 50G
+- hosts: proxmox_servers
+  roles:
+    - proxmox-create-from-clone
+  vars:
+    template_id: 1000
+    vm_name: VM-K3S-03-WORKER
+    vm_id: 207
+    tags: kubernetes,app-server,worker
+    cores: 4
+    memory: 4096
+    ip_address: gw=192.168.0.1,ip=192.168.0.167/24
+    disk_size: 50G
 - hosts: virtual_machines
   roles:
     - reboot

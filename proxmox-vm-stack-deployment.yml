@@ -16,9 +16,6 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 5 seconds
-      ansible.builtin.pause:
-        seconds: 5
     - name: Clone template to VM-SWARM-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -32,9 +29,6 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 5 seconds
-      ansible.builtin.pause:
-        seconds: 5
     - name: Clone template to VM-SWARM-02
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -48,9 +42,6 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 5 seconds
-      ansible.builtin.pause:
-        seconds: 5
     - name: Clone template to VM-SWARM-03
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -64,9 +55,6 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 5 seconds
-      ansible.builtin.pause:
-        seconds: 5
     - name: Clone template to VM-GIT-01
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -80,9 +68,6 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 5 seconds
-      ansible.builtin.pause:
-        seconds: 5
     - name: Clone template to VM-K3S-01-MASTER
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -96,9 +81,6 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 5 seconds
-      ansible.builtin.pause:
-        seconds: 5
     - name: Clone template to VM-K3S-02-WORKER
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -112,9 +94,6 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 5 seconds
-      ansible.builtin.pause:
-        seconds: 5
     - name: Clone template to VM-K3S-03-WORKER
       community.general.proxmox_kvm:
         node: phs-hv-01
@@ -128,9 +107,6 @@
         storage: pool-1
         format: raw
         timeout: 300
-    - name: Pause for 5 seconds
-      ansible.builtin.pause:
-        seconds: 5
 - name: Update VM configurations with correct hardware assignment and cloud-init variables
   hosts: proxmox_servers
   become: true

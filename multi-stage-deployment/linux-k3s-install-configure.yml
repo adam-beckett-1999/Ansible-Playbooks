@@ -1,7 +1,7 @@
 - name: Install K3S on the master node
   hosts: k3s_master
   tasks:
-    - name: Install K3S using the official install script to properly pre-configure the service for the master node
+    - name: Install K3S on the master node
       shell: curl -sfL https://get.k3s.io | sh -
     - name: Get the node token and register it
       ansible.builtin.slurp:
@@ -13,7 +13,7 @@
 - name: Install K3S on the worker nodes
   hosts: k3s_nodes
   tasks:
-    - name: Install K3S using the official install script to properly pre-configure the service for worker nodes
+    - name: Install K3S on the worker nodes
       shell: curl -sfL https://get.k3s.io | K3S_URL="https://{{ hostvars[groups['k3s_master'][0]]['ansible_default_ipv4']['address'] }}:6443" K3S_TOKEN="{{ node-token['content'] }}" sh -
 - name: Check K3S service and get cluster status
   hosts: k3s_master

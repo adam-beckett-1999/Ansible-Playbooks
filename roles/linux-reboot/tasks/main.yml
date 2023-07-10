@@ -1,5 +1,5 @@
 - name: Reboot all VMs to finish updates and ensure all services run correctly
-  hosts: swarm_vms,k3s_vms,app_vms
+  hosts: '*'
   become: true
   tasks:
     - name: Reboot systems [Linux]

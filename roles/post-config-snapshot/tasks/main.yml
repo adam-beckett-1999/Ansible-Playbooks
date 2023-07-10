@@ -1,5 +1,5 @@
 - name: Snapshot all VMs after all configuration has been completed and they are ready for active deployment
-  hosts: proxmox_servers
+  hosts: '*'
   become: true
   tasks:  
     - name: Take a snapshot of VM-LB-01 with final configuration completed

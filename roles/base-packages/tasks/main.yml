@@ -109,3 +109,7 @@
     state: started
   when:
     - ansible_facts.os_family == "RedHat"
+- name: Disable MOTD on login
+  ansible.builtin.file:
+    path: /etc/update-motd.d/*
+    mode: '0666'

@@ -3,9 +3,6 @@
     name:
     - qemu-guest-agent
     - cockpit
-    - snmpd
-    - snmp
-    - libsnmp-dev
     - software-properties-common
     - apt-transport-https
     - ca-certificates
@@ -22,8 +19,6 @@
     name: 
     - qemu-guest-agent
     - epel-release
-    - net-snmp
-    - net-snmp-utils
     - software-properties-common
     - apt-transport-https
     - ca-certificates

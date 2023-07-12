@@ -35,4 +35,4 @@
       - /var/run/docker.sock:/var/run/docker.sock
 - name: Run docker exec command to add the pufferpanel user within the container
   shell: |
-        docker exec -it pufferpanel /pufferpanel/pufferpanel user add
+        docker exec -it PufferPanel /pufferpanel/pufferpanel user add

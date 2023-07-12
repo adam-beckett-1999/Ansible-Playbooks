@@ -10,7 +10,7 @@
     memory: 16384
     ip_address: gw=192.168.0.1,ip=192.168.0.168/24
     disk_size: 100G
-- hosts: virtual_machines
+- hosts: game_server
   roles:
     - reboot
     - update
@@ -26,7 +26,7 @@
   roles:
     - docker-install
     - pufferpanel-install
-- hosts: virtual_machines
+- hosts: game_server
   roles: 
     - reboot
 - hosts: proxmox_servers

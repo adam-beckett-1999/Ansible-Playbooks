@@ -51,5 +51,5 @@
     state: started
     timeout: 300
 - name: Pause for 30 seconds
-      ansible.builtin.pause:
-        seconds: 30
+  ansible.builtin.pause:
+    seconds: 30

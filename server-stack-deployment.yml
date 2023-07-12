@@ -104,6 +104,43 @@
 - hosts: proxmox_servers
   roles:
     - pre-config-snapshot
+  vars:
+    vm_id: 200
+- hosts: proxmox_servers
+  roles:
+    - pre-config-snapshot
+  vars:
+    vm_id: 201
+- hosts: proxmox_servers
+  roles:
+    - pre-config-snapshot
+  vars:
+    vm_id: 202
+- hosts: proxmox_servers
+  roles:
+    - pre-config-snapshot
+  vars:
+    vm_id: 203
+- hosts: proxmox_servers
+  roles:
+    - pre-config-snapshot
+  vars:
+    vm_id: 204
+- hosts: proxmox_servers
+  roles:
+    - pre-config-snapshot
+  vars:
+    vm_id: 205
+- hosts: proxmox_servers
+  roles:
+    - pre-config-snapshot
+  vars:
+    vm_id: 206
+- hosts: proxmox_servers
+  roles:
+    - pre-config-snapshot
+  vars:
+    vm_id: 207
 - hosts: swarm_vms
   roles:
     - glusterfs-service
@@ -135,3 +172,40 @@
 - hosts: proxmox_servers
   roles:
     - post-config-snapshot
+  vars:
+    vm_id: 200
+- hosts: proxmox_servers
+  roles:
+    - post-config-snapshot
+  vars:
+    vm_id: 201
+- hosts: proxmox_servers
+  roles:
+    - post-config-snapshot
+  vars:
+    vm_id: 202
+- hosts: proxmox_servers
+  roles:
+    - post-config-snapshot
+  vars:
+    vm_id: 203
+- hosts: proxmox_servers
+  roles:
+    - post-config-snapshot
+  vars:
+    vm_id: 204
+- hosts: proxmox_servers
+  roles:
+    - post-config-snapshot
+  vars:
+    vm_id: 205
+- hosts: proxmox_servers
+  roles:
+    - post-config-snapshot
+  vars:
+    vm_id: 206
+- hosts: proxmox_servers
+  roles:
+    - post-config-snapshot
+  vars:
+    vm_id: 207

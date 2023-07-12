@@ -1,3 +1,19 @@
+- name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
+  apt:
+    name:
+    - glusterfs-server
+    - glusterfs-client
+    state: present
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Install required base-packages (qemu-guest-agent, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [CentOS/Rocky]
+  dnf:
+    name: 
+    - glusterfs-server
+    - glusterfs-client
+    state: present
+  when:
+    - ansible_facts.os_family == "RedHat"
 - name: Start glusterd service
   systemd:
     name: glusterd

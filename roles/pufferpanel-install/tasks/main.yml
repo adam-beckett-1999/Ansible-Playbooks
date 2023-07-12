@@ -10,6 +10,14 @@
   ansible.builtin.file:
     path: /home/abeckett/config/pufferpanel/
     state: directory
+- name: Download custom dark theme
+  ansible.builtin.get_url:
+    url: https://github.com/snsnf/pufferpanel-themes/blob/main/1st-theme.tar
+    dest: /var/www/pufferpanel/1st-theme.tar
+- name: Download custom light theme
+  ansible.builtin.get_url:
+    url: https://github.com/snsnf/pufferpanel-themes/blob/main/2nd-theme.tar
+    dest: /var/www/pufferpanel/2nd-theme.tar
 - name: Deploy Pufferpanel docker container
   docker_container:
     name: PufferPanel

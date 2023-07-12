@@ -1,41 +1,27 @@
-- name: Add Pufferpanel Repository
-  shell: |
-        curl -s https://packagecloud.io/install/repositories/pufferpanel/pufferpanel/script.deb.sh | sudo bash
-- name: Update cache and install Pufferpanel [Debian/Ubuntu]
-  apt:
-    name:
-      - pufferpanel
-    state: latest
-    update_cache: true
-  when:
-    - ansible_facts.os_family == "Debian"
-- name: Update cache and install Pufferpanel [CentOS/Rocky]
-  dnf:
-    name:
-      - pufferpanel
-    state: latest
-    update_cache: true
-  when:
-    - ansible_facts.os_family == "RedHat"
-- name: Ensure docker group exists
-  ansible.builtin.group:
-    name: docker
-    state: present
-- name: Add the pufferpanel user to the docker group
-  ansible.builtin.user:
-    name: pufferpanel
-    group: docker
-- name: Download custom dark theme
-  ansible.builtin.get_url:
-    url: https://github.com/snsnf/pufferpanel-themes/blob/main/1st-theme.tar
-    dest: /var/www/pufferpanel/1st-theme.tar
-- name: Download custom light theme
-  ansible.builtin.get_url:
-    url: https://github.com/snsnf/pufferpanel-themes/blob/main/2nd-theme.tar
-    dest: /var/www/pufferpanel/2nd-theme.tar
-- name: Start and enable Pufferpanel systemd service.
-  systemd:
-    name: pufferpanel
+- name: Add /var/lib/pufferpanel/ directory
+  ansible.builtin.file:
+    path: /var/lib/pufferpanel/
+    state: directory
+    mode: '0755'
+- name: Add /home/abeckett/config/pufferpanel/ directory
+  ansible.builtin.file:
+    path: /home/abeckett/config/pufferpanel/
+    state: directory
+    mode: '0755'
+- name: Deploy Pufferpanel docker container
+  docker_container:
+    name: PufferPanel
+    image: pufferpanel/pufferpanel:latest
     state: started
-    enabled: true
-    daemon_reload: true
+    recreate: yes
+    restart_policy: always
+    published_ports:
+      - "8080:8080"
+      - "5657:5657"
+    volumes:
+      - /home/abeckett/config/pufferpanel/config:/etc/pufferpanel
+      - /var/lib/pufferpanel:/var/lib/pufferpanel
+      - /var/run/docker.sock:/var/run/docker.sock
+- name: Run docker exec command to add the pufferpanel user within the container
+  shell: |
+        docker exec -it pufferpanel /pufferpanel/pufferpanel user add

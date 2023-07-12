@@ -1,14 +1,14 @@
-- name: Add /var/lib/pufferpanel/ directory
+- name: Add /var/lib/pufferpanel directory
   ansible.builtin.file:
-    path: /var/lib/pufferpanel/
+    path: /var/lib/pufferpanel
     state: directory
-- name: Add /var/www/pufferpanel/ directory
+- name: Add /var/www/pufferpanel directory
   ansible.builtin.file:
-    path: /var/www/pufferpanel/
+    path: /var/www/pufferpanel
     state: directory
-- name: Add /home/abeckett/config/pufferpanel/ directory
+- name: Add /home/abeckett/config/pufferpanel directory
   ansible.builtin.file:
-    path: /home/abeckett/config/pufferpanel/
+    path: /home/abeckett/config/pufferpanel
     state: directory
 - name: Download custom dark theme
   ansible.builtin.get_url:

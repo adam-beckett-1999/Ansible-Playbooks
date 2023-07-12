@@ -20,6 +20,8 @@
 - hosts: proxmox_servers
   roles:
     - pre-config-snapshot
+  vars:
+    vm_id: 208
 - hosts: game_server
   roles:
     - docker-install
@@ -30,3 +32,5 @@
 - hosts: proxmox_servers
   roles:
     - post-config-snapshot
+  vars:
+    vm_id: 208

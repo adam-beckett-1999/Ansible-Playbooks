@@ -25,6 +25,14 @@
   ansible.builtin.user:
     name: pufferpanel
     group: docker
+- name: Download custom dark theme
+  ansible.builtin.get_url:
+    url: https://github.com/snsnf/pufferpanel-themes/blob/main/1st-theme.tar
+    dest: /var/www/pufferpanel/1st-theme.tar
+- name: Download custom light theme
+  ansible.builtin.get_url:
+    url: https://github.com/snsnf/pufferpanel-themes/blob/main/2nd-theme.tar
+    dest: /var/www/pufferpanel/2nd-theme.tar
 - name: Start and enable Pufferpanel systemd service.
   systemd:
     name: pufferpanel

@@ -33,7 +33,3 @@
       - /var/lib/pufferpanel:/var/lib/pufferpanel
       - /var/www/pufferpanel/:/var/www/pufferpanel/
       - /var/run/docker.sock:/var/run/docker.sock
-- name: Run docker exec command to add the pufferpanel user within the container
-  community.docker.docker_container_exec:
-    container: PufferPanel
-    command: /pufferpanel/pufferpanel user add

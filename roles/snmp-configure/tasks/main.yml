@@ -1,4 +1,4 @@
-- name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
+- name: Install required packages [Debian/Ubuntu]
   apt:
     name:
     - snmpd
@@ -7,7 +7,7 @@
     state: present
   when:
     - ansible_facts.os_family == "Debian"
-- name: Install required base-packages (qemu-guest-agent, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [CentOS/Rocky]
+- name: Install required base-packages [CentOS/Rocky]
   dnf:
     name: 
     - net-snmp

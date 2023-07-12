@@ -1,64 +1,8 @@
-- name: Take a snapshot of VM-LB-01 with final configuration completed
+- name: Take a snapshot of the virtual machine with final configuration completed
   community.general.proxmox_snap:
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
     api_host: phs-hv-01
-    vmid: 200
-    snapname: Post-configuration
-    state: present
-- name: Take a snapshot of VM-SWARM-01 with final configuration completed
-  community.general.proxmox_snap:
-    api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
-    vmid: 201
-    snapname: Post-configuration
-    state: present
-- name: Take a snapshot of VM-SWARM-02 with final configuration completed
-  community.general.proxmox_snap:
-    api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
-    vmid: 202
-    snapname: Post-configuration
-    state: present
-- name: Take a snapshot of VM-SWARM-03 with final configuration completed
-  community.general.proxmox_snap:
-    api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
-    vmid: 203
-    snapname: Post-configuration
-    state: present
-- name: Take a snapshot of VM-GIT-01 with final configuration completed
-  community.general.proxmox_snap:
-    api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
-    vmid: 204
-    snapname: Post-configuration
-    state: present
-- name: Take a snapshot of VM-K8S-01-MASTER with final configuration completed
-  community.general.proxmox_snap:
-    api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
-    vmid: 205
-    snapname: Post-configuration
-    state: present
-- name: Take a snapshot of VM-K8S-02-WORKER with final configuration completed
-  community.general.proxmox_snap:
-    api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
-    vmid: 206
-    snapname: Post-configuration
-    state: present
-- name: Take a snapshot of VM-K8S-03-WORKER with final configuration completed
-  community.general.proxmox_snap:
-    api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
-    vmid: 207
+    vmid: "{{ vm_id }}"
     snapname: Post-configuration
     state: present

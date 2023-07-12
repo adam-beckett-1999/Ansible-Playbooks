@@ -1,0 +1,33 @@
+- name: Add Pufferpanel Repository
+  shell: |
+        curl -s https://packagecloud.io/install/repositories/pufferpanel/pufferpanel/script.deb.sh | sudo bash
+- name: Update cache and install Pufferpanel [Debian/Ubuntu]
+  apt:
+    name:
+      - pufferpanel
+    state: latest
+    update_cache: true
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Update cache and install Pufferpanel [CentOS/Rocky]
+  dnf:
+    name:
+      - pufferpanel
+    state: latest
+    update_cache: true
+  when:
+    - ansible_facts.os_family == "RedHat"
+- name: Ensure docker group exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+- name: Add the pufferpanel user to the docker group
+  ansible.builtin.user:
+    name: pufferpanel
+    group: docker
+- name: Start and enable Pufferpanel systemd service.
+  systemd:
+    name: pufferpanel
+    state: started
+    enabled: true
+    daemon_reload: true

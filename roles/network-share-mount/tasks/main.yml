@@ -1,3 +1,21 @@
+- name: Install required packages (qemu-guest-agent, cockpit, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [Debian/Ubuntu]
+  apt:
+    name:
+    - cifs-utils
+    - nfs-common
+    - keyutils
+    state: present
+  when:
+    - ansible_facts.os_family == "Debian"
+- name: Install required base-packages (qemu-guest-agent, cifs-utils, nfs-common, python3, pip, neofetch, glusterfs) [CentOS/Rocky]
+  dnf:
+    name: 
+    - cifs-utils
+    - nfs-common
+    - keyutils
+    state: present
+  when:
+    - ansible_facts.os_family == "RedHat"
 - name: Create NAS-01 local directory
   ansible.builtin.file:
     path: /nas-01

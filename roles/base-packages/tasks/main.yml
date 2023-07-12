@@ -3,9 +3,6 @@
     name:
     - qemu-guest-agent
     - cockpit
-    - cifs-utils
-    - nfs-common
-    - keyutils
     - snmpd
     - snmp
     - libsnmp-dev
@@ -24,9 +21,6 @@
   dnf:
     name: 
     - qemu-guest-agent
-    - cifs-utils
-    - nfs-common
-    - keyutils
     - epel-release
     - net-snmp
     - net-snmp-utils

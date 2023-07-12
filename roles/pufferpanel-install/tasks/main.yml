@@ -2,12 +2,14 @@
   ansible.builtin.file:
     path: /var/lib/pufferpanel/
     state: directory
-    mode: '0755'
+- name: Add /var/www/pufferpanel/ directory
+  ansible.builtin.file:
+    path: /var/www/pufferpanel/
+    state: directory
 - name: Add /home/abeckett/config/pufferpanel/ directory
   ansible.builtin.file:
     path: /home/abeckett/config/pufferpanel/
     state: directory
-    mode: '0755'
 - name: Deploy Pufferpanel docker container
   docker_container:
     name: PufferPanel
@@ -21,6 +23,7 @@
     volumes:
       - /home/abeckett/config/pufferpanel/config:/etc/pufferpanel
       - /var/lib/pufferpanel:/var/lib/pufferpanel
+      - /var/www/pufferpanel/:/var/www/pufferpanel/
       - /var/run/docker.sock:/var/run/docker.sock
 - name: Run docker exec command to add the pufferpanel user within the container
   shell: |

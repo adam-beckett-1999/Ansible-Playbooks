@@ -1,0 +1,3 @@
+- hosts: proxmox_servers
+  roles:
+    - reboot

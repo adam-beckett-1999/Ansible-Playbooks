@@ -7,7 +7,7 @@
     vm_id: 200
     tags: load-balancer,docker,glusterfs
     cores: 4
-    memory: 2048
+    memory: 4096
     ip_address: gw=192.168.0.1,ip=192.168.0.160/24
     disk_size: 50G
 - hosts: proxmox_servers
@@ -18,8 +18,8 @@
     vm_name: VM-SWARM-01
     vm_id: 201
     tags: docker,app-server,glusterfs
-    cores: 4
-    memory: 4096
+    cores: 8
+    memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.161/24
     disk_size: 50G
 - hosts: proxmox_servers
@@ -30,8 +30,8 @@
     vm_name: VM-SWARM-02
     vm_id: 202
     tags: docker,app-server,glusterfs
-    cores: 4
-    memory: 4096
+    cores: 8
+    memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.162/24
     disk_size: 50G
 - hosts: proxmox_servers
@@ -42,8 +42,8 @@
     vm_name: VM-SWARM-03
     vm_id: 203
     tags: docker,app-server,glusterfs
-    cores: 4
-    memory: 4096
+    cores: 8
+    memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.163/24
     disk_size: 50G
 - hosts: proxmox_servers
@@ -54,8 +54,8 @@
     vm_name: VM-GIT-01
     vm_id: 204
     tags: gitlab,app-server
-    cores: 4
-    memory: 2048
+    cores: 8
+    memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.164/24
     disk_size: 50G
 - hosts: proxmox_servers

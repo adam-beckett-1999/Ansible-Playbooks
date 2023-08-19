@@ -1,4 +1,4 @@
-- hosts: proxmox-servers
+- hosts: proxmox_servers
   roles:
     - update
     - reboot

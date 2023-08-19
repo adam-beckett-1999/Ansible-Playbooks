@@ -1,0 +1,3 @@
+- hosts: swarm_manager,game_server
+  roles:
+    - docker-image-prune

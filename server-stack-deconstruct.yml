@@ -40,6 +40,11 @@
     vm_name: VM-K3S-03-WORKER
 - hosts: proxmox_servers
   roles:
+    - proxmox-stop-virtual-machines
+  vars:
+    vm_name: VM-GAMESERVER-01
+- hosts: proxmox_servers
+  roles:
     - proxmox-destroy-virtual-machines
   vars:
     vm_name: VM-LB-01
@@ -78,3 +83,8 @@
     - proxmox-destroy-virtual-machines
   vars:
     vm_name: VM-K3S-03-WORKER
+- hosts: proxmox_servers
+  roles:
+    - proxmox-destroy-virtual-machines
+  vars:
+    vm_name: VM-GAMESERVER-01

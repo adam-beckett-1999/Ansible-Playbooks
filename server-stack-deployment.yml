@@ -9,7 +9,7 @@
     cores: 4
     memory: 4096
     ip_address: gw=192.168.0.1,ip=192.168.0.160/24
-    disk_size: 50G
+    disk_size: 200G
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -21,7 +21,7 @@
     cores: 8
     memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.161/24
-    disk_size: 50G
+    disk_size: 200G
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -33,7 +33,7 @@
     cores: 8
     memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.162/24
-    disk_size: 50G
+    disk_size: 200G
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -45,7 +45,7 @@
     cores: 8
     memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.163/24
-    disk_size: 50G
+    disk_size: 200G
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -57,7 +57,7 @@
     cores: 8
     memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.164/24
-    disk_size: 50G
+    disk_size: 200G
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -69,7 +69,7 @@
     cores: 4
     memory: 4096
     ip_address: gw=192.168.0.1,ip=192.168.0.165/24
-    disk_size: 50G
+    disk_size: 200G
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -81,7 +81,7 @@
     cores: 4
     memory: 4096
     ip_address: gw=192.168.0.1,ip=192.168.0.166/24
-    disk_size: 50G
+    disk_size: 200G
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -93,8 +93,20 @@
     cores: 4
     memory: 4096
     ip_address: gw=192.168.0.1,ip=192.168.0.167/24
-    disk_size: 50G
-- hosts: virtual_machines
+    disk_size: 200G
+- hosts: proxmox_servers
+  roles:
+    - proxmox-create-from-clone
+  vars:
+    template_id: 1000
+    vm_name: VM-GAMESERVER-01
+    vm_id: 208
+    tags: docker,pufferpanel,app-server
+    cores: 8
+    memory: 16384
+    ip_address: gw=192.168.0.1,ip=192.168.0.168/24
+    disk_size: 200G
+- hosts: virtual_machines,game_server
   roles:
     - reboot
     - update
@@ -141,6 +153,11 @@
     - pre-config-snapshot
   vars:
     vm_id: 207
+- hosts: proxmox_servers
+  roles:
+    - pre-config-snapshot
+  vars:
+    vm_id: 208
 - hosts: swarm_vms
   roles:
     - glusterfs-service
@@ -166,7 +183,11 @@
 - hosts: git
   roles: 
     - gitlab-install
-- hosts: virtual_machines
+- hosts: game_server
+  roles:
+    - docker-install
+    - pufferpanel-install
+- hosts: virtual_machines,game_server
   roles: 
     - reboot
 - hosts: proxmox_servers
@@ -209,3 +230,8 @@
     - post-config-snapshot
   vars:
     vm_id: 207
+- hosts: proxmox_servers
+  roles:
+    - post-config-snapshot
+  vars:
+    vm_id: 208

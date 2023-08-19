@@ -1,0 +1,4 @@
+- hosts: proxmox-servers
+  roles:
+    - update
+    - reboot

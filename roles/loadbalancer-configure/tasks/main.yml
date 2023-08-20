@@ -20,13 +20,7 @@
     volumes:
       - /nas-01/Container-configs/loadbalancer/:/etc/nginx/conf.d
     ports:
-    - 9003-9020:9003-9020
-    - 10000-10020:10000-10020
-    - 11000-11020:11000-11020
-    - 12000-12020:12000-12020
-    - 13000-13020:13000-13020
-    - 14000-14020:14000-14020
-    - 15000-15020:15000-15020
+    - 10000-10100:10000-10100
     restart_policy: always
 - name: Deploy File-Manager for GlusterFS volume
   community.docker.docker_container:

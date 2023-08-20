@@ -106,6 +106,9 @@
     memory: 16384
     ip_address: gw=192.168.0.1,ip=192.168.0.168/24
     disk_size: 200G
+- hosts: proxmox_servers
+  roles:
+    - 5-minute-pause
 - hosts: virtual_machines
   roles:
     - reboot

@@ -181,7 +181,7 @@
     - docker-swarm-init
 
 ## JOIN NODES TO DOCKER SWARM
-- hosts: swarm_nodes
+- hosts: swarm_workers
   roles: 
     - docker-swarm-join
 

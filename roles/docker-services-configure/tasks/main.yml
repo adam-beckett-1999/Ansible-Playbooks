@@ -17,7 +17,7 @@
     name: File-Manager
     image: hurlenko/filebrowser
     state: present
-    volumes:
+    mounts:
       - type: bind
         source: /mnt/gluster/containers/file-browser
         target: /config
@@ -42,7 +42,7 @@
     name: VSCode-Server
     image: lscr.io/linuxserver/code-server
     state: present
-    volumes:
+    mounts:
       - type: bind
         source: /mnt/gluster/containers/vscode-server
         target: /config

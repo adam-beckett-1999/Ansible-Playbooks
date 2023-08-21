@@ -12,6 +12,10 @@
     name: portainer
     compose:
       - /mnt/gluster/containers/compose/portainer-agent-stack.yml
+- name: Create NAS-01 local directory
+  ansible.builtin.file:
+    path: /mnt/gluster/containers/file-browser
+    state: directory
 - name: Deploy File-Manager for GlusterFS volume
   docker_swarm_service:
     name: File-Manager
@@ -37,6 +41,10 @@
       delay: 5s
       max_attempts: 3
       window: 120s
+- name: Create NAS-01 local directory
+  ansible.builtin.file:
+    path: /mnt/gluster/containers/vscode-server
+    state: directory
 - name: Deploy VSCode for Swarm Container config editing
   docker_swarm_service:
     name: VSCode-Server

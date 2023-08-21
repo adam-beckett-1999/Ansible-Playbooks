@@ -195,6 +195,7 @@
   roles:
     - docker-install
     - pufferpanel-install
+    - portainer-agent-deploy
 
 ## REBOOT ALL VMs
 - hosts: virtual_machines

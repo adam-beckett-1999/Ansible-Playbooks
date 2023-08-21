@@ -3,10 +3,10 @@
     - proxmox-create-from-clone
   vars:
     template_id: 1000
-    vm_name: VM-LB-01
+    vm_name: VM-GIT-01
     vm_id: 200
-    tags: load-balancer,docker,glusterfs
-    cores: 4
+    tags: gitlab,app-server
+    cores: 8
     memory: 4096
     ip_address: gw=192.168.0.1,ip=192.168.0.160/24
     disk_size: 200G
@@ -51,9 +51,9 @@
     - proxmox-create-from-clone
   vars:
     template_id: 1000
-    vm_name: VM-GIT-01
+    vm_name: VM-SWARM-04
     vm_id: 204
-    tags: gitlab,app-server
+    tags: docker,app-server,glusterfs
     cores: 8
     memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.164/24
@@ -63,11 +63,11 @@
     - proxmox-create-from-clone
   vars:
     template_id: 1000
-    vm_name: VM-K3S-01-MASTER
+    vm_name: VM-SWARM-05
     vm_id: 205
-    tags: kubernetes,app-server,master
-    cores: 4
-    memory: 4096
+    tags: docker,app-server,glusterfs
+    cores: 8
+    memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.165/24
     disk_size: 200G
 - hosts: proxmox_servers
@@ -75,36 +75,12 @@
     - proxmox-create-from-clone
   vars:
     template_id: 1000
-    vm_name: VM-K3S-02-WORKER
-    vm_id: 206
-    tags: kubernetes,app-server,worker
-    cores: 4
-    memory: 4096
-    ip_address: gw=192.168.0.1,ip=192.168.0.166/24
-    disk_size: 200G
-- hosts: proxmox_servers
-  roles:
-    - proxmox-create-from-clone
-  vars:
-    template_id: 1000
-    vm_name: VM-K3S-03-WORKER
-    vm_id: 207
-    tags: kubernetes,app-server,worker
-    cores: 4
-    memory: 4096
-    ip_address: gw=192.168.0.1,ip=192.168.0.167/24
-    disk_size: 200G
-- hosts: proxmox_servers
-  roles:
-    - proxmox-create-from-clone
-  vars:
-    template_id: 1000
     vm_name: VM-GAMESERVER-01
-    vm_id: 208
+    vm_id: 206
     tags: docker,pufferpanel,app-server
     cores: 8
     memory: 16384
-    ip_address: gw=192.168.0.1,ip=192.168.0.168/24
+    ip_address: gw=192.168.0.1,ip=192.168.0.166/24
     disk_size: 200G
 - hosts: proxmox_servers
   roles:
@@ -151,20 +127,10 @@
     - pre-config-snapshot
   vars:
     vm_id: 206
-- hosts: proxmox_servers
-  roles:
-    - pre-config-snapshot
-  vars:
-    vm_id: 207
-- hosts: proxmox_servers
-  roles:
-    - pre-config-snapshot
-  vars:
-    vm_id: 208
 - hosts: swarm_vms
   roles:
     - glusterfs-service
-- hosts: loadbalancer
+- hosts: swarm_manager
   roles:
     - glusterfs-configure
 - hosts: swarm_vms
@@ -228,13 +194,3 @@
     - post-config-snapshot
   vars:
     vm_id: 206
-- hosts: proxmox_servers
-  roles:
-    - post-config-snapshot
-  vars:
-    vm_id: 207
-- hosts: proxmox_servers
-  roles:
-    - post-config-snapshot
-  vars:
-    vm_id: 208

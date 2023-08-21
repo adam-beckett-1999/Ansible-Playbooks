@@ -22,7 +22,7 @@
         target: /data
     publish:
       - target_port: 8080
-        published_port: 9002
+        published_port: 9001
         protocol: tcp
     env:
       PUID: "1000"
@@ -33,26 +33,27 @@
       delay: 5s
       max_attempts: 3
       window: 120s
-- name: Deploy Dozzle for Swarm Container Logs Management
+- name: Deploy VSCode for Swarm Container config editing
   docker_swarm_service:
-    name: Dozzle
-    image: amir20/dozzle
+    name: VSCode-Server
+    image: lscr.io/linuxserver/code-server
     state: present
     volumes:
       - type: bind
-        source: /mnt/gluster/containers/file-browser
+        source: /mnt/gluster/containers/vscode-server
         target: /config
       - type: bind
-        source: /mnt/gluster
-        target: /data
+        source: /mnt/gluster/containers
+        target: /containers
     publish:
-      - target_port: 8080
+      - target_port: 8443
         published_port: 9002
         protocol: tcp
     env:
       PUID: "1000"
       PGID: "1000"
       TZ: "Europe/London"
+      DEFAULT_WORKSPACE: "/home-assistant"
     restart_config:
       condition: on-failure
       delay: 5s

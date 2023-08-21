@@ -1,13 +1,17 @@
+- name: Create NAS-01 local directory
+  ansible.builtin.file:
+    path: /mnt/gluster/containers/compose
+    state: directory
 - name: Download Portainer Agent Stack compose file
   ansible.builtin.get_url:
     url: https://downloads.portainer.io/ce2-18/portainer-agent-stack.yml
-    dest: /mnt/gluster/containers/portainer/portainer-agent-stack.yml
+    dest: /mnt/gluster/containers/compose/portainer-agent-stack.yml
 - name: Deploy Portainer Agent Stack from the compose file
   docker_stack:
     state: present
     name: portainer
     compose:
-      - /mnt/gluster/containers/portainer/portainer-agent-stack.yml
+      - /mnt/gluster/containers/compose/portainer-agent-stack.yml
 - name: Deploy File-Manager for GlusterFS volume
   docker_swarm_service:
     name: File-Manager

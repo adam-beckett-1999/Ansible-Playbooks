@@ -12,23 +12,13 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
-- name: Deploy NGINX load-balancer
-  community.docker.docker_container:
-    name: Load-Balancer
-    image: nginx
-    state: started
-    volumes:
-      - /nas-01/Container-configs/loadbalancer/:/etc/nginx/conf.d
-    ports:
-    - 10000-10100:10000-10100
-    restart_policy: always
 - name: Deploy File-Manager for GlusterFS volume
   community.docker.docker_container:
     name: File-Manager
     image: hurlenko/filebrowser
     state: started
     volumes:
-      - /nas-01/Container-configs/file-browser-glusterfs:/config
+      - /mnt/gluster/containers/file-browser:/config
       - /mnt/gluster:/data
     ports:
       - 9002:8080

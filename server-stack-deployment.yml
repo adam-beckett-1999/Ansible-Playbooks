@@ -185,11 +185,6 @@
   roles: 
     - docker-swarm-join
 
-## PROMOTE 2ND MANAGER TO KEEP ENSURE STABILITY
-- hosts: swarm_manager_2
-  roles: 
-    - docker-swarm-promote
-
 ## INSTALL PORTAINER AND OTHER ESSENTIAL SERVICES
 - hosts: swarm_manager
   roles: 

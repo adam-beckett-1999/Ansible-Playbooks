@@ -190,11 +190,6 @@
   roles: 
     - docker-services-configure
 
-## INSTALL GITLAB AND CONFIGURE
-- hosts: git
-  roles: 
-    - gitlab-install
-
 ## INSTALL PUFFERPANEL AND DOCKER, CONFIGURE FOR INITIAL SETUP
 - hosts: game_server
   roles:
@@ -205,13 +200,6 @@
 - hosts: virtual_machines
   roles: 
     - reboot
-
-## VM-GIT-01 POST-CONFIG SNAPSHOT
-- hosts: proxmox_servers
-  roles:
-    - post-config-snapshot
-  vars:
-    vm_id: 200
 
 ## VM-SWARM-01 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers

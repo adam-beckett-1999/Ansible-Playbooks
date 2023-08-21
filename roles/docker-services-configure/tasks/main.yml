@@ -57,7 +57,7 @@
       PUID: "1000"
       PGID: "1000"
       TZ: "Europe/London"
-      DEFAULT_WORKSPACE: "/home-assistant"
+      DEFAULT_WORKSPACE: "/containers"
     restart_config:
       condition: on-failure
       delay: 5s

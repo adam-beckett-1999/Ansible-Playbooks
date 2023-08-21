@@ -1,20 +1,10 @@
-- name: Install required packages [Debian/Ubuntu]
+- name: Install required packages
   apt:
     name:
     - snmpd
     - snmp
     - libsnmp-dev
     state: present
-  when:
-    - ansible_facts.os_family == "Debian"
-- name: Install required base-packages [CentOS/Rocky]
-  dnf:
-    name: 
-    - net-snmp
-    - net-snmp-utils
-    state: present
-  when:
-    - ansible_facts.os_family == "RedHat"
 - name: Install pysnmp for testing SNMP on hosts
   pip:
     name: pysnmp

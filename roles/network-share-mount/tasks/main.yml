@@ -1,21 +1,10 @@
-- name: Install required packages [Debian/Ubuntu]
+- name: Install required packages
   apt:
     name:
     - cifs-utils
     - nfs-common
     - keyutils
     state: present
-  when:
-    - ansible_facts.os_family == "Debian"
-- name: Install required base-packages [CentOS/Rocky]
-  dnf:
-    name: 
-    - cifs-utils
-    - nfs-common
-    - keyutils
-    state: present
-  when:
-    - ansible_facts.os_family == "RedHat"
 - name: Create NAS-01 local directory
   ansible.builtin.file:
     path: /nas-01

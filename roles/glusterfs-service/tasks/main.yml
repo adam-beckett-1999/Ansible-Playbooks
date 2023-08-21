@@ -1,19 +1,9 @@
-- name: Install required packages [Debian/Ubuntu]
+- name: Install required packages
   apt:
     name:
     - glusterfs-server
     - glusterfs-client
     state: present
-  when:
-    - ansible_facts.os_family == "Debian"
-- name: Install required base-packages [CentOS/Rocky]
-  dnf:
-    name: 
-    - glusterfs-server
-    - glusterfs-client
-    state: present
-  when:
-    - ansible_facts.os_family == "RedHat"
 - name: Start glusterd service
   systemd:
     name: glusterd

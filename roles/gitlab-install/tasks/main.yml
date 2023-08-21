@@ -22,6 +22,6 @@
   ansible.builtin.lineinfile:
     path: /etc/gitlab/gitlab.rb
     regexp: '^external_url.*$'
-    line: 'external_url "http://gitlab.beckettcloud.com"'
+    line: 'external_url "http://gitlab.hyvecloud.dev"'
 - name: Restart Gitlab to update the changes
   shell: gitlab-ctl restart

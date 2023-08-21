@@ -48,3 +48,15 @@
     name: vscode-server
     compose:
       - /mnt/gluster/containers/compose/vscode-server.yaml
+
+- name: Download Shepherd compose file
+  ansible.builtin.get_url:
+    url: https://github.com/adam-beckett-1999/Docker-Compose/blob/main/utilities/shepherd.yaml
+    dest: /mnt/gluster/containers/compose/shepherd.yaml
+
+- name: Deploy File-Manager for GlusterFS volume
+  docker_stack:
+    state: present
+    name: shepherd
+    compose:
+      - /mnt/gluster/containers/compose/shepherd.yaml

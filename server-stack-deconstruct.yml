@@ -2,7 +2,7 @@
   roles:
     - proxmox-stop-virtual-machines
   vars:
-    vm_name: VM-LB-01
+    vm_name: VM-GIT-01
 - hosts: proxmox_servers
   roles:
     - proxmox-stop-virtual-machines
@@ -22,22 +22,12 @@
   roles:
     - proxmox-stop-virtual-machines
   vars:
-    vm_name: VM-GIT-01
+    vm_name: VM-SWARM-04
 - hosts: proxmox_servers
   roles:
     - proxmox-stop-virtual-machines
   vars:
-    vm_name: VM-K3S-01-MASTER
-- hosts: proxmox_servers
-  roles:
-    - proxmox-stop-virtual-machines
-  vars:
-    vm_name: VM-K3S-02-WORKER
-- hosts: proxmox_servers
-  roles:
-    - proxmox-stop-virtual-machines
-  vars:
-    vm_name: VM-K3S-03-WORKER
+    vm_name: VM-SWARM-05
 - hosts: proxmox_servers
   roles:
     - proxmox-stop-virtual-machines
@@ -47,7 +37,7 @@
   roles:
     - proxmox-destroy-virtual-machines
   vars:
-    vm_name: VM-LB-01
+    vm_name: VM-GIT-01
 - hosts: proxmox_servers
   roles:
     - proxmox-destroy-virtual-machines
@@ -67,22 +57,12 @@
   roles:
     - proxmox-destroy-virtual-machines
   vars:
-    vm_name: VM-GIT-01
+    vm_name: VM-SWARM-04
 - hosts: proxmox_servers
   roles:
     - proxmox-destroy-virtual-machines
   vars:
-    vm_name: VM-K3S-01-MASTER
-- hosts: proxmox_servers
-  roles:
-    - proxmox-destroy-virtual-machines
-  vars:
-    vm_name: VM-K3S-02-WORKER
-- hosts: proxmox_servers
-  roles:
-    - proxmox-destroy-virtual-machines
-  vars:
-    vm_name: VM-K3S-03-WORKER
+    vm_name: VM-SWARM-05
 - hosts: proxmox_servers
   roles:
     - proxmox-destroy-virtual-machines

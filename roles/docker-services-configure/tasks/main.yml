@@ -1,29 +1,60 @@
-- name: Spin-up a Portainer instance for management of Swarm
-  docker_container:
-    name: Portainer
-    image: portainer/portainer-ce
-    state: started
-    recreate: yes
-    restart_policy: always
-    published_ports:
-      - "8000:8000"
-      - "9000:9000"
-      - "9443:9443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
+- name: Download Portainer Agent Stack compose file
+  ansible.builtin.get_url:
+    url: https://downloads.portainer.io/ce2-18/portainer-agent-stack.yml
+    dest: /mnt/gluster/containers/portainer/portainer-agent-stack.yml
+- name: Deploy Portainer Agent Stack from the compose file
+  docker_stack:
+    state: present
+    name: portainer
+    compose:
+      - /mnt/gluster/containers/portainer/portainer-agent-stack.yml
 - name: Deploy File-Manager for GlusterFS volume
-  community.docker.docker_container:
+  docker_swarm_service:
     name: File-Manager
     image: hurlenko/filebrowser
-    state: started
+    state: present
     volumes:
-      - /mnt/gluster/containers/file-browser:/config
-      - /mnt/gluster:/data
-    ports:
-      - 9002:8080
+      - type: bind
+        source: /mnt/gluster/containers/file-browser
+        target: /config
+      - type: bind
+        source: /mnt/gluster
+        target: /data
+    publish:
+      - target_port: 8080
+        published_port: 9002
+        protocol: tcp
     env:
       PUID: "1000"
       PGID: "1000"
       TZ: "Europe/London"
-    restart_policy: always
+    restart_config:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3
+      window: 120s
+- name: Deploy Dozzle for Swarm Container Logs Management
+  docker_swarm_service:
+    name: Dozzle
+    image: amir20/dozzle
+    state: present
+    volumes:
+      - type: bind
+        source: /mnt/gluster/containers/file-browser
+        target: /config
+      - type: bind
+        source: /mnt/gluster
+        target: /data
+    publish:
+      - target_port: 8080
+        published_port: 9002
+        protocol: tcp
+    env:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "Europe/London"
+    restart_config:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3
+      window: 120s

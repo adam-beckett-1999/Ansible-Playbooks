@@ -46,6 +46,9 @@
 - name: Install Docker Module for Python
   pip:
     name: docker
+- name: Install JSONDiff
+  pip:
+    name: jsondiff
 - name: Start and enable Docker systemd service.
   systemd:
     name: docker

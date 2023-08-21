@@ -1,3 +1,4 @@
+## VM-GIT-01 [GITLAB SERVER]
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -10,6 +11,8 @@
     memory: 4096
     ip_address: gw=192.168.0.1,ip=192.168.0.160/24
     disk_size: 200G
+
+## VM-SWARM-01 [DOCKER SWARM MANAGER-1]
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -22,6 +25,8 @@
     memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.161/24
     disk_size: 200G
+
+## VM-SWARM-02 [DOCKER SWARM WORKER-1]
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -34,6 +39,8 @@
     memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.162/24
     disk_size: 200G
+
+## VM-SWARM-03 [DOCKER SWARM WORKER-2]
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -46,6 +53,8 @@
     memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.163/24
     disk_size: 200G
+
+## VM-SWARM-04 [DOCKER SWARM WORKER-3]
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -58,6 +67,8 @@
     memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.164/24
     disk_size: 200G
+
+## VM-SWARM-05 [DOCKER SWARM MANAGER-2]
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -70,6 +81,8 @@
     memory: 8192
     ip_address: gw=192.168.0.1,ip=192.168.0.165/24
     disk_size: 200G
+
+## VM-GAMESERVER-01 [PUFFERPANEL SERVER with DOCKER]
 - hosts: proxmox_servers
   roles:
     - proxmox-create-from-clone
@@ -82,9 +95,13 @@
     memory: 16384
     ip_address: gw=192.168.0.1,ip=192.168.0.166/24
     disk_size: 200G
+
+## 5 MINUTE PAUSE POST-CLONE TO START SERVERS CORRECTLY
 - hosts: proxmox_servers
   roles:
     - 5-minute-pause
+
+## INSTALL UPDATES, BASE PACKAGES, CONFIGURE SNMP AND MOUNT NETWORK SHARES
 - hosts: virtual_machines
   roles:
     - reboot
@@ -92,103 +109,151 @@
     - base-packages
     - snmp-configure
     - network-share-mount
+
+## VM-GIT-01 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - pre-config-snapshot
   vars:
     vm_id: 200
+
+## VM-SWARM-01 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - pre-config-snapshot
   vars:
     vm_id: 201
+
+## VM-SWARM-02 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - pre-config-snapshot
   vars:
     vm_id: 202
+
+## VM-SWARM-03 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - pre-config-snapshot
   vars:
     vm_id: 203
+
+## VM-SWARM-04 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - pre-config-snapshot
   vars:
     vm_id: 204
+
+## VM-SWARM-05 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - pre-config-snapshot
   vars:
     vm_id: 205
+
+## VM-GAMESERVER-01 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - pre-config-snapshot
   vars:
     vm_id: 206
+
+## INSTALL GLUSTERFS
 - hosts: swarm_vms
   roles:
     - glusterfs-service
+
+## CONFIGURE GLUSTERFS AND START FILESYSTEM
 - hosts: swarm_manager
   roles:
     - glusterfs-configure
+
+## MOUNT GLUSTER CLUSTER TO ALL NODES AND INSTALL DOCKER
 - hosts: swarm_vms
   roles:
     - glusterfs-mount
     - docker-install
+
+## INITIALIZE DOCKER SWARM
 - hosts: swarm_manager
   roles:
     - docker-swarm-init
+
+## JOIN NODES TO DOCKER SWARM
 - hosts: swarm_nodes
   roles: 
     - docker-swarm-join
-- hosts: loadbalancer
+
+## PROMOTE 2ND MANAGER TO KEEP ENSURE STABILITY
+- hosts: swarm_manager_2
   roles: 
-    - loadbalancer-configure
+    - docker-swarm-promote
+
+## INSTALL PORTAINER AND OTHER ESSENTIAL SERVICES
 - hosts: swarm_manager
   roles: 
-    - portainer-agent-deploy
+    - docker-services-configure
+
+## INSTALL GITLAB AND CONFIGURE
 - hosts: git
   roles: 
     - gitlab-install
+
+## INSTALL PUFFERPANEL AND DOCKER, CONFIGURE FOR INITIAL SETUP
 - hosts: game_server
   roles:
     - docker-install
     - pufferpanel-install
+
+## REBOOT ALL VMs
 - hosts: virtual_machines
   roles: 
     - reboot
+
+## VM-GIT-01 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - post-config-snapshot
   vars:
     vm_id: 200
+
+## VM-SWARM-01 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - post-config-snapshot
   vars:
     vm_id: 201
+
+## VM-SWARM-02 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - post-config-snapshot
   vars:
     vm_id: 202
+
+## VM-SWARM-03 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - post-config-snapshot
   vars:
     vm_id: 203
+
+## VM-SWARM-04 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - post-config-snapshot
   vars:
     vm_id: 204
+
+## VM-SWARM-05 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - post-config-snapshot
   vars:
     vm_id: 205
+
+## VM-GAMESERVER-01 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
     - post-config-snapshot

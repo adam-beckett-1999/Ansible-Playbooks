@@ -11,7 +11,7 @@
     storage: pool-1 
     format: raw
     timeout: 120
-  async: 60
+  async: 120
   poll: 5
 - name: Edit cloned virtual-machine with new cloud-init parameters
   community.general.proxmox_kvm:

@@ -10,6 +10,7 @@
     newid: "{{ vm_id }}"
     storage: pool-1 
     format: raw
+    timeout: 120
   async: 60
   poll: 5
 - name: Edit cloned virtual-machine with new cloud-init parameters

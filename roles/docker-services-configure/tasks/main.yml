@@ -13,7 +13,7 @@
     state: present
     name: portainer
     compose:
-      - /mnt/gluster/containers/compose/portainer-agent-stack.yml
+      - /mnt/gluster/containers/compose/portainer-agent-stack.yaml
 
 - name: Create NAS-01 local directory
   ansible.builtin.file:

@@ -10,10 +10,8 @@
     newid: "{{ vm_id }}"
     storage: pool-1 
     format: raw
-    timeout: 300
-- name: Pause for 30 seconds
-  ansible.builtin.pause:
-    seconds: 30
+  async: 45
+  poll: 5
 - name: Edit cloned virtual-machine with new cloud-init parameters
   community.general.proxmox_kvm:
     node: phs-hv-01
@@ -33,10 +31,8 @@
     ipconfig: 
       ipconfig0: "{{ ip_address }}"
     update: true
-    timeout: 300
-- name: Pause for 30 seconds
-  ansible.builtin.pause:
-    seconds: 30
+  async: 45
+  poll: 5
 - name: Re-size cloned virtual-machine disk
   community.general.proxmox_disk:
     api_user: "{{ proxmox_user }}"
@@ -46,10 +42,8 @@
     disk: scsi0
     size: "{{ disk_size }}"
     state: resized
-    timeout: 300
-- name: Pause for 30 seconds
-  ansible.builtin.pause:
-    seconds: 30
+  async: 45
+  poll: 5
 - name: Start cloned virtual-machine
   community.general.proxmox_kvm:
     node: phs-hv-01
@@ -58,7 +52,5 @@
     api_host: phs-hv-01
     name: "{{ vm_name }}"
     state: started
-    timeout: 300
-- name: Pause for 30 seconds
-  ansible.builtin.pause:
-    seconds: 30
+  async: 45
+  poll: 5

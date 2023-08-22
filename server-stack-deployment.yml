@@ -181,39 +181,47 @@
 ## INSTALL TRAEFIK CONTAINER
 - hosts: swarm_manager
   roles: 
-    - docker-traefik-deploy
+    - docker-reverse-proxy-deploy
 
 ## INSTALL PORTAINER
 - hosts: swarm_manager
   roles: 
     - docker-container-deploy
   vars:
-    category: "utlities"
-    service: "portainer"
+    category: utlities
+    service: portainer
 
 ## INSTALL FILE-BROWSER
 - hosts: swarm_manager
   roles: 
     - docker-container-deploy
   vars:
-    category: "utlities"
-    service: "file-browser"
+    category: utlities
+    service: file-browser
 
 ## INSTALL VSCODE-SERVER
 - hosts: swarm_manager
   roles: 
     - docker-container-deploy
   vars:
-    category: "utlities"
-    service: "vscode-server"
+    category: utlities
+    service: vscode-server
 
 ## INSTALL SHEPHERD
 - hosts: swarm_manager
   roles: 
     - docker-container-deploy
   vars:
-    category: "utlities"
-    service: "shepherd"
+    category: utlities
+    service: shepherd
+
+## INSTALL APACHE GUACAMOLE
+- hosts: swarm_manager
+  roles: 
+    - docker-container-deploy
+  vars:
+    category: utilities
+    service: guacamole
 
 ## INSTALL PUFFERPANEL AND DOCKER, CONFIGURE FOR INITIAL SETUP
 - hosts: game_server

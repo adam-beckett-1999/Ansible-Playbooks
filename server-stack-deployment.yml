@@ -1,17 +1,3 @@
-## VM-GIT-01 [GITLAB SERVER]
-- hosts: proxmox_servers
-  roles:
-    - proxmox-create-from-clone
-  vars:
-    template_id: 1000
-    vm_name: VM-GIT-01
-    vm_id: 200
-    tags: gitlab,app-server
-    cores: 8
-    memory: 4096
-    ip_address: gw=192.168.0.1,ip=192.168.0.160/24
-    disk_size: 200G
-
 ## VM-SWARM-01 [DOCKER SWARM MANAGER-1]
 - hosts: proxmox_servers
   roles:
@@ -96,11 +82,11 @@
     ip_address: gw=192.168.0.1,ip=192.168.0.166/24
     disk_size: 200G
 
-## 5 MINUTE PAUSE POST-CLONE TO START SERVERS CORRECTLY
+## 3 MINUTE PAUSE POST-CLONE TO START SERVERS CORRECTLY
 - hosts: proxmox_servers
-  name: Pause for 5 minutes
+  name: Pause for 3 minutes
   ansible.builtin.pause:
-    seconds: 300
+    seconds: 180
 
 ## INSTALL UPDATES, BASE PACKAGES, CONFIGURE SNMP AND MOUNT NETWORK SHARES
 - hosts: virtual_machines
@@ -110,13 +96,6 @@
     - base-packages
     - snmp-configure
     - network-share-mount
-
-## VM-GIT-01 PRE-CONFIG SNAPSHOT
-- hosts: proxmox_servers
-  roles:
-    - pre-config-snapshot
-  vars:
-    vm_id: 200
 
 ## VM-SWARM-01 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers

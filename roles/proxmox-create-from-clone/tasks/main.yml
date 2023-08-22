@@ -27,7 +27,6 @@
     ciuser: "{{ username }}"
     cipassword: "{{ password }}"
     sshkeys: "{{ sshkeys }}"
-    searchdomains: 'homelab.internal'
     nameservers: 192.168.0.210
     ipconfig: 
       ipconfig0: "{{ ip_address }}"

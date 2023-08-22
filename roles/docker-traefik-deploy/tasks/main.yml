@@ -1,0 +1,52 @@
+- name: Create directory for docker compose files
+  ansible.builtin.file:
+    path: /mnt/gluster/containers/compose
+    state: directory
+
+- name: Create directory for traefik container configs
+  ansible.builtin.file:
+    path: /mnt/gluster/containers/traefik
+    state: directory
+
+- name: Copy traefik.yml from Ansible server
+  copy: src=/home/abeckett/traefik.yml dest=/mnt/gluster/containers/traefik.yml owner=root group=root mode=600
+
+- name: Copy fileConfig.yml from Ansible server
+  copy: src=/home/abeckett/fileConfig.yml dest=/mnt/gluster/containers/fileConfig.yml owner=root group=root mode=600
+
+- name: Download Traefik compose file
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/utilities/traefik.yaml
+    dest: /mnt/gluster/containers/compose/traefik.yaml
+
+- name: Deploy Traefik from the compose file
+  docker_stack:
+    state: present
+    name: traefik
+    compose:
+      - /mnt/gluster/containers/compose/traefik.yaml
+
+- name: Create directory for authentik compose files
+  ansible.builtin.file:
+    path: /mnt/gluster/containers/compose/authentik
+    state: directory
+
+- name: Copy environment variables for Authentik from Ansible server
+  copy: src=/home/abeckett/.env dest=/mnt/gluster/containers/compose/authentik/.env owner=root group=root mode=600
+
+- name: Download Authentik compose file
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/utilities/authentik.yaml
+    dest: /mnt/gluster/containers/compose/authentik/authentik.yaml
+
+- name: Create directory for docker compose files
+  ansible.builtin.file:
+    path: /mnt/gluster/containers/authentik
+    state: directory
+
+- name: Deploy Authentik from the compose file
+  docker_stack:
+    state: present
+    name: authentik
+    compose:
+      - /mnt/gluster/containers/compose/authentik/authentik.yaml

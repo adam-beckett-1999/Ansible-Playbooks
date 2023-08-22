@@ -82,12 +82,6 @@
     ip_address: gw=192.168.0.1,ip=192.168.0.166/24
     disk_size: 200G
 
-## 3 MINUTE PAUSE POST-CLONE TO START SERVERS CORRECTLY
-- name: Pause for 3 minutes
-  hosts: proxmox_servers
-  ansible.builtin.pause:
-    seconds: 180
-
 ## INSTALL UPDATES, BASE PACKAGES, CONFIGURE SNMP AND MOUNT NETWORK SHARES
 - hosts: virtual_machines
   roles:

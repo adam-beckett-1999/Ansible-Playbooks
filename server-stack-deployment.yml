@@ -82,9 +82,11 @@
     ip_address: gw=192.168.0.1,ip=192.168.0.166/24
     disk_size: 200G
 
-- name: Pause for 3 minutes for VMs to start correctly
-  ansible.builtin.pause:
-    minutes: 3
+- hosts: proxmox_servers
+  roles:
+    - pause
+  vars:
+    time: 180 #in seconds
 
 ## INSTALL UPDATES, BASE PACKAGES, CONFIGURE SNMP AND MOUNT NETWORK SHARES
 - hosts: virtual_machines

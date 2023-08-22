@@ -98,8 +98,9 @@
 
 ## 5 MINUTE PAUSE POST-CLONE TO START SERVERS CORRECTLY
 - hosts: proxmox_servers
-  roles:
-    - 5-minute-pause
+  name: Pause for 5 minutes
+  ansible.builtin.pause:
+    seconds: 300
 
 ## INSTALL UPDATES, BASE PACKAGES, CONFIGURE SNMP AND MOUNT NETWORK SHARES
 - hosts: virtual_machines

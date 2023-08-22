@@ -1,13 +1,7 @@
-- name: Create the portainer_agent_network
-  docker_network:
-    name: portainer_agent_network
-    driver: overlay
 - name: Start portainer_agent service
   docker_container:
     name: Portainer-Agent
     image: portainer/agent:2.18.4
-    networks:
-      - portainer_agent_network
     ports:
       - 9001:9001
     volumes:

@@ -3,7 +3,7 @@
     node: phs-hv-01
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
+    api_host: 127.0.0.1
     clone: template
     vmid: "{{ template_id }}"
     name: "{{ vm_name }}"
@@ -18,7 +18,7 @@
     node: phs-hv-01
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
+    api_host: 127.0.0.1
     name: "{{ vm_name }}"
     tags: "{{ tags }}"
     cores: "{{ cores }}"
@@ -38,7 +38,7 @@
   community.general.proxmox_disk:
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
+    api_host: 127.0.0.1
     name: "{{ vm_name }}"
     disk: scsi0
     size: "{{ disk_size }}"
@@ -50,7 +50,7 @@
     node: phs-hv-01
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
+    api_host: 127.0.0.1
     name: "{{ vm_name }}"
     state: started
   async: 60

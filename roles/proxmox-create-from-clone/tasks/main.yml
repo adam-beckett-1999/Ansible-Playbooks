@@ -10,7 +10,7 @@
     newid: "{{ vm_id }}"
     storage: pool-1 
     format: raw
-  async: 45
+  async: 60
   poll: 5
 - name: Edit cloned virtual-machine with new cloud-init parameters
   community.general.proxmox_kvm:
@@ -31,7 +31,7 @@
     ipconfig: 
       ipconfig0: "{{ ip_address }}"
     update: true
-  async: 45
+  async: 60
   poll: 5
 - name: Re-size cloned virtual-machine disk
   community.general.proxmox_disk:
@@ -42,7 +42,7 @@
     disk: scsi0
     size: "{{ disk_size }}"
     state: resized
-  async: 45
+  async: 60
   poll: 5
 - name: Start cloned virtual-machine
   community.general.proxmox_kvm:
@@ -52,5 +52,5 @@
     api_host: phs-hv-01
     name: "{{ vm_name }}"
     state: started
-  async: 45
+  async: 60
   poll: 5

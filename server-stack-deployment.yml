@@ -1,7 +1,7 @@
 ## VM-SWARM-01 [DOCKER SWARM MANAGER-1]
 - hosts: proxmox_servers
   roles:
-    - proxmox-create-from-clone
+    - proxmox-clone
   vars:
     template_id: 1000
     vm_name: VM-SWARM-01
@@ -15,7 +15,7 @@
 ## VM-SWARM-02 [DOCKER SWARM WORKER-1]
 - hosts: proxmox_servers
   roles:
-    - proxmox-create-from-clone
+    - proxmox-clone
   vars:
     template_id: 1000
     vm_name: VM-SWARM-02
@@ -29,7 +29,7 @@
 ## VM-SWARM-03 [DOCKER SWARM WORKER-2]
 - hosts: proxmox_servers
   roles:
-    - proxmox-create-from-clone
+    - proxmox-clone
   vars:
     template_id: 1000
     vm_name: VM-SWARM-03
@@ -43,7 +43,7 @@
 ## VM-SWARM-04 [DOCKER SWARM WORKER-3]
 - hosts: proxmox_servers
   roles:
-    - proxmox-create-from-clone
+    - proxmox-clone
   vars:
     template_id: 1000
     vm_name: VM-SWARM-04
@@ -57,7 +57,7 @@
 ## VM-SWARM-05 [DOCKER SWARM MANAGER-2]
 - hosts: proxmox_servers
   roles:
-    - proxmox-create-from-clone
+    - proxmox-clone
   vars:
     template_id: 1000
     vm_name: VM-SWARM-05
@@ -71,7 +71,7 @@
 ## VM-GAMESERVER-01 [PUFFERPANEL SERVER with DOCKER]
 - hosts: proxmox_servers
   roles:
-    - proxmox-create-from-clone
+    - proxmox-clone
   vars:
     template_id: 1000
     vm_name: VM-GAMESERVER-01
@@ -100,44 +100,50 @@
 ## VM-SWARM-01 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - pre-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 201
+    snapshot_name: Post-update-early-configuration
 
 ## VM-SWARM-02 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - pre-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 202
+    snapshot_name: Post-update-early-configuration
 
 ## VM-SWARM-03 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - pre-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 203
+    snapshot_name: Post-update-early-configuration
 
 ## VM-SWARM-04 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - pre-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 204
+    snapshot_name: Post-update-early-configuration
 
 ## VM-SWARM-05 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - pre-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 205
+    snapshot_name: Post-update-early-configuration
 
 ## VM-GAMESERVER-01 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - pre-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 206
+    snapshot_name: Post-update-early-configuration
 
 ## INSTALL GLUSTERFS
 - hosts: swarm_vms
@@ -238,41 +244,47 @@
 ## VM-SWARM-01 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - post-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 201
+    snapshot_name: Post-configuration
 
 ## VM-SWARM-02 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - post-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 202
+    snapshot_name: Post-configuration
 
 ## VM-SWARM-03 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - post-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 203
+    snapshot_name: Post-configuration
 
 ## VM-SWARM-04 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - post-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 204
+    snapshot_name: Post-configuration
 
 ## VM-SWARM-05 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - post-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 205
+    snapshot_name: Post-configuration
 
 ## VM-GAMESERVER-01 POST-CONFIG SNAPSHOT
 - hosts: proxmox_servers
   roles:
-    - post-config-snapshot
+    - proxmox-snapshot
   vars:
     vm_id: 206
+    snapshot_name: Post-configuration

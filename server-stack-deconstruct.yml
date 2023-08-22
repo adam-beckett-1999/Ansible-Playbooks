@@ -1,60 +1,60 @@
 - hosts: proxmox_servers
   roles:
-    - proxmox-stop-virtual-machines
+    - proxmox-stop
   vars:
     vm_name: VM-SWARM-01
 - hosts: proxmox_servers
   roles:
-    - proxmox-stop-virtual-machines
+    - proxmox-stop
   vars:
     vm_name: VM-SWARM-02
 - hosts: proxmox_servers
   roles:
-    - proxmox-stop-virtual-machines
+    - proxmox-stop
   vars:
     vm_name: VM-SWARM-03
 - hosts: proxmox_servers
   roles:
-    - proxmox-stop-virtual-machines
+    - proxmox-stop
   vars:
     vm_name: VM-SWARM-04
 - hosts: proxmox_servers
   roles:
-    - proxmox-stop-virtual-machines
+    - proxmox-stop
   vars:
     vm_name: VM-SWARM-05
 - hosts: proxmox_servers
   roles:
-    - proxmox-stop-virtual-machines
+    - proxmox-stop
   vars:
     vm_name: VM-GAMESERVER-01
 - hosts: proxmox_servers
   roles:
-    - proxmox-destroy-virtual-machines
+    - proxmox-destroy
   vars:
     vm_name: VM-SWARM-01
 - hosts: proxmox_servers
   roles:
-    - proxmox-destroy-virtual-machines
+    - proxmox-destroy
   vars:
     vm_name: VM-SWARM-02
 - hosts: proxmox_servers
   roles:
-    - proxmox-destroy-virtual-machines
+    - proxmox-destroy
   vars:
     vm_name: VM-SWARM-03
 - hosts: proxmox_servers
   roles:
-    - proxmox-destroy-virtual-machines
+    - proxmox-destroy
   vars:
     vm_name: VM-SWARM-04
 - hosts: proxmox_servers
   roles:
-    - proxmox-destroy-virtual-machines
+    - proxmox-destroy
   vars:
     vm_name: VM-SWARM-05
 - hosts: proxmox_servers
   roles:
-    - proxmox-destroy-virtual-machines
+    - proxmox-destroy
   vars:
     vm_name: VM-GAMESERVER-01

@@ -1,6 +1,11 @@
-- name: Create NAS-01 local directory
+- name: Create directory for docker compose files
   ansible.builtin.file:
     path: /mnt/gluster/containers/compose
+    state: directory
+
+- name: Create directory for portainer configuration
+  ansible.builtin.file:
+    path: /mnt/gluster/containers/portainer
     state: directory
 
 - name: Download Portainer Agent Stack compose file
@@ -15,7 +20,7 @@
     compose:
       - /mnt/gluster/containers/compose/portainer.yaml
 
-- name: Create NAS-01 local directory
+- name: Create directory for file-browser configuration
   ansible.builtin.file:
     path: /mnt/gluster/containers/file-browser
     state: directory
@@ -32,7 +37,7 @@
     compose:
       - /mnt/gluster/containers/compose/filebrowser.yaml
 
-- name: Create NAS-01 local directory
+- name: Create directory for vscode-server configuration
   ansible.builtin.file:
     path: /mnt/gluster/containers/vscode-server
     state: directory

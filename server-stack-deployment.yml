@@ -83,8 +83,8 @@
     disk_size: 200G
 
 ## 3 MINUTE PAUSE POST-CLONE TO START SERVERS CORRECTLY
-- hosts: proxmox_servers
-  name: Pause for 3 minutes
+- name: Pause for 3 minutes
+  hosts: proxmox_servers
   ansible.builtin.pause:
     seconds: 180
 

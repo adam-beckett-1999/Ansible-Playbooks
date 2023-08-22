@@ -1,23 +1,14 @@
 - name: Create a trusted storage pool
   gluster.gluster.gluster_peer:
     state: present
-    nodes:
-      - VM-SWARM-02.homelab.internal
-      - VM-SWARM-03.homelab.internal
-      - VM-SWARM-04.homelab.internal
-      - VM-SWARM-05.homelab.internal
+    nodes: "{{ nodes }}"
 - name: Create GlusterFS volume
   gluster.gluster.gluster_volume:
     state: present
     name: gv0
-    replicas: 5
+    replicas: "{{ replicas }}"
     bricks: /glusterfs/bricks/gv0
-    cluster:
-      - VM-SWARM-01.homelab.internal
-      - VM-SWARM-02.homelab.internal
-      - VM-SWARM-03.homelab.internal
-      - VM-SWARM-04.homelab.internal
-      - VM-SWARM-05.homelab.internal
+    cluster: "{{ cluster }}"
     force: true
   run_once: true
 - name: Start GlusterFS volume

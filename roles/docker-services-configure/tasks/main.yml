@@ -30,7 +30,7 @@
     url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/utilities/filebrowser.yaml
     dest: /mnt/gluster/containers/compose/filebrowser.yaml
 
-- name: Deploy File-Manager for GlusterFS volume
+- name: Deploy File-Manager from the compose file
   docker_stack:
     state: present
     name: file-browser
@@ -47,7 +47,7 @@
     url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/utilities/vscode-server.yaml
     dest: /mnt/gluster/containers/compose/vscode-server.yaml
 
-- name: Deploy File-Manager for GlusterFS volume
+- name: Deploy VSCode-Server from the compose file
   docker_stack:
     state: present
     name: vscode-server
@@ -59,7 +59,7 @@
     url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/utilities/shepherd.yaml
     dest: /mnt/gluster/containers/compose/shepherd.yaml
 
-- name: Deploy File-Manager for GlusterFS volume
+- name: Deploy Shepherd from the compose file
   docker_stack:
     state: present
     name: shepherd

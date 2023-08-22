@@ -169,6 +169,19 @@
 - hosts: swarm_manager
   roles:
     - glusterfs-configure
+  vars:
+    nodes:
+      - VM-SWARM-02.homelab.internal
+      - VM-SWARM-03.homelab.internal
+      - VM-SWARM-04.homelab.internal
+      - VM-SWARM-05.homelab.internal
+    replicas: 5
+    cluster:
+      - VM-SWARM-01.homelab.internal
+      - VM-SWARM-02.homelab.internal
+      - VM-SWARM-03.homelab.internal
+      - VM-SWARM-04.homelab.internal
+      - VM-SWARM-05.homelab.internal
 
 ## MOUNT GLUSTER CLUSTER TO ALL NODES AND INSTALL DOCKER
 - hosts: swarm_vms

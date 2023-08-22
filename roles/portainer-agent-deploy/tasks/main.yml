@@ -3,23 +3,13 @@
     name: portainer_agent_network
     driver: overlay
 - name: Start portainer_agent service
-  docker_swarm_service:
-    name: portainer_agent
-    image: portainer/agent:2.18.2
+  docker_container:
+    name: Portainer-Agent
+    image: portainer/agent:2.18.4
     networks:
       - portainer_agent_network
-    publish:
-      - published_port: 9001
-        target_port: 9001
-        protocol: tcp
-    mode: global
-    placement:
-      constraints:
-        - node.platform.os == linux
-    mounts:
-      - source: //var/run/docker.sock
-        target: /var/run/docker.sock
-        type: bind
-      - source: //var/lib/docker/volumes
-        target: /var/lib/docker/volumes
-        type: bind
+    ports:
+      - 9001:9001
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes

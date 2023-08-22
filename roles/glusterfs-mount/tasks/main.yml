@@ -8,4 +8,4 @@
     path: /mnt/gluster
     fstype: glusterfs
     state: mounted
-    opts: rw,sync,hard
+    opts: rw

@@ -1,16 +1,16 @@
 
 
-- name: Create directory for portainer configuration
+- name: Create directory for container configuration
   ansible.builtin.file:
     path: "/mnt/gluster/containers/{{ service }}"
     state: directory
 
-- name: Download Portainer Agent Stack compose file
+- name: Download container compose file
   ansible.builtin.get_url:
     url: "https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/{{ service }}.yaml"
     dest: "/mnt/gluster/containers/compose/{{ service }}.yaml"
 
-- name: Deploy Portainer Agent Stack from the compose file
+- name: Deploy container from the compose file
   docker_stack:
     state: present
     name: "{{ service }}"

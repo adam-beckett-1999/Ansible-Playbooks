@@ -13,11 +13,15 @@
     path: /mnt/gluster/containers/traefik
     state: directory
 
-- name: Copy traefik.yml from Ansible server
-  copy: src=/home/abeckett/traefik.yml dest=/mnt/gluster/containers/traefik.yml owner=root group=root mode=600
+- name: Download Traefik static configuration file
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/adam-beckett-1999/Traefik-Configuration/main/traefik.yml
+    dest: /mnt/gluster/containers/traefik.yml
 
-- name: Copy fileConfig.yml from Ansible server
-  copy: src=/home/abeckett/fileConfig.yml dest=/mnt/gluster/containers/fileConfig.yml owner=root group=root mode=600
+- name: Download Traefik dynamic configuration file
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/adam-beckett-1999/Traefik-Configuration/main/fileConfig.yml
+    dest: /mnt/gluster/containers/fileConfig.yml
 
 - name: Download Traefik compose file
   ansible.builtin.get_url:

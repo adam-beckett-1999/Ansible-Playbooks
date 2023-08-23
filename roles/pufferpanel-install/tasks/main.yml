@@ -6,18 +6,18 @@
   ansible.builtin.file:
     path: /var/www/pufferpanel
     state: directory
-- name: Add /home/abeckett/config/pufferpanel directory
+- name: Add /home/config/pufferpanel directory
   ansible.builtin.file:
-    path: /home/abeckett/config/pufferpanel
+    path: /home/config/pufferpanel
     state: directory
 - name: Download custom dark theme
   ansible.builtin.get_url:
     url: https://github.com/snsnf/pufferpanel-themes/blob/main/1st-theme.tar
-    dest: /var/www/pufferpanel/1st-theme.tar
+    dest: /var/www/pufferpanel/themes/1st-theme.tar
 - name: Download custom light theme
   ansible.builtin.get_url:
     url: https://github.com/snsnf/pufferpanel-themes/blob/main/2nd-theme.tar
-    dest: /var/www/pufferpanel/2nd-theme.tar
+    dest: /var/www/pufferpanel/themes/2nd-theme.tar
 - name: Deploy Pufferpanel docker container
   docker_container:
     name: PufferPanel
@@ -29,7 +29,7 @@
       - "8080:8080"
       - "5657:5657"
     volumes:
-      - /home/abeckett/config/pufferpanel/config:/etc/pufferpanel
+      - /home/config/pufferpanel:/etc/pufferpanel
       - /var/lib/pufferpanel:/var/lib/pufferpanel
       - /var/www/pufferpanel/:/var/www/pufferpanel/
       - /var/run/docker.sock:/var/run/docker.sock

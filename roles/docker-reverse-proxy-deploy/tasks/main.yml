@@ -40,10 +40,8 @@
     path: /mnt/gluster/containers/compose/authentik
     state: directory
 
-- name: Download environment variables for Authentik
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose-Variables/main/authentik/.env
-    dest: /mnt/gluster/containers/compose/authentik/.env
+- name: Copy environment variables for Authentik
+  copy: src=/home/abeckett/authentik.env dest=/mnt/gluster/containers/compose/authentik/.env owner=root group=root mode=600
 
 - name: Download Authentik compose file
   ansible.builtin.get_url:

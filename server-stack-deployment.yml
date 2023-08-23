@@ -196,34 +196,6 @@
   vars:
     service: portainer
 
-## INSTALL FILE-BROWSER
-- hosts: swarm_manager
-  roles: 
-    - docker-container-deploy
-  vars:
-    service: file-browser
-
-## INSTALL VSCODE-SERVER
-- hosts: swarm_manager
-  roles: 
-    - docker-container-deploy
-  vars:
-    service: vscode-server
-
-## INSTALL SHEPHERD
-- hosts: swarm_manager
-  roles: 
-    - docker-container-deploy
-  vars:
-    service: shepherd
-
-## INSTALL APACHE GUACAMOLE
-- hosts: swarm_manager
-  roles: 
-    - docker-container-deploy
-  vars:
-    service: guacamole
-
 ## INSTALL PUFFERPANEL AND DOCKER, CONFIGURE FOR INITIAL SETUP
 - hosts: game_server
   roles:

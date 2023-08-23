@@ -194,7 +194,6 @@
   roles: 
     - docker-container-deploy
   vars:
-    category: utlities
     service: portainer
 
 ## INSTALL FILE-BROWSER
@@ -202,7 +201,6 @@
   roles: 
     - docker-container-deploy
   vars:
-    category: utlities
     service: file-browser
 
 ## INSTALL VSCODE-SERVER
@@ -210,7 +208,6 @@
   roles: 
     - docker-container-deploy
   vars:
-    category: utlities
     service: vscode-server
 
 ## INSTALL SHEPHERD
@@ -218,7 +215,6 @@
   roles: 
     - docker-container-deploy
   vars:
-    category: utlities
     service: shepherd
 
 ## INSTALL APACHE GUACAMOLE
@@ -226,7 +222,6 @@
   roles: 
     - docker-container-deploy
   vars:
-    category: utilities
     service: guacamole
 
 ## INSTALL PUFFERPANEL AND DOCKER, CONFIGURE FOR INITIAL SETUP

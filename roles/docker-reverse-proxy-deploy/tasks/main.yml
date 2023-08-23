@@ -21,7 +21,7 @@
 
 - name: Download Traefik compose file
   ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/utilities/traefik.yaml
+    url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/traefik.yaml
     dest: /mnt/gluster/containers/compose/traefik/traefik.yaml
 
 - name: Deploy Traefik from the compose file
@@ -43,7 +43,7 @@
 
 - name: Download Authentik compose file
   ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/utilities/authentik.yaml
+    url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/authentik.yaml
     dest: /mnt/gluster/containers/compose/authentik/authentik.yaml
 
 - name: Create directory for Authentik container configs

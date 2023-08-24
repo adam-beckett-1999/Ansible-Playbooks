@@ -3,7 +3,7 @@
   roles:
     - terraform-apply
   vars:
-    project_dir: ~/terraform/proxmox
+    project_dir: /home/abeckett/terraform/proxmox
 
 ## INSTALL UPDATES, BASE PACKAGES, CONFIGURE SNMP AND MOUNT NETWORK SHARES
 - hosts: virtual_machines

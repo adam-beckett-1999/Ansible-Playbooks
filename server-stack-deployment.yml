@@ -1,10 +1,11 @@
-## INSTALL UPDATES, BASE PACKAGES, CONFIGURE SNMP AND MOUNT NETWORK SHARES
+## CLONE VIRTUAL MACHINES USING TERRAFORM
 - hosts: terraform
   roles:
     - terraform-apply
   vars:
     project_dir: ~/terraform/proxmox
 
+## INSTALL UPDATES, BASE PACKAGES, CONFIGURE SNMP AND MOUNT NETWORK SHARES
 - hosts: virtual_machines
   roles:
     - reboot

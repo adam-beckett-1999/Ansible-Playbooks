@@ -1,60 +1,6 @@
-- hosts: proxmox_servers
+## CLONE VIRTUAL MACHINES USING TERRAFORM
+- hosts: terraform
   roles:
-    - proxmox-stop
+    - terraform-destroy
   vars:
-    vm_name: VM-SWARM-01
-- hosts: proxmox_servers
-  roles:
-    - proxmox-stop
-  vars:
-    vm_name: VM-SWARM-02
-- hosts: proxmox_servers
-  roles:
-    - proxmox-stop
-  vars:
-    vm_name: VM-SWARM-03
-- hosts: proxmox_servers
-  roles:
-    - proxmox-stop
-  vars:
-    vm_name: VM-SWARM-04
-- hosts: proxmox_servers
-  roles:
-    - proxmox-stop
-  vars:
-    vm_name: VM-SWARM-05
-- hosts: proxmox_servers
-  roles:
-    - proxmox-stop
-  vars:
-    vm_name: VM-GAMESERVER-01
-- hosts: proxmox_servers
-  roles:
-    - proxmox-destroy
-  vars:
-    vm_name: VM-SWARM-01
-- hosts: proxmox_servers
-  roles:
-    - proxmox-destroy
-  vars:
-    vm_name: VM-SWARM-02
-- hosts: proxmox_servers
-  roles:
-    - proxmox-destroy
-  vars:
-    vm_name: VM-SWARM-03
-- hosts: proxmox_servers
-  roles:
-    - proxmox-destroy
-  vars:
-    vm_name: VM-SWARM-04
-- hosts: proxmox_servers
-  roles:
-    - proxmox-destroy
-  vars:
-    vm_name: VM-SWARM-05
-- hosts: proxmox_servers
-  roles:
-    - proxmox-destroy
-  vars:
-    vm_name: VM-GAMESERVER-01
+    project_dir: ~/terraform/proxmox

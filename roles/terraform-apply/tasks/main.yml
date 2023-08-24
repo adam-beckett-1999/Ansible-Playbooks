@@ -1,5 +1,5 @@
 - name: Basic deploy of a terraform service
   community.general.terraform:
     project_path: '{{ project_dir }}'
-    parallelism: 2
+    parallelism: 3
     state: present

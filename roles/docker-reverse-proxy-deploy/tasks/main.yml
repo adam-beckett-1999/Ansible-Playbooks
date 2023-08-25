@@ -28,6 +28,13 @@
     url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/traefik.yaml
     dest: /mnt/gluster/containers/compose/traefik/traefik.yaml
 
+- name: Create the proxy network
+  docker_network:
+    name: proxy
+    state: present
+    scope: swarm
+    driver: bridge
+
 - name: Deploy Traefik from the compose file
   docker_stack:
     state: present

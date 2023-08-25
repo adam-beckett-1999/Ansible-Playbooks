@@ -6,6 +6,10 @@
   ansible.builtin.file:
     path: /var/www/pufferpanel
     state: directory
+- name: Add /var/www/pufferpanel/themes directory
+  ansible.builtin.file:
+    path: /var/www/pufferpanel/themes
+    state: directory
 - name: Add /home/config/pufferpanel directory
   ansible.builtin.file:
     path: /home/config/pufferpanel

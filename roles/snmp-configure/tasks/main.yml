@@ -24,7 +24,7 @@
   community.general.snmp_facts:
     host: '{{ inventory_hostname }}'
     version: v2c
-    community: BCloudHomelab
+    community: '{{ SNMP_comunity }}'
   register: response
 - name: Print the results of the test
   debug:

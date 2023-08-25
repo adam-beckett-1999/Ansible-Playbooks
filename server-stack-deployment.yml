@@ -13,6 +13,8 @@
     - base-packages
     - snmp-configure
     - network-share-mount
+  vars:
+    SNMP_comunity: HyveCloudHomelab
 
 ## VM-SWARM-01 PRE-CONFIG SNAPSHOT
 - hosts: proxmox_servers

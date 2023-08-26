@@ -19,21 +19,21 @@
 - hosts: kubernetes_vms
   roles: 
     - reboot
-- name: Take snapshot of VM-KUBERNETES-01
+- name: Take snapshot of VM-K3S-01
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
     vm_id: 211
     snapshot_name: Post-configuration
-- name: Take snapshot of VM-KUBERNETES-02
+- name: Take snapshot of VM-K3S-02
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
     vm_id: 212
     snapshot_name: Post-configuration
-- name: Take snapshot of VM-KUBERNETES-03
+- name: Take snapshot of VM-K3S-03
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot

@@ -1,15 +1,16 @@
 - name: Install required packages
-  apt:
+  ansible.builtin.apt:
     name:
-    - glusterfs-server
-    - glusterfs-client
+      - glusterfs-server
+      - glusterfs-client
     state: present
 - name: Start glusterd service
-  systemd:
+  ansible.builtin.systemd:
     name: glusterd
-    enabled: yes
+    enabled: true
     state: started
 - name: Create GlusterFS brick-1 directory
   ansible.builtin.file:
     path: /glusterfs/bricks/gv0
     state: directory
+    mode: '777'

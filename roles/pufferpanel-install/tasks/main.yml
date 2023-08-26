@@ -2,32 +2,38 @@
   ansible.builtin.file:
     path: /var/lib/pufferpanel
     state: directory
+    mode: '744'
 - name: Add /var/www/pufferpanel directory
   ansible.builtin.file:
     path: /var/www/pufferpanel
     state: directory
+    mode: '744'
 - name: Add /var/www/pufferpanel/themes directory
   ansible.builtin.file:
     path: /var/www/pufferpanel/themes
     state: directory
+    mode: '744'
 - name: Add /home/config/pufferpanel directory
   ansible.builtin.file:
     path: /home/config/pufferpanel
     state: directory
+    mode: '744'
 - name: Download custom dark theme
   ansible.builtin.get_url:
     url: https://github.com/snsnf/pufferpanel-themes/blob/main/1st-theme.tar
     dest: /var/www/pufferpanel/themes/1st-theme.tar
+    mode: '744'
 - name: Download custom light theme
   ansible.builtin.get_url:
     url: https://github.com/snsnf/pufferpanel-themes/blob/main/2nd-theme.tar
     dest: /var/www/pufferpanel/themes/2nd-theme.tar
+    mode: '744'
 - name: Deploy Pufferpanel docker container
-  docker_container:
+  ansible.docker.docker_container:
     name: PufferPanel
     image: pufferpanel/pufferpanel:latest
     state: started
-    recreate: yes
+    recreate: true
     restart_policy: always
     published_ports:
       - "8080:8080"

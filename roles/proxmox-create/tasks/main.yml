@@ -11,7 +11,7 @@
     sockets: 2
     cores: "{{ cores }}" # 2,4 etc
     memory: "{{ memory }}" # 2048,4096 etc
-    agent: 'enabled=1'
+    agent: true
     scsihw: virtio-scsi-pci
     scsi:
       scsi0: "{{ storage }}" # pool-1:100,format=raw '100' being size of disk

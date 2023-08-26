@@ -1,5 +1,4 @@
-- name: Initialize a Terraform plan
+- name: Initialize a Terraform directory
   community.general.terraform:
     project_path: '{{ project_dir }}'
     force_init: true
-    state: planned

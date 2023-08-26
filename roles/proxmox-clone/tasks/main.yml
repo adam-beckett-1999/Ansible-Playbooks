@@ -8,7 +8,7 @@
     vmid: "{{ template_id }}"
     name: "{{ vm_name }}"
     newid: "{{ vm_id }}"
-    storage: pool-1 
+    storage: pool-1
     format: raw
     timeout: 120
   async: 120
@@ -28,7 +28,7 @@
     cipassword: "{{ password }}"
     sshkeys: "{{ sshkeys }}"
     nameservers: 192.168.0.210
-    ipconfig: 
+    ipconfig:
       ipconfig0: "{{ ip_address }}"
     update: true
 - name: Re-size cloned virtual-machine disk

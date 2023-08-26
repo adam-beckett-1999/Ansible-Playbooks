@@ -2,6 +2,7 @@
   ansible.builtin.file:
     path: /mnt/gluster
     state: directory
+    mode: '777'
 - name: Mount Gluster volume
   ansible.posix.mount:
     src: "{{ ansible_host }}:/gv0"

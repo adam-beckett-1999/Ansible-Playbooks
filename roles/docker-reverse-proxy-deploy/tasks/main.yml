@@ -2,34 +2,40 @@
   ansible.builtin.file:
     path: /mnt/gluster/containers/compose
     state: directory
+    mode: '744'
 - name: Create directory for traefik compose files
   ansible.builtin.file:
     path: /mnt/gluster/containers/compose/traefik
     state: directory
+    mode: '744'
 - name: Create directory for traefik container configs
   ansible.builtin.file:
     path: /mnt/gluster/containers/traefik
     state: directory
+    mode: '744'
 - name: Download Traefik static configuration file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Traefik-Configuration/main/traefik.yml
     dest: /mnt/gluster/containers/traefik.yml
+    mode: '744'
 - name: Download Traefik dynamic configuration file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Traefik-Configuration/main/fileConfig.yml
     dest: /mnt/gluster/containers/fileConfig.yml
+    mode: '744'
 - name: Download Traefik compose file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/traefik.yaml
     dest: /mnt/gluster/containers/compose/traefik/traefik.yaml
+    mode: '744'
 - name: Create the proxy network
-  docker_network:
+  ansible.docker.docker_network:
     name: proxy
     state: present
     scope: swarm
     driver: bridge
 - name: Deploy Traefik from the compose file
-  docker_stack:
+  ansible.docker.docker_stack:
     state: present
     name: traefik
     compose:
@@ -38,18 +44,24 @@
   ansible.builtin.file:
     path: /mnt/gluster/containers/compose/authentik
     state: directory
+    mode: '744'
 - name: Copy environment variables for Authentik
-  copy: src=/home/abeckett/authentik.env dest=/mnt/gluster/containers/compose/authentik/.env owner=root group=root mode=600
+  ansible.builtin.copy:
+    src: /home/abeckett/authentik.env
+    dest: /mnt/gluster/containers/compose/authentik/.env
+    mode: '600'
 - name: Download Authentik compose file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/authentik.yaml
     dest: /mnt/gluster/containers/compose/authentik/authentik.yaml
+    mode: '744'
 - name: Create directory for Authentik container configs
   ansible.builtin.file:
     path: /mnt/gluster/containers/authentik
     state: directory
+    mode: '744'
 - name: Deploy Authentik from the compose file
-  docker_stack:
+  ansible.docker.docker_stack:
     state: present
     name: authentik
     compose:

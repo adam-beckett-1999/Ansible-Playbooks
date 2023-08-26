@@ -1,23 +1,26 @@
 - name: Install required packages
-  apt:
+  ansible.builtin.apt:
     name:
-    - snmpd
-    - snmp
-    - libsnmp-dev
+      - snmpd
+      - snmp
+      - libsnmp-dev
     state: present
 - name: Install pysnmp for testing SNMP on hosts
-  pip:
+  ansible.builtin.pip:
     name: pysnmp
 - name: Configure SNMP server
-  copy: src=/home/abeckett/snmpd.conf dest=/etc/snmp/snmpd.conf owner=root group=root mode=600
+  ansible.builtin.copy:
+    src: /home/abeckett/snmpd.conf
+    dest: /etc/snmp/snmpd.conf
+    mode: '777'
 - name: Start and enable SNMPd systemd service.
-  systemd:
+  ansible.builtin.systemd:
     name: snmpd
     state: started
     enabled: true
     daemon_reload: true
 - name: Restart SNMPd systemd service if already running.
-  systemd:
+  ansible.builtin.systemd:
     name: snmpd
     state: restarted
 - name: Test that SNMP is working
@@ -27,5 +30,5 @@
     community: '{{ SNMP_comunity }}'
   register: response
 - name: Print the results of the test
-  debug:
+  ansible.builtin.debug:
     var: response

@@ -1,44 +1,48 @@
 - name: Install required packages
-  apt:
+  ansible.builtin.apt:
     name:
-    - qemu-guest-agent
-    - cockpit
-    - software-properties-common
-    - apt-transport-https
-    - ca-certificates
-    - curl
-    - python3-pip
-    - virtualenv
-    - python3-setuptools
-    - neofetch
+      - qemu-guest-agent
+      - cockpit
+      - software-properties-common
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - python3-pip
+      - virtualenv
+      - python3-setuptools
+      - neofetch
     state: present
 - name: Install cockpit navigator plugin
-  apt:
+  ansible.builtin.apt:
     deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
     state: present
 - name: Install cockpit file sharing plugin
-  apt:
+  ansible.builtin.apt:
     deb: https://github.com/45Drives/cockpit-file-sharing/releases/download/v3.3.2/cockpit-file-sharing_3.3.2-1focal_all.deb
     state: present
 - name: Start qemu-guest-agent service
-  systemd:
+  ansible.builtin.systemd:
     name: qemu-guest-agent
-    enabled: yes
+    enabled: true
     state: started
 - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit
-  copy:
+  ansible.builtin.copy:
     dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
     content: |
       [keyfile]
       unmanaged-devices=none
+    mode: '744'
 - name: Create fake network interface to fix issue with NetworkManager and Cockpit
   ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
+  register: command_output
+  changed_when: command_output.rc != 0
 - name: Start cockpit service
-  systemd:
+  ansible.builtin.systemd:
     name: cockpit
-    enabled: yes
+    enabled: true
     state: started
-    masked: no
+    masked: false
 - name: Disable MOTD on login
-  shell: |
+  ansible.builtin.shell: |
         chmod -x /etc/update-motd.d/*
+  changed_when: false

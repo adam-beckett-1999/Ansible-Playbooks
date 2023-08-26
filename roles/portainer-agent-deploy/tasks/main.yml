@@ -1,5 +1,5 @@
 - name: Start portainer_agent service
-  docker_container:
+  ansible.docker.docker_container:
     name: Portainer-Agent
     image: portainer/agent:2.18.4
     ports:

@@ -1,4 +1,5 @@
-- hosts: proxmox_servers
+- name: Update and Reboot the Proxmox Hypervisor
+  hosts: proxmox_servers
   roles:
     - update
     - reboot

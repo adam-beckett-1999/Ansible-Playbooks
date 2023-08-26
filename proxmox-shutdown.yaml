@@ -1,3 +1,4 @@
-- hosts: proxmox_servers
+- name: Shutdown the Proxmox Hypervisor
+  hosts: proxmox_servers
   roles:
     - shutdown

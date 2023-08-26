@@ -47,7 +47,7 @@
   vars:
     service: portainer
 - name: Reboot Virtual Machines
-- hosts: swarm_vms
+  hosts: swarm_vms
   roles: 
     - reboot
 - name: Take snapshot of VM-SWARM-01

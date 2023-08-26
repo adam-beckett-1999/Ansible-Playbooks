@@ -1,4 +1,4 @@
-- name: Deploy Docker Swarm on Proxmox with Terraform
+- name: Deploy Docker Swarm Virtual-Machines on Proxmox with Terraform
   hosts: terraform
   roles:
     - terraform-init

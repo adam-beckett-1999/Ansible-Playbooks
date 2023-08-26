@@ -1,23 +1,23 @@
 - name: Preliminary checks [Linux]
-  file:
+  ansible.builtin.file:
     path: /var/lib/apt/lists/
     state: directory
-    mode: 0755
+    mode: "0755"
   when:
     - ansible_facts.os_family == "Debian"
 - name: Install all updates [Linux]
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
     upgrade: dist
-    autoremove: yes
-    autoclean: yes
+    autoremove: true
+    autoclean: true
   when:
     - ansible_facts.os_family == "Debian"
 - name: Install all critical and security updates [Windows]
-  win_updates:
+  ansible.windows.win_updates:
     category_names:
-    - CriticalUpdates
-    - SecurityUpdates
+      - CriticalUpdates
+      - SecurityUpdates
     state: installed
   when:
     - ansible_facts.os_family == "Windows"

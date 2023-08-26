@@ -1,4 +1,5 @@
-- hosts: virtual_machines
+- name: Update all virtual machines on proxmox hypervisor
+  hosts: virtual_machines
   roles:
     - update
     - reboot

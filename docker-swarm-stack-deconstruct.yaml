@@ -1,5 +1,4 @@
-## CLONE VIRTUAL MACHINES USING TERRAFORM
-- name: Destroy current terraform docker swarm deployment on proxmox hypervisor
+- name: Destroy current Terraform Docker Swarm deployment on Proxmox
   hosts: terraform
   roles:
     - terraform-destroy

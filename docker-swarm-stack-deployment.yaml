@@ -1,0 +1,73 @@
+- name: Deploy Docker Swarm on Proxmox with Terraform
+  hosts: terraform
+  roles:
+    - terraform-init
+    - terraform-apply
+  vars:
+    project_dir: /home/abeckett/terraform/proxmox/docker-swarm
+- name: Reboot machines, install updates and base packages, configure SNMP and network shares
+  hosts: swarm_vms
+  roles: 
+    - reboot
+    - update
+    - base-packages
+    - snmp-configure
+    - network-share-mount
+    - glusterfs-service
+    - docker-install
+  vars:
+    SNMP_comunity: HyveCloudHomelab
+- name: Configure GlusterFS and start the service
+  hosts: swarm_manager
+  roles:
+    - glusterfs-configure
+    - docker-swarm-init
+  vars:
+    nodes:
+      - VM-SWARM-02.homelab.internal
+      - VM-SWARM-03.homelab.internal
+    replicas: 3
+    cluster:
+      - VM-SWARM-01.homelab.internal
+      - VM-SWARM-02.homelab.internal
+      - VM-SWARM-03.homelab.internal
+- name: Mount GlusterFS cluster to VMs
+  hosts: swarm_vms
+  roles:
+    - glusterfs-mount
+- name: Join the other nodes to Docker Swarm
+  hosts: swarm_workers
+  roles: 
+    - docker-swarm-join
+- name: Deploy Traefik, Authentik and Portainer to Swarm as services
+  hosts: swarm_manager
+  roles: 
+    - docker-reverse-proxy-deploy
+    - docker-container-deploy
+  vars:
+    service: portainer
+- name: Reboot Virtual Machines
+- hosts: swarm_vms
+  roles: 
+    - reboot
+- name: Take snapshot of VM-SWARM-01
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 201
+    snapshot_name: Post-configuration
+- name: Take snapshot of VM-SWARM-02
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 202
+    snapshot_name: Post-configuration
+- name: Take snapshot of VM-SWARM-03
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 203
+    snapshot_name: Post-configuration

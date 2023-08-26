@@ -1,4 +1,4 @@
-- name: Basic deploy of a terraform service
+- name: Deploy a Terraform plan
   community.general.terraform:
     project_path: '{{ project_dir }}'
     parallelism: 3

@@ -1,0 +1,6 @@
+- name: Destroy current Terraform Application-Servers deployment on Proxmox
+  hosts: terraform
+  roles:
+    - terraform-destroy
+  vars:
+    project_dir: /home/abeckett/terraform/proxmox/app-servers

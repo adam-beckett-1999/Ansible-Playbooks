@@ -1,0 +1,28 @@
+- name: Deploy Application-Servers on Proxmox with Terraform
+  hosts: terraform
+  roles:
+    - terraform-init
+    - terraform-apply
+  vars:
+    project_dir: /home/abeckett/terraform/proxmox/app-servers
+- name: Reboot machines, install updates and base packages, configure SNMP and network shares
+  hosts: game_server
+  roles:
+    - reboot
+    - update
+    - base-packages
+    - snmp-configure
+    - network-share-mount
+    - docker-install
+    - pufferpanel-install
+    - portainer-agent-deploy
+    - reboot
+  vars:
+    SNMP_comunity: HyveCloudHomelab
+- name: Take snapshot of VM-GAMESERVER-01
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 206
+    snapshot_name: Post-configuration

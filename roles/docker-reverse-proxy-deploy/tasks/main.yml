@@ -29,13 +29,13 @@
     dest: /mnt/gluster/containers/compose/traefik/traefik.yaml
     mode: '744'
 - name: Create the proxy network
-  ansible.docker.docker_network:
+  community.docker.docker_network:
     name: proxy
     state: present
     scope: swarm
     driver: bridge
 - name: Deploy Traefik from the compose file
-  ansible.docker.docker_stack:
+  community.docker.docker_stack:
     state: present
     name: traefik
     compose:
@@ -61,7 +61,7 @@
     state: directory
     mode: '744'
 - name: Deploy Authentik from the compose file
-  ansible.docker.docker_stack:
+  community.docker.docker_stack:
     state: present
     name: authentik
     compose:

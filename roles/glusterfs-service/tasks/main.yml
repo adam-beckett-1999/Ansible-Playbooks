@@ -13,4 +13,5 @@
   ansible.builtin.file:
     path: /glusterfs/bricks/gv0
     state: directory
+    owner: abeckett
     mode: '777'

@@ -13,3 +13,8 @@
     group: root
     mode: '755'
   when: ansible_facts.architecture == "x86_64"
+- name: Install ansible kubernetes module dependencies
+  ansible.builtin.pip:
+    name:
+      - pyyaml
+      - jsonpatch

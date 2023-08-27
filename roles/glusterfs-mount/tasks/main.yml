@@ -11,29 +11,18 @@
     fstype: glusterfs
     state: mounted
     opts: rw
-- name: Create custom mount service to ensure glusterfs volume is mounted after restart
+- name: Create directory for mount service override
+  ansible.builtin.file:
+    path: /etc/systemd/system/srv.mount.d/
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Create override file for systemd-mount that delays mounting until after glusterfs-server.service has started
   ansible.builtin.copy:
-    dest: /etc/systemd/system/glusterfsmounts.service
+    dest: /etc/systemd/system/srv.mount.d/override.conf
     mode: '777'
     owner: abeckett
     content: |
       [Unit]
-      Description=Glustermounting
-      Requires=glusterfs-server.service
-
-      [Service]
-      Type=simple
-      RemainAfterExit=true
-      ExecStartPre=/usr/sbin/gluster volume list
-      ExecStart=/bin/mount -a -t glusterfs
-      Restart=on-failure
-      RestartSec=3
-
-      [Install]
-      WantedBy=multi-user.target
-- name: Start glusterfsmounts service
-  ansible.builtin.systemd_service:
-    name: glusterfsmounts
-    enabled: true
-    state: started
-    daemon_reload: true
+      After=glusterfs-server.service
+      Wants=glusterfs-server.service

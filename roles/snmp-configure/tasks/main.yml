@@ -13,7 +13,7 @@
     dest: /etc/snmp/snmpd.conf
     mode: '777'
     content: |
-      com2sec notConfigUser default '{{ SNMP_community }}'
+      com2sec notConfigUser default HyveCloudHomelab
 
       group notConfigGroup v1 notConfigUser
       group notConfigGroup v2c notConfigUser
@@ -35,7 +35,7 @@
   community.general.snmp_facts:
     host: '{{ inventory_hostname }}'
     version: v2c
-    community: '{{ SNMP_comunity }}'
+    community: HyveCloudHomelab
   register: response
 - name: Print the results of the test
   ansible.builtin.debug:

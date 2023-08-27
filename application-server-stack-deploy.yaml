@@ -17,8 +17,6 @@
     - pufferpanel-install
     - docker-portainer-agent-deploy
     - reboot
-  vars:
-    SNMP_comunity: HyveCloudHomelab
 - name: Take snapshot of VM-GAMESERVER-01
   hosts: proxmox_servers
   roles:

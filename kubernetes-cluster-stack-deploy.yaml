@@ -15,7 +15,6 @@
     - network-share-mount
     - k3s-prerequisites
   vars:
-    SNMP_comunity: HyveCloudHomelab
     k3s_version: v1.22.3+k3s1
 - name: Deploy K3s to master node
   hosts: k3s_master

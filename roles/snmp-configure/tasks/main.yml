@@ -12,6 +12,7 @@
   ansible.builtin.copy:
     dest: /etc/snmp/snmpd.conf
     mode: '777'
+    owner: abeckett
     content: |
       com2sec notConfigUser default HyveCloudHomelab
 

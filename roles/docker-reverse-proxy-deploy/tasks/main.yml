@@ -1,33 +1,33 @@
 - name: Create directory for docker compose files
   ansible.builtin.file:
-    path: /glusterfs/bricks/gv0/containers/compose
+    path: /mnt/gluster/containers/compose
     state: directory
-    mode: '744'
+    mode: '777'
 - name: Create directory for traefik compose files
   ansible.builtin.file:
-    path: /glusterfs/bricks/gv0/containers/compose/traefik
+    path: /mnt/gluster/containers/compose/traefik
     state: directory
-    mode: '744'
+    mode: '777'
 - name: Create directory for traefik container configs
   ansible.builtin.file:
-    path: /glusterfs/bricks/gv0/containers/traefik
+    path: /mnt/gluster/containers/traefik
     state: directory
-    mode: '744'
+    mode: '777'
 - name: Download Traefik static configuration file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Traefik-Configuration/main/traefik.yml
-    dest: /glusterfs/bricks/gv0/containers/traefik.yml
-    mode: '744'
+    dest: /mnt/gluster/containers/traefik.yml
+    mode: '777'
 - name: Download Traefik dynamic configuration file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Traefik-Configuration/main/fileConfig.yml
-    dest: /glusterfs/bricks/gv0/containers/fileConfig.yml
-    mode: '744'
+    dest: /mnt/gluster/containers/fileConfig.yml
+    mode: '777'
 - name: Download Traefik compose file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/traefik.yaml
-    dest: /glusterfs/bricks/gv0/containers/compose/traefik/traefik.yaml
-    mode: '744'
+    dest: /mnt/gluster/containers/compose/traefik/traefik.yaml
+    mode: '777'
 - name: Create the proxy network
   community.docker.docker_network:
     name: proxy
@@ -39,30 +39,30 @@
     state: present
     name: traefik
     compose:
-      - /glusterfs/bricks/gv0/containers/compose/traefik/traefik.yaml
+      - /mnt/gluster/containers/compose/traefik/traefik.yaml
 - name: Create directory for authentik compose files
   ansible.builtin.file:
-    path: /glusterfs/bricks/gv0/containers/compose/authentik
+    path: /mnt/gluster/containers/compose/authentik
     state: directory
-    mode: '744'
+    mode: '777'
 - name: Copy environment variables for Authentik
   ansible.builtin.copy:
     src: /home/abeckett/authentik.env
-    dest: /glusterfs/bricks/gv0/containers/compose/authentik/.env
-    mode: '600'
+    dest: /mnt/gluster/containers/compose/authentik/.env
+    mode: '777'
 - name: Download Authentik compose file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/authentik.yaml
-    dest: /glusterfs/bricks/gv0/containers/compose/authentik/authentik.yaml
-    mode: '744'
+    dest: /mnt/gluster/containers/compose/authentik/authentik.yaml
+    mode: '777'
 - name: Create directory for Authentik container configs
   ansible.builtin.file:
-    path: /glusterfs/bricks/gv0/containers/authentik
+    path: /mnt/gluster/containers/authentik
     state: directory
-    mode: '744'
+    mode: '777'
 - name: Deploy Authentik from the compose file
   community.docker.docker_stack:
     state: present
     name: authentik
     compose:
-      - /glusterfs/bricks/gv0/containers/compose/authentik/authentik.yaml
+      - /mnt/gluster/containers/compose/authentik/authentik.yaml

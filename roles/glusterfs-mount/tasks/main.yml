@@ -1,0 +1,39 @@
+- name: Create mountpoint for Gluster volume
+  ansible.builtin.file:
+    path: /mnt/gluster
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Mount Gluster volume
+  ansible.posix.mount:
+    src: "{{ ansible_host }}:/gv0"
+    path: /mnt/gluster
+    fstype: glusterfs
+    state: mounted
+    opts: rw
+- name: Create custom mount service to ensure glusterfs volume is mounted after restart
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/glusterfsmounts.service
+    mode: '777'
+    owner: abeckett
+    content: |
+      [Unit]
+      Description=Glustermounting
+      Requires=glusterfs-server.service
+
+      [Service]
+      Type=simple
+      RemainAfterExit=true
+      ExecStartPre=/usr/sbin/gluster volume list
+      ExecStart=/bin/mount -a -t glusterfs
+      Restart=on-failure
+      RestartSec=3
+
+      [Install]
+      WantedBy=multi-user.target
+- name: Start glusterfsmounts service
+  ansible.builtin.systemd_service:
+    name: glusterfsmounts
+    enabled: true
+    state: started
+    daemon_reload: true

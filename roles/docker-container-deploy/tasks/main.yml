@@ -1,16 +1,16 @@
 - name: Create directory for container configuration
   ansible.builtin.file:
-    path: "/mnt/gluster/containers/{{ service }}"
+    path: "/glusterfs/bricks/gv0/containers/{{ service }}"
     state: directory
     mode: '744'
 - name: Download container compose file
   ansible.builtin.get_url:
     url: "https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/{{ service }}.yaml"
-    dest: "/mnt/gluster/containers/compose/{{ service }}.yaml"
+    dest: "/glusterfs/bricks/gv0/containers/compose/{{ service }}.yaml"
     mode: '744'
 - name: Deploy container from the compose file
   community.docker.docker_stack:
     state: present
     name: "{{ service }}"
     compose:
-      - "/mnt/gluster/containers/compose/{{ service }}.yaml"
+      - "/glusterfs/bricks/gv0/containers/compose/{{ service }}.yaml"

@@ -29,10 +29,6 @@
       - VM-SWARM-01.homelab.internal
       - VM-SWARM-02.homelab.internal
       - VM-SWARM-03.homelab.internal
-- name: Mount GlusterFS cluster to VMs
-  hosts: swarm_vms
-  roles:
-    - glusterfs-mount
 - name: Join the other nodes to Docker Swarm
   hosts: swarm_workers
   roles: 

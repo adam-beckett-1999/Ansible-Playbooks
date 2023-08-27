@@ -15,7 +15,7 @@
     - network-share-mount
     - docker-install
     - pufferpanel-install
-    - portainer-agent-deploy
+    - docker-portainer-agent-deploy
     - reboot
   vars:
     SNMP_comunity: HyveCloudHomelab

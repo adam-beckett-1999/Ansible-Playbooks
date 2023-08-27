@@ -1,0 +1,9 @@
+- name: Download Portainer agent manifest to cluster
+  ansible.builtin.get_url:
+    url: https://downloads.portainer.io/ce2-18/portainer-agent-k8s-lb.yaml
+    dest: ~/portainer-agent-k8s-lb.yaml
+    mode: '644'
+- name: Apply Portainer agent manifest to cluster
+  kubernetes.core.k8s:
+    state: present
+    src: ~/portainer-agent-k8s-lb.yaml

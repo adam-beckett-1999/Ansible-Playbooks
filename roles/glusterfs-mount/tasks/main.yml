@@ -10,7 +10,7 @@
     path: /mnt/gluster
     fstype: glusterfs
     state: mounted
-    opts: rw
+    opts: rw,defaults,_netdev,noauto,x-systemd.automount
 - name: Create directory for mount service override
   ansible.builtin.file:
     path: /etc/systemd/system/srv.mount.d/

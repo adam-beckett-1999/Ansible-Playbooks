@@ -8,7 +8,7 @@
       - curl
       - python3-pip
       - virtualenv
-      - python3.8
+      - python3
       - python3-setuptools
       - neofetch
     state: present

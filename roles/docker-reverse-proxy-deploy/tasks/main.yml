@@ -16,12 +16,12 @@
 - name: Download Traefik static configuration file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Traefik-Configuration/main/traefik.yml
-    dest: /mnt/gluster/containers/traefik.yml
+    dest: /mnt/gluster/containers/traefik/traefik.yml
     mode: '777'
 - name: Download Traefik dynamic configuration file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Traefik-Configuration/main/fileConfig.yml
-    dest: /mnt/gluster/containers/fileConfig.yml
+    dest: /mnt/gluster/containers/traefik/fileConfig.yml
     mode: '777'
 - name: Download Traefik compose file
   ansible.builtin.get_url:

@@ -25,7 +25,7 @@
     master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
     ansible_user: abeckett
 - name: Deploy K3s to worker nodes
-  hosts: k3s_master
+  hosts: k3s_nodes
   roles:
     - k3s-node-deploy
   vars:

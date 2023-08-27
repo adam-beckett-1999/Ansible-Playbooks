@@ -1,7 +1,6 @@
 - name: Install required packages
   ansible.builtin.apt:
     name:
-      - qemu-guest-agent
       - cockpit
       - software-properties-common
       - apt-transport-https

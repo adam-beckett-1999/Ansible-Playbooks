@@ -15,8 +15,6 @@
     - network-share-mount
     - glusterfs-service
     - docker-install
-  vars:
-    SNMP_comunity: HyveCloudHomelab
 - name: Configure GlusterFS and start the service
   hosts: swarm_manager
   roles:

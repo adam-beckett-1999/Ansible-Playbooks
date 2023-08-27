@@ -1,0 +1,3 @@
+- name: Download Portainer agent manifest to cluster
+  ansible.builtin.command: kubectl apply -f https://downloads.portainer.io/ce2-18/portainer-agent-k8s-lb.yaml
+  changed_when: false

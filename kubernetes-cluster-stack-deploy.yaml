@@ -13,10 +13,28 @@
     - base-packages
     - snmp-configure
     - network-share-mount
+    - k3s-prerequisites
   vars:
-    SNMP_comunity: HyveCloudHomelab
+    k3s_version: v1.22.3+k3s1
+- name: Deploy K3s to master node
+  hosts: k3s_master
+  roles:
+    - k3s-master-deploy
+  vars:
+    master_ip: "{{ hostvars[groups['k3s_master'][0]]['ansible_host'] | default(groups['k3s_master'][0]) }}"
+    ansible_user: abeckett
+- name: Deploy K3s to worker nodes
+  hosts: k3s_nodes
+  roles:
+    - k3s-node-deploy
+  vars:
+    master_ip: "{{ hostvars[groups['k3s_master'][0]]['ansible_host'] | default(groups['k3s_master'][0]) }}"
+- name: Deploy Portainer Agent to cluster
+  hosts: k3s_master
+  roles:
+    - kubernetes-portainer-agent-deploy
 - name: Reboot Virtual Machines
-- hosts: kubernetes_vms
+  hosts: kubernetes_vms
   roles: 
     - reboot
 - name: Take snapshot of VM-K3S-01

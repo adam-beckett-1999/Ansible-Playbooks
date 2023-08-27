@@ -65,6 +65,21 @@
     path: /mnt/gluster/containers/authentik
     state: directory
     mode: '777'
+- name: Create directory for Authentik container configs
+  ansible.builtin.file:
+    path: /mnt/gluster/containers/authentik/media
+    state: directory
+    mode: '777'
+- name: Create directory for Authentik container configs
+  ansible.builtin.file:
+    path: /mnt/gluster/containers/authentik/certs
+    state: directory
+    mode: '777'
+- name: Create directory for Authentik container configs
+  ansible.builtin.file:
+    path: /mnt/gluster/containers/authentik/custom-templates
+    state: directory
+    mode: '777'
 - name: Deploy Authentik from the compose file
   community.docker.docker_stack:
     state: present

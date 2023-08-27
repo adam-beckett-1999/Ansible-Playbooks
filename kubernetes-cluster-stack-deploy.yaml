@@ -22,14 +22,14 @@
   roles:
     - k3s-master-deploy
   vars:
-    master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
+    master_ip: "{{ hostvars[groups['k3s_master'][0]]['ansible_host'] | default(groups['k3s_master'][0]) }}"
     ansible_user: abeckett
 - name: Deploy K3s to worker nodes
   hosts: k3s_nodes
   roles:
     - k3s-node-deploy
   vars:
-    master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
+    master_ip: "{{ hostvars[groups['k3s_master'][0]]['ansible_host'] | default(groups['k3s_master'][0]) }}"
 - name: Reboot Virtual Machines
   hosts: kubernetes_vms
   roles: 

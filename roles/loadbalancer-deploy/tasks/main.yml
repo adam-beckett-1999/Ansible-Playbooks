@@ -1,4 +1,4 @@
-- name: Create directory for container configuration
+- name: Create directory for nginx configuration
   ansible.builtin.file:
     path: "/mnt/gluster/containers/nginx"
     state: directory
@@ -10,105 +10,105 @@
     dest: /mnt/gluster/containers/nginx/default.conf
     mode: '777'
     owner: abeckett
-- name: Download container compose file
+- name: Download nginx compose file
   ansible.builtin.get_url:
     url: "https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/nginx.yaml"
     dest: "/mnt/gluster/nginx.yaml"
     owner: abeckett
     mode: '777'
-- name: Deploy container from the compose file
+- name: Deploy nginx from the compose file
   community.docker.docker_compose:
     project_src: /mnt/gluster
     files:
       - nginx.yaml
-- name: Delete compose file after stack deployment
+- name: Delete nginx compose file after stack deployment
   ansible.builtin.file:
     path: "/mnt/gluster/nginx.yaml"
     state: absent
-- name: Create directory for container configuration
+- name: Create directory for nginx-proxy-manager configuration
   ansible.builtin.file:
     path: "/mnt/gluster/containers/nginx-proxy-manager"
     state: directory
     owner: abeckett
     mode: '777'
-- name: Create directory for container configuration
+- name: Create directory for nginx-proxy-manager letsencrypt certs
   ansible.builtin.file:
     path: "/mnt/gluster/containers/nginx-proxy-manager/letsencrypt"
     state: directory
     owner: abeckett
     mode: '777'
-- name: Download container compose file
+- name: Download nginx-proxy-manager compose file
   ansible.builtin.get_url:
     url: "https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/nginx-proxy-manager.yaml"
     dest: "/mnt/gluster/nginx-proxy-manager.yaml"
     owner: abeckett
     mode: '777'
-- name: Deploy container from the compose file
+- name: Deploy nginx-proxy-manager from the compose file
   community.docker.docker_compose:
     project_src: /mnt/gluster
     files:
       - nginx-proxy-manager.yaml
-- name: Delete compose file after stack deployment
+- name: Delete nginx-proxy-manager compose file after stack deployment
   ansible.builtin.file:
     path: "/mnt/gluster/nginx-proxy-manager.yaml"
     state: absent
-- name: Create directory for container configuration
+- name: Create directory for authentik configuration
   ansible.builtin.file:
     path: "/mnt/gluster/containers/authentik"
     state: directory
     owner: abeckett
     mode: '777'
-- name: Create directory for container configuration
+- name: Create directory for authentik media
   ansible.builtin.file:
     path: "/mnt/gluster/containers/authentik/media"
     state: directory
     owner: abeckett
     mode: '777'
-- name: Create directory for container configuration
+- name: Create directory for authentik templates
   ansible.builtin.file:
     path: "/mnt/gluster/containers/authentik/custom-templates"
     state: directory
     owner: abeckett
     mode: '777'
-- name: Create directory for container configuration
+- name: Create directory for authentik certs
   ansible.builtin.file:
     path: "/mnt/gluster/containers/authentik/certs"
     state: directory
     owner: abeckett
     mode: '777'
-- name: Download container compose file
+- name: Download authentik compose file
   ansible.builtin.get_url:
     url: "https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/authentik.yaml"
     dest: "/mnt/gluster/authentik.yaml"
     owner: abeckett
     mode: '777'
-- name: Configure nginx to loadbalance connections to swarm
+- name: Copy authentik .env variables for deployment
   ansible.builtin.copy:
     src: /home/abeckett/authentik.env
     dest: /mnt/gluster/.env
     mode: '777'
     owner: abeckett
-- name: Deploy container from the compose file
+- name: Deploy authentik from the compose file
   community.docker.docker_compose:
     project_src: /mnt/gluster
     files:
       - authentik.yaml
-- name: Delete compose file after stack deployment
+- name: Delete authentik compose file after stack deployment
   ansible.builtin.file:
     path: "/mnt/gluster/authentik.yaml"
     state: absent
-- name: Download container compose file
+- name: Download portainer-agent compose file
   ansible.builtin.get_url:
     url: "https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/portainer-agent.yaml"
     dest: "/mnt/gluster/portainer-agent.yaml"
     owner: abeckett
     mode: '777'
-- name: Deploy container from the compose file
+- name: Deploy portainer-agent from the compose file
   community.docker.docker_compose:
     project_src: /mnt/gluster
     files:
       - portainer-agent.yaml
-- name: Delete compose file after stack deployment
+- name: Delete portainer-agent compose file after stack deployment
   ansible.builtin.file:
     path: "/mnt/gluster/portainer-agent.yaml"
     state: absent

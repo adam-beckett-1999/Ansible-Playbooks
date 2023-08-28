@@ -80,6 +80,11 @@
     path: /mnt/gluster/containers/authentik/custom-templates
     state: directory
     mode: '777'
+- name: Create the proxy network
+  community.docker.docker_network:
+    name: authentik-network
+    state: present
+    scope: swarm
 - name: Deploy Authentik from the compose file
   community.docker.docker_stack:
     state: present

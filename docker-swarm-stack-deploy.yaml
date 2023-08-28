@@ -50,12 +50,12 @@
 - name: Deploy Portainer to Swarm as a service
   hosts: lb
   roles: 
-    - loadbalancer-deploy
+    - loadbalancer-configure
 - name: Reboot Virtual Machines
   hosts: swarm_vms,lb
   roles: 
     - reboot
-- name: Take snapshot of VM-SWARM-01
+- name: Take snapshot of VM-LB-01
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot

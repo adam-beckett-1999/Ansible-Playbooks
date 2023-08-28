@@ -12,6 +12,7 @@
       - docker-ce
       - docker-ce-cli
       - containerd.io
+      - docker-compose
     update_cache: true
 - name: Add the admin user to the docker group
   ansible.builtin.user:
@@ -23,6 +24,8 @@
     name:
       - docker
       - jsondiff
+      - pyyaml
+      - docker-compose
 - name: Start and enable Docker systemd service.
   ansible.builtin.systemd:
     name: docker

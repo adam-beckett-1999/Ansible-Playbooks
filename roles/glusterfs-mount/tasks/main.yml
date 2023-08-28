@@ -2,6 +2,7 @@
   ansible.builtin.file:
     path: /mnt/gluster
     state: directory
+    owner: abeckett
     mode: '777'
 - name: Mount Gluster volume
   ansible.posix.mount:
@@ -9,4 +10,19 @@
     path: /mnt/gluster
     fstype: glusterfs
     state: mounted
-    opts: rw
+    opts: rw,defaults,_netdev,noauto,x-systemd.automount
+- name: Create directory for mount service override
+  ansible.builtin.file:
+    path: /etc/systemd/system/srv.mount.d/
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Create override file for systemd-mount that delays mounting until after glusterfs-server.service has started
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/srv.mount.d/override.conf
+    mode: '777'
+    owner: abeckett
+    content: |
+      [Unit]
+      After=glusterfs-server.service
+      Wants=glusterfs-server.service

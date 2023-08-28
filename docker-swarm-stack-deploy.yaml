@@ -1,12 +1,14 @@
 - name: Deploy Docker Swarm Virtual-Machines on Proxmox with Terraform
   hosts: terraform
   roles:
+    - terraform-prepare
     - terraform-apply
   vars:
+    vm_stack: docker-swarm
     project_dir: /home/abeckett/terraform/proxmox/docker-swarm
     parallelism: 1
 - name: Reboot machines, install updates and base packages, configure SNMP and network shares
-  hosts: swarm_vms
+  hosts: swarm_vms,lb
   roles: 
     - reboot
     - update
@@ -24,30 +26,42 @@
     nodes:
       - VM-SWARM-02.homelab.internal
       - VM-SWARM-03.homelab.internal
-    replicas: 3
+      - VM-LB-01.homelab.internal
+    replicas: 4
     cluster:
       - VM-SWARM-01.homelab.internal
       - VM-SWARM-02.homelab.internal
       - VM-SWARM-03.homelab.internal
-- name: Mount GlusterFS cluster to VMs
-  hosts: swarm_vms
-  roles:
+      - VM-LB-01.homelab.internal
+- name: Mount glusterfs share to VMs
+  hosts: swarm_vms,lb
+  roles: 
     - glusterfs-mount
 - name: Join the other nodes to Docker Swarm
   hosts: swarm_workers
   roles: 
     - docker-swarm-join
-- name: Deploy Traefik, Authentik and Portainer to Swarm as services
+- name: Deploy Portainer to Swarm as a service
   hosts: swarm_manager
   roles: 
-    - docker-reverse-proxy-deploy
     - docker-container-deploy
   vars:
     service: portainer
+- name: Deploy Portainer to Swarm as a service
+  hosts: lb
+  roles: 
+    - loadbalancer-deploy
 - name: Reboot Virtual Machines
-  hosts: swarm_vms
+  hosts: swarm_vms,lb
   roles: 
     - reboot
+- name: Take snapshot of VM-SWARM-01
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 200
+    snapshot_name: Post-configuration
 - name: Take snapshot of VM-SWARM-01
   hosts: proxmox_servers
   roles:

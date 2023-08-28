@@ -28,10 +28,11 @@
 - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit
   ansible.builtin.copy:
     dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
+    owner: abeckett
     content: |
       [keyfile]
       unmanaged-devices=none
-    mode: '744'
+    mode: '777'
 - name: Create fake network interface to fix issue with NetworkManager and Cockpit
   ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
   register: command_output

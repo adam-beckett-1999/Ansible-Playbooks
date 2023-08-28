@@ -1,8 +1,10 @@
 - name: Deploy Application-Server Virtual-Machines on Proxmox with Terraform
   hosts: terraform
   roles:
+    - terraform-prepare
     - terraform-apply
   vars:
+    vm_stack: app-servers
     project_dir: /home/abeckett/terraform/proxmox/app-servers
     parallelism: 1
 - name: Reboot machines, install updates and base packages, configure SNMP and network shares

@@ -17,11 +17,8 @@
     owner: abeckett
     mode: '777'
 - name: Deploy container from the compose file
-  community.docker.docker_stack:
-    state: present
-    name: "nginx"
-    compose:
-      - "/mnt/gluster/nginx.yaml"
+  community.docker.docker_compose:
+    project_src: "/mnt/gluster/nginx.yaml"
 - name: Delete compose file after stack deployment
   ansible.builtin.file:
     path: "/mnt/gluster/nginx.yaml"
@@ -45,11 +42,8 @@
     owner: abeckett
     mode: '777'
 - name: Deploy container from the compose file
-  community.docker.docker_stack:
-    state: present
-    name: "nginx-proxy-manager"
-    compose:
-      - "/mnt/gluster/nginx-proxy-manager.yaml"
+  community.docker.docker_compose:
+    project_src: "/mnt/gluster/nginx-proxy-manager.yaml"
 - name: Delete compose file after stack deployment
   ansible.builtin.file:
     path: "/mnt/gluster/nginx-proxy-manager.yaml"
@@ -91,11 +85,8 @@
     mode: '777'
     owner: abeckett
 - name: Deploy container from the compose file
-  community.docker.docker_stack:
-    state: present
-    name: "authentik"
-    compose:
-      - "/mnt/gluster/authentik.yaml"
+  community.docker.docker_compose:
+    project_src: "/mnt/gluster/authentik.yaml"
 - name: Delete compose file after stack deployment
   ansible.builtin.file:
     path: "/mnt/gluster/authentik.yaml"

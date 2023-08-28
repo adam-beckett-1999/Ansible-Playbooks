@@ -50,7 +50,6 @@
   hosts: lb
   roles: 
     - loadbalancer-deploy
-    - docker-portainer-agent-deploy
 - name: Reboot Virtual Machines
   hosts: swarm_vms,lb
   roles: 

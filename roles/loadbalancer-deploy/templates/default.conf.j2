@@ -1,10 +1,21 @@
 server {
-   listen 7443;
+   listen 7000;
    location / {
-      proxy_pass http://portainer;
+      proxy_pass http://portainer_http;
    }
 }
-upstream portainer {
+upstream portainer_http {
+   server 192.168.0.161:7000;
+   server 192.168.0.162:7000;
+   server 192.168.0.163:7000;
+}
+server {
+   listen 7443;
+   location / {
+      proxy_pass http://portainer_https;
+   }
+}
+upstream portainer_https {
    server 192.168.0.161:7443;
    server 192.168.0.162:7443;
    server 192.168.0.163:7443;

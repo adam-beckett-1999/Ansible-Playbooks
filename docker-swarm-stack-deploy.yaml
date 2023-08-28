@@ -1,9 +1,10 @@
 - name: Deploy Docker Swarm Virtual-Machines on Proxmox with Terraform
   hosts: terraform
   roles:
-    - terraform-prepare-docker-swarm
+    - terraform-prepare
     - terraform-apply
   vars:
+    vm_stack: docker-swarm
     project_dir: /home/abeckett/terraform/proxmox/docker-swarm
     parallelism: 1
 - name: Reboot machines, install updates and base packages, configure SNMP and network shares

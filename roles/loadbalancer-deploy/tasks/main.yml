@@ -24,6 +24,7 @@
 - name: Delete nginx compose file after stack deployment
   ansible.builtin.file:
     path: "/mnt/gluster/nginx.yaml"
+    project_name: nginx
     state: absent
 - name: Create directory for nginx-proxy-manager configuration
   ansible.builtin.file:
@@ -46,6 +47,7 @@
 - name: Deploy nginx-proxy-manager from the compose file
   community.docker.docker_compose:
     project_src: /mnt/gluster
+    project_name: nginx-proxy-manager
     files:
       - nginx-proxy-manager.yaml
 - name: Delete nginx-proxy-manager compose file after stack deployment
@@ -91,6 +93,7 @@
 - name: Deploy authentik from the compose file
   community.docker.docker_compose:
     project_src: /mnt/gluster
+    project_name: authentik
     files:
       - authentik.yaml
 - name: Delete authentik compose file after stack deployment
@@ -106,6 +109,7 @@
 - name: Deploy portainer-agent from the compose file
   community.docker.docker_compose:
     project_src: /mnt/gluster
+    project_name: portainer-agent
     files:
       - portainer-agent.yaml
 - name: Delete portainer-agent compose file after stack deployment

@@ -1,6 +1,7 @@
 - name: Deploy Kubernetes Cluster Virtual-Machines on Proxmox with Terraform
   hosts: terraform
   roles:
+    - terraform-prepare-kubernetes-cluster
     - terraform-apply
   vars:
     project_dir: /home/abeckett/terraform/proxmox/kubernetes-cluster

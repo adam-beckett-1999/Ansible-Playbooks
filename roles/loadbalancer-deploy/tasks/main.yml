@@ -5,8 +5,8 @@
     owner: abeckett
     mode: '777'
 - name: Configure nginx to loadbalance connections to swarm
-  ansible.builtin.copy:
-    src: /home/abeckett/default.conf
+  ansible.builtin.template:
+    src: default.conf.j2
     dest: /mnt/gluster/containers/nginx/default.conf
     mode: '777'
     owner: abeckett

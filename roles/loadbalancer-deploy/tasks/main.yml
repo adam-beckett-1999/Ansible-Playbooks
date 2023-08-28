@@ -39,7 +39,7 @@
     mode: '777'
 - name: Download container compose file
   ansible.builtin.get_url:
-    url: "https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/nginx.yaml"
+    url: "https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/nginx-proxy-manager.yaml"
     dest: "/mnt/gluster/nginx-proxy-manager.yaml"
     owner: abeckett
     mode: '777'
@@ -78,7 +78,7 @@
     mode: '777'
 - name: Download container compose file
   ansible.builtin.get_url:
-    url: "https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/nginx.yaml"
+    url: "https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/authentik.yaml"
     dest: "/mnt/gluster/authentik.yaml"
     owner: abeckett
     mode: '777'
@@ -96,4 +96,19 @@
 - name: Delete compose file after stack deployment
   ansible.builtin.file:
     path: "/mnt/gluster/authentik.yaml"
+    state: absent
+- name: Download container compose file
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/adam-beckett-1999/Docker-Compose/main/portainer-agent.yaml"
+    dest: "/mnt/gluster/portainer-agent.yaml"
+    owner: abeckett
+    mode: '777'
+- name: Deploy container from the compose file
+  community.docker.docker_compose:
+    project_src: /mnt/gluster
+    files:
+      - portainer-agent.yaml
+- name: Delete compose file after stack deployment
+  ansible.builtin.file:
+    path: "/mnt/gluster/portainer-agent.yaml"
     state: absent

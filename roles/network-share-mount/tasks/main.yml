@@ -9,7 +9,6 @@
   ansible.builtin.file:
     path: /mnt/nas-01
     state: directory
-    owner: abeckett
     mode: '777'
 - name: Mount NAS-01 network share
   ansible.posix.mount:
@@ -23,7 +22,6 @@
   ansible.builtin.file:
     path: /mnt/storage-01
     state: directory
-    owner: abeckett
     mode: '777'
 - name: Mount STORAGE-01 network share
   ansible.posix.mount:

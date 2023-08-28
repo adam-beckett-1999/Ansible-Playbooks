@@ -11,14 +11,26 @@ upstream filebrowser {
    server 192.168.0.163:8181;
 }
 server {
-   listen 7443;
-   server_name 192.168.0.160:7443;
+   listen 9000;
+   server_name 192.168.0.160:9000;
+   location / {
+      proxy_pass http://portainer_http;
+   }
+}
+upstream portainer_http {
+   server 192.168.0.161:9000;
+   server 192.168.0.162:9000;
+   server 192.168.0.163:9000;
+}
+server {
+   listen 9443;
+   server_name 192.168.0.160:9443;
    location / {
       proxy_pass http://portainer_https;
    }
 }
 upstream portainer_https {
-   server 192.168.0.161:7443;
-   server 192.168.0.162:7443;
-   server 192.168.0.163:7443;
+   server 192.168.0.161:9443;
+   server 192.168.0.162:9443;
+   server 192.168.0.163:9443;
 }

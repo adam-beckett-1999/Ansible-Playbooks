@@ -6,7 +6,7 @@
     mode: '777'
 - name: Download terraform variables.tf file
   ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/adam-beckett-1999/Terraform/main/proxmox/{docker-swarm/variables.tf
+    url: https://raw.githubusercontent.com/adam-beckett-1999/Terraform/main/proxmox/docker-swarm/variables.tf
     dest: "/home/abeckett/terraform/proxmox/docker-swarm/variables.tf"
     owner: abeckett
     mode: '777'

@@ -1,5 +1,6 @@
 - name: Start portainer_agent service
   community.docker.docker_container:
+    name: portainer_agent
     image: portainer/agent:2.18.4
     ports:
       - 9001:9001

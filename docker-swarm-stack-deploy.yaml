@@ -1,6 +1,7 @@
 - name: Deploy Docker Swarm Virtual-Machines on Proxmox with Terraform
   hosts: terraform
   roles:
+    - terraform-prepare-docker-swarm
     - terraform-apply
   vars:
     project_dir: /home/abeckett/terraform/proxmox/docker-swarm

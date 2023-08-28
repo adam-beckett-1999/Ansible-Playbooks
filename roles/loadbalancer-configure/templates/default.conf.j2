@@ -1,4 +1,16 @@
 server {
+   listen 9001;
+   server_name 192.168.0.160;
+   location / {
+      proxy_pass http://portainer_http;
+   }
+}
+upstream portainer_http {
+   server 192.168.0.161:9000;
+   server 192.168.0.162:9000;
+   server 192.168.0.163:9000;
+}
+server {
    listen 8181;
    server_name 192.168.0.160;
    location / {
@@ -11,26 +23,38 @@ upstream filebrowser {
    server 192.168.0.163:8181;
 }
 server {
-   listen 9000;
+   listen 8443;
    server_name 192.168.0.160;
    location / {
-      proxy_pass http://portainer_http;
+      proxy_pass http://vscode_server;
    }
 }
-upstream portainer_http {
-   server 192.168.0.161:9000;
-   server 192.168.0.162:9000;
-   server 192.168.0.163:9000;
+upstream vscode_server {
+   server 192.168.0.161:8443;
+   server 192.168.0.162:8443;
+   server 192.168.0.163:8443;
 }
 server {
-   listen 9443;
+   listen 8282;
    server_name 192.168.0.160;
    location / {
-      proxy_pass http://portainer_https;
+      proxy_pass http://guacamole;
    }
 }
-upstream portainer_https {
-   server 192.168.0.161:9443;
-   server 192.168.0.162:9443;
-   server 192.168.0.163:9443;
+upstream guacamole {
+   server 192.168.0.161:8282;
+   server 192.168.0.162:8282;
+   server 192.168.0.163:8282;
+}
+server {
+   listen 3001;
+   server_name 192.168.0.160;
+   location / {
+      proxy_pass http://homepage;
+   }
+}
+upstream homepage {
+   server 192.168.0.161:3001;
+   server 192.168.0.162:3001;
+   server 192.168.0.163:3001;
 }

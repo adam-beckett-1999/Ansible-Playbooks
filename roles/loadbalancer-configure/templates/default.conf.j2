@@ -1,5 +1,5 @@
 server {
-   listen 9001;
+   listen 9000;
    server_name 192.168.0.160;
    location / {
       proxy_pass http://portainer_http;
@@ -57,4 +57,16 @@ upstream homepage {
    server 192.168.0.161:3001;
    server 192.168.0.162:3001;
    server 192.168.0.163:3001;
+}
+server {
+   listen 5055;
+   server_name 192.168.0.160;
+   location / {
+      proxy_pass http://overseerr;
+   }
+}
+upstream overseerr {
+   server 192.168.0.161:5055;
+   server 192.168.0.162:5055;
+   server 192.168.0.163:5055;
 }

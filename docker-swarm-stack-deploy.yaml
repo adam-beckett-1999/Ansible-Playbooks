@@ -47,10 +47,6 @@
     - docker-container-deploy
   vars:
     service: portainer
-- name: Deploy Portainer to Swarm as a service
-  hosts: lb
-  roles: 
-    - loadbalancer-configure
 - name: Reboot Virtual Machines
   hosts: swarm_vms,lb
   roles: 

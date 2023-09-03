@@ -4,7 +4,7 @@
     state: directory
     owner: abeckett
     mode: '777'
-- name: Start portainer_agent service
+- name: Deploy Portainer
   community.docker.docker_container:
     name: Portainer
     image: portainer/portainer-ce:latest

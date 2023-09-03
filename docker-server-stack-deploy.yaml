@@ -1,4 +1,4 @@
-- name: Deploy Docker Swarm Virtual-Machines on Proxmox with Terraform
+- name: Deploy Docker Virtual-Machines on Proxmox with Terraform
   hosts: terraform
   roles:
     - terraform-prepare
@@ -36,7 +36,7 @@
   hosts: docker_vms
   roles: 
     - glusterfs-mount
-- name: Deploy Portainer to proxy node
+- name: Deploy Portainer to Proxy node
   hosts: docker_proxy
   roles: 
     - container-directories

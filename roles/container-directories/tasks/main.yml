@@ -1,9 +1,3 @@
-- name: Create directory for portainer configuration
-  ansible.builtin.file:
-    path: "/mnt/gluster/containers/portainer"
-    state: directory
-    owner: abeckett
-    mode: '777'
 - name: Create directory for filebrowser configuration
   ansible.builtin.file:
     path: "/mnt/gluster/containers/filebrowser"

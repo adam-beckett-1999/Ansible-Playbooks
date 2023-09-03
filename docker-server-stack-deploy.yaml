@@ -40,7 +40,7 @@
   hosts: docker_proxy
   roles: 
     - container-directories
-    - docker-container-deploy
+    - docker-portainer-deploy
   vars:
     service: portainer
 - name: Deploy Portainer-agent to other Docker servers

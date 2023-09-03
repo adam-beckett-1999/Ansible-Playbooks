@@ -1,0 +1,19 @@
+- name: Create directory for Portainer configuration
+  ansible.builtin.file:
+    path: "/mnt/gluster/containers/portainer"
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Start portainer_agent service
+  community.docker.docker_container:
+    name: Portainer
+    image: portainer/portainer-ce:latest
+    restart_policy: always
+    security_opts:
+      - "no-new-privileges:true"
+    ports:
+      - 9000:9000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /mnt/gluster/containers/portainer:/data

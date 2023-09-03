@@ -1,4 +1,4 @@
 - name: Reboot Virtual Machines
-  hosts: virtual_machines
+  hosts: *
   roles:
     - reboot

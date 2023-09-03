@@ -1,5 +1,5 @@
 - name: Deploy Docker Virtual-Machines on Proxmox with Terraform
-  hosts: terraform
+  hosts: localhost
   roles:
     - terraform-prepare
     - terraform-apply

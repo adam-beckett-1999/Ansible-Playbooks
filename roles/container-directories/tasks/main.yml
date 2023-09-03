@@ -1,0 +1,54 @@
+- name: Create directory for portainer configuration
+  ansible.builtin.file:
+    path: "/mnt/gluster/containers/portainer"
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Create directory for filebrowser configuration
+  ansible.builtin.file:
+    path: "/mnt/gluster/containers/filebrowser"
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Create directory for filebrowser branding
+  ansible.builtin.file:
+    path: "/mnt/gluster/containers/filebrowser/branding"
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Create directory for nginx-proxy-manager configuration
+  ansible.builtin.file:
+    path: "/mnt/gluster/containers/nginx-proxy-manager"
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Create directory for nginx-proxy-manager letsencrypt certs
+  ansible.builtin.file:
+    path: "/mnt/gluster/containers/nginx-proxy-manager/letsencrypt"
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Create directory for authentik configuration
+  ansible.builtin.file:
+    path: "/mnt/gluster/containers/authentik"
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Create directory for authentik media
+  ansible.builtin.file:
+    path: "/mnt/gluster/containers/authentik/media"
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Create directory for authentik templates
+  ansible.builtin.file:
+    path: "/mnt/gluster/containers/authentik/custom-templates"
+    state: directory
+    owner: abeckett
+    mode: '777'
+- name: Create directory for authentik certs
+  ansible.builtin.file:
+    path: "/mnt/gluster/containers/authentik/certs"
+    state: directory
+    owner: abeckett
+    mode: '777'

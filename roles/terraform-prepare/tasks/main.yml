@@ -10,7 +10,7 @@
     dest: "/home/abeckett/terraform/proxmox/{{ vm_stack }}/variables.tf"
     owner: abeckett
     mode: '777'
-- name: Download terraform vm-lb-01.tf file
+- name: Download terraform resources.tf file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Terraform/main/proxmox/{{ vm_stack }}/resources.tf
     dest: "/home/abeckett/terraform/proxmox/{{ vm_stack }}/resources.tf"

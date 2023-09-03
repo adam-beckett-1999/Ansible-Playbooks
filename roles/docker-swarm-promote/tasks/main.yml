@@ -1,4 +1,0 @@
-- name: Change the role of a docker swarm node to manager
-  community.docker.docker_node:
-    hostname: "{{ ansible_host }}"
-    role: manager

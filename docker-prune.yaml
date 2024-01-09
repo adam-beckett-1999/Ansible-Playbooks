@@ -1,4 +1,4 @@
 - name: Prune dangling and un-used images to free space
-  hosts: swarm_vms,game_server
+  hosts: docker_vms,game_server
   roles:
     - docker-image-prune

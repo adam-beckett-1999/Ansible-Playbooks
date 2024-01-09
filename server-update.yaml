@@ -2,4 +2,3 @@
   hosts: virtual_machines
   roles:
     - update
-    - reboot

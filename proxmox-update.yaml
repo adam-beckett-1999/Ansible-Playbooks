@@ -2,4 +2,3 @@
   hosts: proxmox_servers
   roles:
     - update
-    - reboot

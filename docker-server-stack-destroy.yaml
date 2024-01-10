@@ -1,6 +1,6 @@
-- name: Destroy current Terraform Docker Swarm deployment on Proxmox
+- name: Destroy current Terraform Docker Server deployment on Proxmox
   hosts: terraform
   roles:
     - terraform-destroy
   vars:
-    project_dir: /home/abeckett/terraform/proxmox/docker-swarm
+    project_dir: /home/abeckett/terraform/proxmox/docker-servers

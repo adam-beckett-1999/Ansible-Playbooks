@@ -23,28 +23,30 @@
     - glusterfs-configure
   vars:
     nodes:
-      - VM-DOCKER-MEDIA.homelab.internal
-      - VM-DOCKER-SERVICES.homelab.internal
-      - VM-DOCKER-MANAGEMENT.homelab.internal
+      - VM-DOCKER-MEDIA.hyvecloud.local
+      - VM-DOCKER-SERVICES.hyvecloud.local
+      - VM-DOCKER-SMARTHOME.hyvecloud.local
+      - VM-DOCKER-MANAGEMENT.hyvecloud.local
     replicas: 4
     cluster:
-      - VM-DOCKER-PROXY.homelab.internal
-      - VM-DOCKER-MEDIA.homelab.internal
-      - VM-DOCKER-SERVICES.homelab.internal
-      - VM-DOCKER-MANAGEMENT.homelab.internal
+      - VM-DOCKER-PROXY.hyvecloud.local
+      - VM-DOCKER-MEDIA.hyvecloud.local
+      - VM-DOCKER-SERVICES.hyvecloud.local
+      - VM-DOCKER-SMARTHOME.hyvecloud.local
+      - VM-DOCKER-MANAGEMENT.hyvecloud.local
 - name: Mount glusterfs share to VMs
   hosts: docker_vms
   roles: 
     - glusterfs-mount
-- name: Deploy Portainer to Proxy node
-  hosts: docker_proxy
+- name: Deploy Portainer to Management node
+  hosts: docker_management
   roles: 
     - container-directories
     - docker-portainer-deploy
   vars:
     service: portainer
 - name: Deploy Portainer-agent to other Docker servers
-  hosts: docker_media,docker_services,docker_management
+  hosts: docker_media,docker_services,docker_smarthome,docker_proxy
   roles: 
     - docker-portainer-agent-deploy
 - name: Reboot Virtual Machines
@@ -56,26 +58,33 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 200
+    vm_id: 100
     snapshot_name: Post-configuration
 - name: Take snapshot of VM-DOCKER-MEDIA
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 201
+    vm_id: 101
     snapshot_name: Post-configuration
 - name: Take snapshot of VM-DOCKER-SERVICES
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 202
+    vm_id: 102
+    snapshot_name: Post-configuration
+- name: Take snapshot of VM-DOCKER-SMARTHOME
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 103
     snapshot_name: Post-configuration
 - name: Take snapshot of VM-DOCKER-MANAGEMENT
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 203
+    vm_id: 104
     snapshot_name: Post-configuration

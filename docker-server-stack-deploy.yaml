@@ -55,26 +55,33 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 200
+    vm_id: 100
     snapshot_name: Post-configuration
 - name: Take snapshot of VM-DOCKER-MEDIA
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 201
+    vm_id: 101
     snapshot_name: Post-configuration
 - name: Take snapshot of VM-DOCKER-SERVICES
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 202
+    vm_id: 102
+    snapshot_name: Post-configuration
+- name: Take snapshot of VM-DOCKER-SMARTHOME
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 103
     snapshot_name: Post-configuration
 - name: Take snapshot of VM-DOCKER-MANAGEMENT
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 203
+    vm_id: 104
     snapshot_name: Post-configuration

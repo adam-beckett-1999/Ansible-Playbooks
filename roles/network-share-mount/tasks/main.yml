@@ -18,16 +18,3 @@
     boot: true
     opts: rw,sync,hard
     state: mounted
-- name: Create STORAGE-01 local directory
-  ansible.builtin.file:
-    path: /mnt/storage-01
-    state: directory
-    mode: '777'
-- name: Mount STORAGE-01 network share
-  ansible.posix.mount:
-    src: STORAGE-01.hyvecloud.local:/mnt/pool-1/Data
-    path: /mnt/storage-01
-    fstype: nfs
-    boot: true
-    opts: rw,sync,hard
-    state: mounted

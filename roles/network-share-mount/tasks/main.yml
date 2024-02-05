@@ -12,7 +12,7 @@
     mode: '777'
 - name: Mount NAS-01 network share
   ansible.posix.mount:
-    src: NAS-01.homelab.internal:/volume1/Media
+    src: NAS-01.hyvecloud.local:/volume1/Media
     path: /mnt/nas-01
     fstype: nfs
     boot: true
@@ -25,7 +25,7 @@
     mode: '777'
 - name: Mount STORAGE-01 network share
   ansible.posix.mount:
-    src: STORAGE-01.homelab.internal:/mnt/user/media
+    src: STORAGE-01.hyvecloud.local:/mnt/pool-1/Data
     path: /mnt/storage-01
     fstype: nfs
     boot: true

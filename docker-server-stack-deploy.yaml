@@ -18,33 +18,32 @@
     - glusterfs-service
     - docker-install
 - name: Configure GlusterFS and start the service
-  hosts: docker_proxy
+  hosts: docker_management
   roles:
     - glusterfs-configure
   vars:
     nodes:
-      - VM-DOCKER-MEDIA.homelab.internal
-      - VM-DOCKER-SERVICES.homelab.internal
-      - VM-DOCKER-MANAGEMENT.homelab.internal
+      - VM-DOCKER-MEDIA.hyvecloud.local
+      - VM-DOCKER-SERVICES.hyvecloud.local
+      - VM-DOCKER-PROXY.hyvecloud.local
     replicas: 4
     cluster:
-      - VM-DOCKER-PROXY.homelab.internal
-      - VM-DOCKER-MEDIA.homelab.internal
-      - VM-DOCKER-SERVICES.homelab.internal
-      - VM-DOCKER-MANAGEMENT.homelab.internal
+      - VM-DOCKER-PROXY.hyvecloud.local
+      - VM-DOCKER-MEDIA.hyvecloud.local
+      - VM-DOCKER-SERVICES.hyvecloud.local
+      - VM-DOCKER-MANAGEMENT.hyvecloud.local
 - name: Mount glusterfs share to VMs
   hosts: docker_vms
   roles: 
     - glusterfs-mount
 - name: Deploy Portainer to Proxy node
-  hosts: docker_proxy
+  hosts: docker_management
   roles: 
-    - container-directories
     - docker-portainer-deploy
   vars:
     service: portainer
 - name: Deploy Portainer-agent to other Docker servers
-  hosts: docker_media,docker_services,docker_management
+  hosts: docker_media,docker_services,docker_proxy
   roles: 
     - docker-portainer-agent-deploy
 - name: Reboot Virtual Machines

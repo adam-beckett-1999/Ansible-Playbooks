@@ -28,7 +28,7 @@
   community.general.snmp_facts:
     host: '{{ inventory_hostname }}'
     version: v2c
-    community: HyveCloudHomelab
+    community: HyvecloudSNMP
   register: response
 - name: Print the results of the test
   ansible.builtin.debug:

@@ -1,18 +1,18 @@
 - name: Download terraform provider.tf file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Terraform/main/proxmox/{{ vm_stack }}/provider.tf
-    dest: "/home/abeckett/terraform/proxmox/{{ vm_stack }}/provider.tf"
+    dest: "/home/abeckett/Terraform/proxmox/{{ vm_stack }}/provider.tf"
     owner: abeckett
     mode: '777'
 - name: Download terraform variables.tf file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Terraform/main/proxmox/{{ vm_stack }}/variables.tf
-    dest: "/home/abeckett/terraform/proxmox/{{ vm_stack }}/variables.tf"
+    dest: "/home/abeckett/Terraform/proxmox/{{ vm_stack }}/variables.tf"
     owner: abeckett
     mode: '777'
 - name: Download terraform resources.tf file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Terraform/main/proxmox/{{ vm_stack }}/resources.tf
-    dest: "/home/abeckett/terraform/proxmox/{{ vm_stack }}/resources.tf"
+    dest: "/home/abeckett/Terraform/proxmox/{{ vm_stack }}/resources.tf"
     owner: abeckett
     mode: '777'

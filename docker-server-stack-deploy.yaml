@@ -1,13 +1,13 @@
 ##### TERRAFORM VM DEPLOYMENT TO HYPERVISORS
 - name: Deploy Docker Virtual-Machines on Proxmox with Terraform
-  hosts: 192.168.0.151
+  hosts: localhost
   gather_facts: False
   roles:
     - terraform-prepare
     - terraform-apply
   vars:
     vm_stack: docker-servers
-    project_dir: /home/abeckett/Terraform/proxmox/docker-servers
+    project_dir: /Terraform/proxmox/docker-servers
     parallelism: 1
 
 ##### INITIAL CONFIGURATION

@@ -1,3 +1,4 @@
+##### TERRAFORM VM DEPLOYMENT TO HYPERVISORS
 - name: Deploy Docker Virtual-Machines on Proxmox with Terraform
   hosts: localhost
   roles:
@@ -7,7 +8,9 @@
     vm_stack: docker-servers
     project_dir: /home/abeckett/terraform/proxmox/docker-servers
     parallelism: 1
-- name: Reboot machines, install updates and base packages, configure SNMP and network shares
+
+##### INITIAL CONFIGURATION
+- name: Reboot machines, install updates and standard packages, configure SNMP and network shares
   hosts: docker_vms
   roles: 
     - reboot
@@ -18,8 +21,48 @@
     - cockpit-install
     - snmp-configure
     - network-share-mount
+
+##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
+- name: Take pre-service-configuration snapshot of VM-DOCKER-PROXY
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 100
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of VM-DOCKER-MEDIA
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 101
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of VM-DOCKER-SERVICES
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 102
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of VM-DOCKER-MANAGEMENT
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 103
+    snapshot_name: Pre-service-configuration
+
+##### SERVICE INSTALL
+- name: Install GlusterFS and Docker
+  hosts: docker_vms
+  roles: 
     - glusterfs-service
     - docker-install
+
+##### SERVICE-SPECIFIC CONFIGURATIONS
 - name: Configure GlusterFS and start the service
   hosts: docker_management
   roles:
@@ -35,46 +78,53 @@
       - VM-DOCKER-MEDIA.hyvecloud.local
       - VM-DOCKER-SERVICES.hyvecloud.local
       - VM-DOCKER-MANAGEMENT.hyvecloud.local
+
 - name: Mount glusterfs share to VMs
   hosts: docker_vms
   roles: 
     - glusterfs-mount
+
 - name: Deploy Portainer to Proxy node
   hosts: docker_management
   roles: 
     - docker-portainer-deploy
-  vars:
-    service: portainer
+
 - name: Deploy Portainer-agent to other Docker servers
   hosts: docker_media,docker_services,docker_proxy
   roles: 
     - docker-portainer-agent-deploy
+
+##### REBOOT AND POST-CONFIGURATION SNAPSHOTS
 - name: Reboot Virtual Machines
   hosts: docker_vms
   roles: 
     - reboot
-- name: Take snapshot of VM-DOCKER-PROXY
+
+- name: Take post-configuration snapshot of VM-DOCKER-PROXY
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
     vm_id: 100
     snapshot_name: Post-configuration
-- name: Take snapshot of VM-DOCKER-MEDIA
+
+- name: Take post-configuration snapshot of VM-DOCKER-MEDIA
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
     vm_id: 101
     snapshot_name: Post-configuration
-- name: Take snapshot of VM-DOCKER-SERVICES
+
+- name: Take post-configuration snapshot of VM-DOCKER-SERVICES
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
     vm_id: 102
     snapshot_name: Post-configuration
-- name: Take snapshot of VM-DOCKER-MANAGEMENT
+
+- name: Take post-configuration snapshot of VM-DOCKER-MANAGEMENT
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot

@@ -1,3 +1,4 @@
+##### TERRAFORM VM DEPLOYMENT TO HYPERVISORS
 - name: Deploy Application-Server Virtual-Machines on Proxmox with Terraform
   hosts: terraform
   roles:
@@ -7,22 +8,89 @@
     vm_stack: app-servers
     project_dir: /home/abeckett/terraform/proxmox/app-servers
     parallelism: 1
+
+##### INITIAL CONFIGURATION
 - name: Reboot machines, install updates and base packages, configure SNMP and network shares
-  hosts: game_server
+  hosts: app_server_vms,game_server_vms
   roles:
     - reboot
     - update
     - base-packages
+    - disable-motd-ubuntu
+    - qemu-guest-agent-install
+    - cockpit-install
     - snmp-configure
     - network-share-mount
-    - docker-install
-    - pufferpanel-install
-    - docker-portainer-agent-deploy
-    - reboot
-- name: Take snapshot of VM-GAMESERVER-01
+
+##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
+- name: Take snapshot of VM-GAMESERVER-MANAGEMENT
   hosts: proxmox_servers
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 221
+    vm_id: 200
+    snapshot_name: Pre-service-configuration
+
+- name: Take snapshot of VM-GAMESERVER-NODE-01
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 201
+    snapshot_name: Pre-service-configuration
+
+- name: Take snapshot of VM-GAMESERVER-NODE-02
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 202
+    snapshot_name: Pre-service-configuration
+
+##### SERVICE INSTALL
+- name: Install Cubecoders AMP and Pterodactyl Panel on VM-GAMESERVER-MANAGEMENT
+  hosts: game_server_vms
+  roles:
+    - cc-amp-install
+    - pterodactyl-panel-install
+  vars:
+    ampuser:
+    amppass:
+    syspass:
+    externalhostname:
+
+##### SERVICE-SPECIFIC CONFIGURATIONS
+- name: Deploy the Portainer agent to manage docker instances on these nodes
+  hosts: game_server_vms
+  roles:
+    - docker-portainer-agent-deploy
+  
+##### REBOOT AND POST-CONFIGURATION SNAPSHOTS
+- name: Reboot Virtual-Machines
+  hosts: app_server_vms,game_server_vms
+  roles:
+    - reboot
+
+- name: Take snapshot of VM-GAMESERVER-MANAGEMENT
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 200
+    snapshot_name: Post-configuration
+
+- name: Take snapshot of VM-GAMESERVER-NODE-01
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 201
+    snapshot_name: Post-configuration
+
+- name: Take snapshot of VM-GAMESERVER-NODE-02
+  hosts: proxmox_servers
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 202
     snapshot_name: Post-configuration

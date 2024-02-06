@@ -13,6 +13,9 @@
     - reboot
     - update
     - base-packages
+    - disable-motd-ubuntu
+    - qemu-guest-agent-install
+    - cockpit-install
     - snmp-configure
     - network-share-mount
     - glusterfs-service

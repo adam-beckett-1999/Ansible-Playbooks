@@ -1,0 +1,39 @@
+- name: Install cockpit and related packages/dependencies
+  ansible.builtin.apt:
+    name:
+      - cockpit
+      - cockpit-packagekit
+      - cockpit-networkmanager
+      - cockpit-sosreport
+      - cockpit-storaged
+      - cockpit-system
+      - cockpit-ws
+      - coreutils
+    default_release: jammy-backports
+    update_cache: yes
+- name: Install cockpit-navigator plugin from 45Drives github repo
+  ansible.builtin.apt:
+    deb: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator_0.5.10-1focal_all.deb
+    state: present
+- name: Install cockpit-identities plugin from 45Drives github repo
+  ansible.builtin.apt:
+    deb: https://github.com/45Drives/cockpit-identities/releases/download/v0.1.12/cockpit-identities_0.1.12-1focal_all.deb
+    state: present
+- name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit
+  ansible.builtin.copy:
+    dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
+    owner: abeckett
+    content: |
+      [keyfile]
+      unmanaged-devices=none
+    mode: '777'
+- name: Create fake network interface to fix issue with NetworkManager and Cockpit
+  ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
+  register: command_output
+  changed_when: command_output.rc != 0
+- name: Start cockpit service
+  ansible.builtin.systemd:
+    name: cockpit
+    enabled: true
+    state: started
+    masked: false

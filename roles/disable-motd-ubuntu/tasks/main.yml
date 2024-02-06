@@ -1,0 +1,4 @@
+- name: Disable MOTD on login
+  ansible.builtin.shell: |
+        chmod -x /etc/update-motd.d/*
+  changed_when: false

@@ -24,7 +24,7 @@
 
 ##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
 - name: Take pre-service-configuration snapshot of VM-DOCKER-PROXY
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -32,7 +32,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-DOCKER-MEDIA
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -40,7 +40,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-DOCKER-SERVICES
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -48,7 +48,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-DOCKER-MANAGEMENT
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -101,7 +101,7 @@
     - reboot
 
 - name: Take post-configuration snapshot of VM-DOCKER-PROXY
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -109,7 +109,7 @@
     snapshot_name: Post-configuration
 
 - name: Take post-configuration snapshot of VM-DOCKER-MEDIA
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -117,7 +117,7 @@
     snapshot_name: Post-configuration
 
 - name: Take post-configuration snapshot of VM-DOCKER-SERVICES
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -125,7 +125,7 @@
     snapshot_name: Post-configuration
 
 - name: Take post-configuration snapshot of VM-DOCKER-MANAGEMENT
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:

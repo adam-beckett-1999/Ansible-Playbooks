@@ -24,7 +24,7 @@
 
 ##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
 - name: Take snapshot of VM-GAMESERVER-MANAGEMENT
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -32,7 +32,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take snapshot of VM-GAMESERVER-NODE-01
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -40,7 +40,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take snapshot of VM-GAMESERVER-NODE-02
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -49,7 +49,7 @@
 
 ##### SERVICE INSTALL
 - name: Install Cubecoders AMP and Pterodactyl Panel on VM-GAMESERVER-MANAGEMENT
-  hosts: game_server_vms
+  hosts: game_server_management
   roles:
     - cc-amp-install
     - pterodactyl-panel-install
@@ -72,7 +72,7 @@
     - reboot
 
 - name: Take snapshot of VM-GAMESERVER-MANAGEMENT
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -80,7 +80,7 @@
     snapshot_name: Post-configuration
 
 - name: Take snapshot of VM-GAMESERVER-NODE-01
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:
@@ -88,7 +88,7 @@
     snapshot_name: Post-configuration
 
 - name: Take snapshot of VM-GAMESERVER-NODE-02
-  hosts: proxmox_servers
+  hosts: hypervisor-01
   roles:
     - proxmox-snapshot
   vars:

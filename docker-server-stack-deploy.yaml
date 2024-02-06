@@ -2,8 +2,6 @@
 - name: Deploy Docker Virtual-Machines on Proxmox with Terraform
   hosts: localhost
   gather_facts: False
-  become: true
-  connection: local
   roles:
     - terraform-prepare
     - terraform-apply

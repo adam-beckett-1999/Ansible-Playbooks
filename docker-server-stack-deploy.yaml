@@ -6,7 +6,7 @@
     - terraform-apply
   vars:
     vm_stack: docker-servers
-    project_dir: /home/abeckett/terraform/proxmox/docker-servers
+    project_dir: /home/abeckett/Terraform/proxmox/docker-servers
     parallelism: 1
 
 ##### INITIAL CONFIGURATION

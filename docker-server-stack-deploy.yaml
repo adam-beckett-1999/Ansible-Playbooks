@@ -8,7 +8,7 @@
   vars:
     vm_stack: docker-servers
     project_dir: /Terraform/proxmox/docker-servers/
-    parallelism: 1
+    parallelism: 2
 
 ##### INITIAL CONFIGURATION
 - name: Reboot machines, install updates and standard packages, configure SNMP and network shares

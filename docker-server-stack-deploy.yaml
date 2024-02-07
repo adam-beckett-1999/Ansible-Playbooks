@@ -12,7 +12,7 @@
 
 ##### FIRST BOOT AND PAUSE FOR UPDATES
 - name: Start VM-DOCKER-PROXY
-  hosts: hypervisor-01
+  hosts: hypervisor_01
   roles:
     - proxmox-vm-start
   vars:
@@ -20,7 +20,7 @@
     vm_name: VM-DOCKER-PROXY
 
 - name: Start VM-DOCKER-MEDIA
-  hosts: hypervisor-01
+  hosts: hypervisor_01
   roles:
     - proxmox-vm-start
   vars:
@@ -28,7 +28,7 @@
     vm_name: VM-DOCKER-PROXY
 
 - name: Start VM-DOCKER-MEDIA
-  hosts: hypervisor-01
+  hosts: hypervisor_01
   roles:
     - proxmox-vm-start
   vars:
@@ -36,7 +36,7 @@
     vm_name: VM-DOCKER-PROXY
 
 - name: Start VM-DOCKER-SERVICES
-  hosts: hypervisor-01
+  hosts: hypervisor_01
   roles:
     - proxmox-vm-start
   vars:

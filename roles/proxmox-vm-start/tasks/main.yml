@@ -1,9 +1,9 @@
 - name: Start Virtual Machine
   community.general.proxmox_kvm:
-    node: "HYPERVISOR-01"
+    node: HYPERVISOR-01
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
-    api_host: "HYPERVISOR-01"
+    api_host: HYPERVISOR-01
     name: "{{ vm_name }}"
     state: started
     force: true

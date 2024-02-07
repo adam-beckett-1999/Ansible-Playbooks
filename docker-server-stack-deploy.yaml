@@ -25,17 +25,17 @@
     - proxmox-vm-start
   vars:
     proxmox_node: HYPERVISOR-01
-    vm_name: VM-DOCKER-PROXY
+    vm_name: VM-DOCKER-MEDIA
 
-- name: Start VM-DOCKER-MEDIA
+- name: Start VM-DOCKER-SERVICES
   hosts: hypervisor_01
   roles:
     - proxmox-vm-start
   vars:
     proxmox_node: HYPERVISOR-01
-    vm_name: VM-DOCKER-PROXY
+    vm_name: VM-DOCKER-SERVICES
 
-- name: Start VM-DOCKER-SERVICES
+- name: Start VM-DOCKER-MANAGEMENT
   hosts: hypervisor_01
   roles:
     - proxmox-vm-start

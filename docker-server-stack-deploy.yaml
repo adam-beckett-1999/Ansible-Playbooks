@@ -10,12 +10,15 @@
     project_dir: /Terraform/proxmox/docker-servers/
     parallelism: 2
 
+##### 5 MINUTE PAUSE DURING FIRST BOOT AND INITIAL UPDATE
+- name: Wait for VMs to boot and run initial updates
+  ansible.builtin.pause:
+    minutes: 5
+
 ##### INITIAL CONFIGURATION
 - name: Reboot machines, install updates and standard packages, configure SNMP and network shares
   hosts: docker_vms
   roles: 
-    - reboot
-    - update
     - base-packages
     - disable-motd-ubuntu
     - qemu-guest-agent-install

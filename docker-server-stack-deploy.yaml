@@ -11,6 +11,45 @@
     project_dir: /Terraform/proxmox/docker-servers/
     parallelism: 2
 
+##### FIRST BOOT AND PAUSE FOR UPDATES
+- name: Start VM-DOCKER-PROXY
+  hosts: hypervisor-01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-01
+    vm_id: 100
+
+- name: Start VM-DOCKER-MEDIA
+  hosts: hypervisor-01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-01
+    vm_id: 101
+
+- name: Start VM-DOCKER-SERVICES
+  hosts: hypervisor-01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-01
+    vm_id: 102
+
+- name: Start VM-DOCKER-MANAGEMENT
+  hosts: hypervisor-01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-01
+    vm_id: 103
+
+- name: 5 minute pause for first boot and initial update of OS
+  hosts: localhost
+  gather_facts: False
+  roles:
+    - 5-minute-pause
+
 ##### INITIAL CONFIGURATION
 - name: Reboot machines, install updates and standard packages, configure SNMP and network shares
   hosts: docker_vms

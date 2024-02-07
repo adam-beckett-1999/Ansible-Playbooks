@@ -3,4 +3,4 @@
   roles:
     - terraform-destroy
   vars:
-    project_dir: /home/abeckett/terraform/proxmox/docker-servers
+    project_dir: /Terraform/proxmox/docker-servers/

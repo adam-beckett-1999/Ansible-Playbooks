@@ -1,10 +1,10 @@
 - name: Stop Virtual Machine
   community.general.proxmox_kvm:
-    node: phs-hv-01
+    node: "{{ proxmox_node }}"
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
-    api_host: phs-hv-01
-    name: "{{ vm_name }}"
+    api_host: "{{ proxmox_node }}"
+    vmid: "{{ vm_id }}"
     state: stopped
     force: true
     timeout: 300

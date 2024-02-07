@@ -5,7 +5,6 @@
   roles:
     - terraform-prepare
     - terraform-apply
-    - 5-minute-pause
   vars:
     vm_stack: docker-servers
     project_dir: /Terraform/proxmox/docker-servers/

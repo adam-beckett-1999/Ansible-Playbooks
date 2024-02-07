@@ -2,4 +2,5 @@
   community.general.terraform:
     project_path: '{{ project_dir }}'
     parallelism: '{{ parallelism }}'
+    lock: false
     state: present

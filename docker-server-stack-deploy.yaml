@@ -17,7 +17,7 @@
     - proxmox-vm-start
   vars:
     proxmox_node: HYPERVISOR-01
-    vm_id: 100
+    vm_name: VM-DOCKER-PROXY
 
 - name: Start VM-DOCKER-MEDIA
   hosts: hypervisor-01
@@ -25,7 +25,15 @@
     - proxmox-vm-start
   vars:
     proxmox_node: HYPERVISOR-01
-    vm_id: 101
+    vm_name: VM-DOCKER-PROXY
+
+- name: Start VM-DOCKER-MEDIA
+  hosts: hypervisor-01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-01
+    vm_name: VM-DOCKER-PROXY
 
 - name: Start VM-DOCKER-SERVICES
   hosts: hypervisor-01
@@ -33,15 +41,7 @@
     - proxmox-vm-start
   vars:
     proxmox_node: HYPERVISOR-01
-    vm_id: 102
-
-- name: Start VM-DOCKER-MANAGEMENT
-  hosts: hypervisor-01
-  roles:
-    - proxmox-vm-start
-  vars:
-    proxmox_node: HYPERVISOR-01
-    vm_id: 103
+    vm_name: VM-DOCKER-MANAGEMENT
 
 - name: 5 minute pause for first boot and initial update of OS
   hosts: localhost

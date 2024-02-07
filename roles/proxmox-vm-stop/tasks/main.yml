@@ -1,9 +1,9 @@
 - name: Stop Virtual Machine
   community.general.proxmox_kvm:
-    node: "{{ proxmox_node }}"
+    node: "HYPERVISOR-01"
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
-    api_host: "{{ proxmox_node }}"
+    api_host: "HYPERVISOR-01"
     vmid: "{{ vm_id }}"
     state: stopped
     force: true

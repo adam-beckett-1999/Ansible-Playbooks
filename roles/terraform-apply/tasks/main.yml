@@ -3,4 +3,5 @@
     project_path: '{{ project_dir }}'
     parallelism: '{{ parallelism }}'
     lock: false
+    force_init: true
     state: present

@@ -1,6 +1,7 @@
 ##### TERRAFORM VM DEPLOYMENT TO HYPERVISORS
 - name: Deploy Docker Virtual-Machines on Proxmox with Terraform
   hosts: localhost
+  gather_facts: false
   roles:
     - terraform-prepare
     - terraform-apply

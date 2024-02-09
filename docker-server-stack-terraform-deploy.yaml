@@ -9,36 +9,3 @@
     vm_stack: docker-servers
     project_dir: /Terraform/proxmox/docker-servers/
     parallelism: 2
-
-##### FIRST BOOT AND PAUSE FOR UPDATES
-- name: Start VM-DOCKER-PROXY
-  hosts: hypervisor_01
-  roles:
-    - proxmox-vm-start
-  vars:
-    proxmox_node: HYPERVISOR-01
-    vm_name: VM-DOCKER-PROXY
-
-- name: Start VM-DOCKER-MEDIA
-  hosts: hypervisor_01
-  roles:
-    - proxmox-vm-start
-  vars:
-    proxmox_node: HYPERVISOR-01
-    vm_name: VM-DOCKER-MEDIA
-
-- name: Start VM-DOCKER-SERVICES
-  hosts: hypervisor_01
-  roles:
-    - proxmox-vm-start
-  vars:
-    proxmox_node: HYPERVISOR-01
-    vm_name: VM-DOCKER-SERVICES
-
-- name: Start VM-DOCKER-MANAGEMENT
-  hosts: hypervisor_01
-  roles:
-    - proxmox-vm-start
-  vars:
-    proxmox_node: HYPERVISOR-01
-    vm_name: VM-DOCKER-MANAGEMENT

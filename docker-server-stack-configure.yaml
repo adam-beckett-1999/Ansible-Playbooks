@@ -1,3 +1,36 @@
+##### FIRST BOOT AND PAUSE FOR UPDATES
+- name: Start VM-DOCKER-PROXY
+  hosts: hypervisor_01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-01
+    vm_name: VM-DOCKER-PROXY
+
+- name: Start VM-DOCKER-MEDIA
+  hosts: hypervisor_01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-01
+    vm_name: VM-DOCKER-MEDIA
+
+- name: Start VM-DOCKER-SERVICES
+  hosts: hypervisor_01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-01
+    vm_name: VM-DOCKER-SERVICES
+
+- name: Start VM-DOCKER-MANAGEMENT
+  hosts: hypervisor_01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-01
+    vm_name: VM-DOCKER-MANAGEMENT
+
 ##### INITIAL CONFIGURATION
 - name: Reboot machines, install updates and standard packages, configure SNMP and network shares
   hosts: docker_vms

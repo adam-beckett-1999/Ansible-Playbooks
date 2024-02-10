@@ -11,7 +11,7 @@
 
 ##### FIRST BOOT AND PAUSE FOR UPDATES
 - name: Start VM-DOCKER-PROXY
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-vm-start
   vars:
@@ -19,7 +19,7 @@
     vm_name: VM-DOCKER-SERVER-01
 
 - name: Start VM-DOCKER-MEDIA
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-vm-start
   vars:
@@ -27,7 +27,7 @@
     vm_name: VM-DOCKER-SERVER-02
 
 - name: Start VM-DOCKER-SERVICES
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-vm-start
   vars:
@@ -35,7 +35,7 @@
     vm_name: VM-DOCKER-SERVER-03
 
 - name: Start VM-DOCKER-MANAGEMENT
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-vm-start
   vars:

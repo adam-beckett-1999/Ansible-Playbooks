@@ -11,7 +11,7 @@
 
 ##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
 - name: Take pre-service-configuration snapshot of VM-DOCKER-SERVER-01
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -19,7 +19,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-DOCKER-SERVER-02
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -27,7 +27,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-DOCKER-SERVER-03
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -35,7 +35,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-DOCKER-SERVER-04
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -88,7 +88,7 @@
     - reboot
 
 - name: Take post-configuration snapshot of VM-DOCKER-SERVER-01
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -96,7 +96,7 @@
     snapshot_name: Post-configuration
 
 - name: Take post-configuration snapshot of VM-DOCKER-SERVER-02
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -104,7 +104,7 @@
     snapshot_name: Post-configuration
 
 - name: Take post-configuration snapshot of VM-DOCKER-SERVER-03
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -112,7 +112,7 @@
     snapshot_name: Post-configuration
 
 - name: Take post-configuration snapshot of VM-DOCKER-SERVER-04
-  hosts: HYPERVISOR-01.hyvecloud.local
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:

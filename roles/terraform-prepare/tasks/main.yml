@@ -1,26 +1,26 @@
 - name: Create directory for terraform files
   ansible.builtin.file:
-    path: "/Terraform/proxmox/{{ vm_stack }}/"
+    path: "/home/terraform/proxmox/{{ vm_stack }}/"
     state: directory
     mode: '0777'
 - name: Download terraform provider.tf file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Terraform/main/proxmox/{{ vm_stack }}/provider.tf
-    dest: "/Terraform/proxmox/{{ vm_stack }}/provider.tf"
-    owner: abeckett
+    dest: "/home/terraform/proxmox/{{ vm_stack }}/provider.tf"
+    owner: root
     mode: '777'
     force: true
 - name: Download terraform variables.tf file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Terraform/main/proxmox/{{ vm_stack }}/variables.tf
-    dest: "/Terraform/proxmox/{{ vm_stack }}/variables.tf"
-    owner: abeckett
+    dest: "/home/terraform/proxmox/{{ vm_stack }}/variables.tf"
+    owner: root
     mode: '777'
     force: true
 - name: Download terraform resources.tf file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Terraform/main/proxmox/{{ vm_stack }}/resources.tf
-    dest: "/Terraform/proxmox/{{ vm_stack }}/resources.tf"
-    owner: abeckett
+    dest: "/home/terraform/proxmox/{{ vm_stack }}/resources.tf"
+    owner: root
     mode: '777'
     force: true

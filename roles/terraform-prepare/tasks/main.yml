@@ -2,7 +2,8 @@
   ansible.builtin.file:
     path: "/home/terraform/proxmox/{{ vm_stack }}/"
     state: directory
-    mode: '0777'
+    mode: '777'
+    force: true
 - name: Download terraform provider.tf file
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/adam-beckett-1999/Terraform/main/proxmox/{{ vm_stack }}/provider.tf

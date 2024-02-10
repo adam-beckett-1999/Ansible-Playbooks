@@ -2,6 +2,7 @@
 - name: Reboot machines, install updates and standard packages, configure SNMP and network shares
   hosts: docker_virtual_machines
   roles: 
+    - reboot
     - base-packages
     - disable-motd-ubuntu
     - qemu-guest-agent-install
@@ -51,7 +52,7 @@
 
 ##### SERVICE-SPECIFIC CONFIGURATIONS
 - name: Configure GlusterFS and start the service
-  hosts: VM-DOCKER-SERVER-04.hyvecloud.local
+  hosts: docker_server_04
   roles:
     - glusterfs-configure
   vars:
@@ -72,7 +73,7 @@
     - glusterfs-mount
 
 - name: Deploy Portainer to Proxy node
-  hosts: VM-DOCKER-SERVER-04.hyvecloud.local
+  hosts: docker_server_04
   roles: 
     - docker-portainer-deploy
 

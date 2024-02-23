@@ -60,7 +60,7 @@
   roles:
     - k3s-master-deploy
   vars:
-    master_ip: "{{ hostvars[groups['k3s_master'][0]]['ansible_host'] | default(groups['k3s_master'][0]) }}"
+    master_ip: "{{ hostvars[groups['vm_k3s_server_01'][0]]['ansible_host'] | default(groups['vm_k3s_server_01'][0]) }}"
     ansible_user: abeckett
 
 - name: Deploy K3s to worker nodes
@@ -68,7 +68,7 @@
   roles:
     - k3s-node-deploy
   vars:
-    master_ip: "{{ hostvars[groups['k3s_master'][0]]['ansible_host'] | default(groups['k3s_master'][0]) }}"
+    master_ip: "{{ hostvars[groups['vm_k3s_server_01'][0]]['ansible_host'] | default(groups['vm_k3s_server_01'][0]) }}"
 
 - name: Deploy Portainer Agent to cluster
   hosts: vm_k3s_server_01

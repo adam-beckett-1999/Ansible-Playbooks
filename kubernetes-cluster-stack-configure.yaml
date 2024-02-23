@@ -15,7 +15,7 @@
 
 ##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
 - name: Take pre-service-configuration snapshot of VM-K3S-SERVER-01
-  hosts: hypervisor_02
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -23,7 +23,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-K3S-SERVER-02
-  hosts: hypervisor_02
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -31,7 +31,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-K3S-SERVER-03
-  hosts: hypervisor_02
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -39,7 +39,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-K3S-SERVER-04
-  hosts: hypervisor_02
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -47,7 +47,7 @@
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-K3S-SERVER-05
-  hosts: hypervisor_02
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -82,7 +82,7 @@
 
 ##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-01
-  hosts: hypervisor_02
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -90,7 +90,7 @@
     snapshot_name: Post-service-configuration
 
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-02
-  hosts: hypervisor_02
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -98,7 +98,7 @@
     snapshot_name: Post-service-configuration
 
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-03
-  hosts: hypervisor_02
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -106,7 +106,7 @@
     snapshot_name: Post-service-configuration
 
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-04
-  hosts: hypervisor_02
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:
@@ -114,7 +114,7 @@
     snapshot_name: Post-service-configuration
 
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-05
-  hosts: hypervisor_02
+  hosts: hypervisor_01
   roles:
     - proxmox-snapshot
   vars:

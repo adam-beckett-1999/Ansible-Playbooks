@@ -1,62 +1,122 @@
-- name: Deploy Kubernetes Cluster Virtual-Machines on Proxmox with Terraform
-  hosts: terraform
-  roles:
-    - terraform-prepare
-    - terraform-apply
-  vars:
-    vm_stack: kubernetes-cluster
-    project_dir: /home/abeckett/terraform/proxmox/kubernetes-cluster
-    parallelism: 1
+##### INITIAL CONFIGURATION
 - name: Reboot machines, install updates and base packages, configure SNMP and network shares
-  hosts: kubernetes_vms
+  hosts: kubernetes_virtual_machines
   roles: 
     - reboot
-    - update
     - base-packages
+    - disable-motd-ubuntu
+    - qemu-guest-agent-install
+    - cockpit-install
     - snmp-configure
     - network-share-mount
     - k3s-prerequisites
   vars:
-    k3s_version: v1.22.3+k3s1
+    k3s_version: v1.29.1+k3s2
+
+##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
+- name: Take pre-service-configuration snapshot of VM-K3S-SERVER-01
+  hosts: hypervisor_02
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 201
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of VM-K3S-SERVER-02
+  hosts: hypervisor_02
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 202
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of VM-K3S-SERVER-03
+  hosts: hypervisor_02
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 203
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of VM-K3S-SERVER-04
+  hosts: hypervisor_02
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 204
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of VM-K3S-SERVER-05
+  hosts: hypervisor_02
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 205
+    snapshot_name: Pre-service-configuration
+
+##### K3S INSTALL AND DEPLOYMENT
 - name: Deploy K3s to master node
-  hosts: k3s_master
+  hosts: vm_k3s_server_01
   roles:
     - k3s-master-deploy
   vars:
     master_ip: "{{ hostvars[groups['k3s_master'][0]]['ansible_host'] | default(groups['k3s_master'][0]) }}"
     ansible_user: abeckett
+
 - name: Deploy K3s to worker nodes
-  hosts: k3s_nodes
+  hosts: vm_k3s_server_02,vm_k3s_server_03,vm_k3s_server_04,vm_k3s_server_05
   roles:
     - k3s-node-deploy
   vars:
     master_ip: "{{ hostvars[groups['k3s_master'][0]]['ansible_host'] | default(groups['k3s_master'][0]) }}"
+
 - name: Deploy Portainer Agent to cluster
-  hosts: k3s_master
+  hosts: vm_k3s_server_01
   roles:
     - kubernetes-portainer-agent-deploy
+
 - name: Reboot Virtual Machines
-  hosts: kubernetes_vms
+  hosts: kubernetes_virtual_machines
   roles: 
     - reboot
-- name: Take snapshot of VM-K3S-01
-  hosts: proxmox_servers
+
+##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
+- name: Take post-service-configuration snapshot of VM-K3S-SERVER-01
+  hosts: hypervisor_02
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 211
-    snapshot_name: Post-configuration
-- name: Take snapshot of VM-K3S-02
-  hosts: proxmox_servers
+    vm_id: 201
+    snapshot_name: Post-service-configuration
+
+- name: Take post-service-configuration snapshot of VM-K3S-SERVER-02
+  hosts: hypervisor_02
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 212
-    snapshot_name: Post-configuration
-- name: Take snapshot of VM-K3S-03
-  hosts: proxmox_servers
+    vm_id: 202
+    snapshot_name: Post-service-configuration
+
+- name: Take post-service-configuration snapshot of VM-K3S-SERVER-03
+  hosts: hypervisor_02
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 213
-    snapshot_name: Post-configuration
+    vm_id: 203
+    snapshot_name: Post-service-configuration
+
+- name: Take post-service-configuration snapshot of VM-K3S-SERVER-04
+  hosts: hypervisor_02
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 204
+    snapshot_name: Post-service-configuration
+
+- name: Take post-service-configuration snapshot of VM-K3S-SERVER-05
+  hosts: hypervisor_02
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 205
+    snapshot_name: Post-service-configuration

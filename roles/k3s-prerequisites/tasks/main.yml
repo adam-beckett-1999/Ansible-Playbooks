@@ -4,6 +4,7 @@
     value: "1"
     state: present
     reload: true
+
 - name: Download k3s binary x64
   ansible.builtin.get_url:
     url: https://github.com/k3s-io/k3s/releases/download/{{ k3s_version }}/k3s
@@ -13,6 +14,7 @@
     group: root
     mode: '755'
   when: ansible_facts.architecture == "x86_64"
+
 - name: Install ansible kubernetes module dependencies
   ansible.builtin.pip:
     name:

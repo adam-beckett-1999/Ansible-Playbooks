@@ -8,7 +8,6 @@
   vars:
     vm_stack: kubernetes-cluster
     project_dir: /home/terraform/proxmox/kubernetes-cluster
-    parallelism: 2
 
 ##### FIRST BOOT AND PAUSE FOR UPDATES
 - name: Start VM-K3S-SERVER-01

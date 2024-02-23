@@ -11,7 +11,7 @@
 
 ##### FIRST BOOT AND PAUSE FOR UPDATES
 - name: Start VM-K3S-SERVER-01
-  hosts: hypervisor_01
+  hosts: hypervisor_02
   roles:
     - proxmox-vm-start
   vars:
@@ -19,7 +19,7 @@
     vm_name: VM-K3S-SERVER-01
 
 - name: Start VM-K3S-SERVER-02
-  hosts: hypervisor_01
+  hosts: hypervisor_02
   roles:
     - proxmox-vm-start
   vars:
@@ -27,7 +27,7 @@
     vm_name: VM-K3S-SERVER-02
 
 - name: Start VM-K3S-SERVER-03
-  hosts: hypervisor_01
+  hosts: hypervisor_02
   roles:
     - proxmox-vm-start
   vars:
@@ -35,7 +35,7 @@
     vm_name: VM-K3S-SERVER-03
 
 - name: Start VM-K3S-SERVER-04
-  hosts: hypervisor_01
+  hosts: hypervisor_02
   roles:
     - proxmox-vm-start
   vars:
@@ -43,7 +43,7 @@
     vm_name: VM-K3S-SERVER-04
 
 - name: Start VM-K3S-SERVER-05
-  hosts: hypervisor_01
+  hosts: hypervisor_02
   roles:
     - proxmox-vm-start
   vars:

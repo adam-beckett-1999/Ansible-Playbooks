@@ -3,4 +3,4 @@
   roles:
     - terraform-destroy
   vars:
-    project_dir: /home/abeckett/terraform/proxmox/kubernetes-cluster
+    project_dir: /home/terraform/proxmox/kubernetes-cluster

@@ -1,0 +1,52 @@
+##### TERRAFORM VM DEPLOYMENT TO HYPERVISORS
+- name: Deploy Kubernetes Cluster Virtual-Machines on Proxmox with Terraform
+  hosts: localhost
+  gather_facts: False
+  roles:
+    - terraform-prepare
+    - terraform-apply
+  vars:
+    vm_stack: kubernetes-cluster
+    project_dir: /home/terraform/proxmox/kubernetes-cluster
+    parallelism: 2
+
+##### FIRST BOOT AND PAUSE FOR UPDATES
+- name: Start VM-K3S-SERVER-01
+  hosts: hypervisor_01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-02
+    vm_name: VM-K3S-SERVER-01
+
+- name: Start VM-K3S-SERVER-02
+  hosts: hypervisor_01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-02
+    vm_name: VM-K3S-SERVER-02
+
+- name: Start VM-K3S-SERVER-03
+  hosts: hypervisor_01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-02
+    vm_name: VM-K3S-SERVER-03
+
+- name: Start VM-K3S-SERVER-04
+  hosts: hypervisor_01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-02
+    vm_name: VM-K3S-SERVER-04
+
+- name: Start VM-K3S-SERVER-05
+  hosts: hypervisor_01
+  roles:
+    - proxmox-vm-start
+  vars:
+    proxmox_node: HYPERVISOR-02
+    vm_name: VM-K3S-SERVER-05

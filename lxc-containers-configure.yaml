@@ -1,0 +1,10 @@
+##### INITIAL CONFIGURATION
+- name: Reboot machines, install updates and standard packages, configure SNMP and network shares
+  hosts: lxc_containers
+  roles: 
+    - reboot
+    - base-packages
+    - disable-motd-ubuntu
+    - cockpit-install
+    - snmp-configure
+    - network-share-mount

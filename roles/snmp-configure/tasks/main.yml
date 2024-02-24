@@ -13,7 +13,7 @@
     src: snmp.conf.j2
     dest: /etc/snmp/snmpd.conf
     mode: '777'
-    owner: abeckett
+    owner: root
 - name: Start and enable SNMPd systemd service.
   ansible.builtin.systemd:
     name: snmpd

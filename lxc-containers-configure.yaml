@@ -3,6 +3,7 @@
   hosts: lxc_containers
   roles: 
     - reboot
+    - update
     - base-packages
     - disable-motd-ubuntu
     - cockpit-install

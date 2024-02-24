@@ -1,10 +1,10 @@
 - name: Download Helm install script
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-    dest: /home/abeckett/get_helm.sh
+    dest: /get_helm.sh
     mode: '0700'
 - name: Run the Helm install script
-  ansible.builtin.script: /home/abeckett/get_helm.sh
+  ansible.builtin.shell: /get_helm.sh
 - name: Create a namespace for Rancher
   kubernetes.core.k8s:
     name: cattle-system

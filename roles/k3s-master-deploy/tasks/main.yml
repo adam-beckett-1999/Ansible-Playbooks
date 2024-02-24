@@ -3,8 +3,7 @@
   ansible.builtin.template:
     src: "k3s.service.j2"
     dest: "/etc/systemd/system/k3s.service"
-    owner: root
-    group: root
+    owner: abeckett
     mode: '644'
 
 - name: Enable and check K3s service
@@ -44,24 +43,24 @@
 
 - name: Create directory .kube
   ansible.builtin.file:
-    path: ~{{ ansible_user }}/.kube
+    path: /home/abeckett/.kube
     state: directory
-    owner: "{{ ansible_user }}"
+    owner: abeckett
     mode: "u=rwx,g=rx,o="
 
 - name: Copy config file to user home directory
   ansible.builtin.copy:
     src: /etc/rancher/k3s/k3s.yaml
-    dest: ~{{ ansible_user }}/.kube/config
+    dest: /home/abeckett/.kube/config
     remote_src: true
-    owner: "{{ ansible_user }}"
+    owner: abeckett
     mode: "u=rw,g=,o="
 
 - name: Replace https://localhost:6443 by https://master-ip:6443
   ansible.builtin.command: >-
     k3s kubectl config set-cluster default
       --server=https://{{ master_ip }}:6443
-      --kubeconfig ~{{ ansible_user }}/.kube/config
+      --kubeconfig /home/abeckett/.kube/config
   changed_when: true
 
 - name: Create kubectl symlink

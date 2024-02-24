@@ -11,7 +11,7 @@
     api_version: v1
     kind: Namespace
     state: present
-- name: Add the Rancher-Latest helm repository
+- name: Add the Rancher-Latest Helm repository
   kubernetes.core.helm_repository:
     name: rancher-latest
     repo_url: "https://releases.rancher.com/server-charts/latest"
@@ -27,7 +27,7 @@
     chart_ref: jetstack/cert-manager
     release_namespace: cert-manager
     create_namespace: true
-- name: Deploy Grafana chart using set values on target
+- name: Deploy the Rancher Helm Chart
   kubernetes.core.helm:
     name: rancher
     chart_ref: rancher-latest/rancher

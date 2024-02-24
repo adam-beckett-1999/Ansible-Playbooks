@@ -31,6 +31,10 @@
   ansible.builtin.command: nmcli con add type dummy con-name fake ifname fake0 ip4 1.2.3.4/24 gw4 1.2.3.1
   register: command_output
   changed_when: command_output.rc != 0
+- name: Remove cockpit disallowed-users file
+  ansible.builtin.file:
+    path: /etc/cockpit/disallowed-users
+    state: absent
 - name: Start cockpit service
   ansible.builtin.systemd:
     name: cockpit

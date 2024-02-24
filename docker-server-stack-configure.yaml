@@ -9,6 +9,8 @@
     - cockpit-install
     - snmp-configure
     - network-share-mount
+  vars:
+    user: abeckett
 
 ##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
 - name: Take pre-service-configuration snapshot of VM-DOCKER-SERVER-01
@@ -49,6 +51,8 @@
   roles: 
     - glusterfs-service
     - docker-install
+  vars:
+    user: abeckett
 
 ##### SERVICE-SPECIFIC CONFIGURATIONS
 - name: Configure GlusterFS and start the service

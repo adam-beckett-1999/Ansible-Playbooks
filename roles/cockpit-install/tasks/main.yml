@@ -22,7 +22,7 @@
 - name: Create file with NetworkManager config to fix issue with NetworkManager and Cockpit
   ansible.builtin.copy:
     dest: /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
-    owner: root
+    owner: "{{ user }}"
     content: |
       [keyfile]
       unmanaged-devices=none

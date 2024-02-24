@@ -2,7 +2,7 @@
   ansible.builtin.file:
     path: "/mnt/gluster/containers/portainer"
     state: directory
-    owner: abeckett
+    owner: "{{ user }}"
     mode: '777'
 - name: Deploy Portainer
   community.docker.docker_container:

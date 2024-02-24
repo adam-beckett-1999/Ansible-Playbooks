@@ -1,3 +1,0 @@
-- name: Wait for VMs to boot and run initial updates
-  ansible.builtin.pause:
-    minutes: 5

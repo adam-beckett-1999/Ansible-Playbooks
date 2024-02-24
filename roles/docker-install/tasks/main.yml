@@ -16,7 +16,7 @@
     update_cache: true
 - name: Add the admin user to the docker group
   ansible.builtin.user:
-    name: abeckett
+    name: "{{ user }}"
     groups: docker
     append: true
 - name: Install Docker Module for Python and JSONdiff

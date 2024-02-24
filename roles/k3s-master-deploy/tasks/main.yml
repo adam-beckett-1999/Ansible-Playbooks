@@ -4,6 +4,7 @@
     src: "k3s.service.j2"
     dest: "/etc/systemd/system/k3s.service"
     owner: abeckett
+    group: abeckett
     mode: '644'
 
 - name: Enable and check K3s service
@@ -46,6 +47,7 @@
     path: /home/abeckett/.kube
     state: directory
     owner: abeckett
+    group: abeckett
     mode: "u=rwx,g=rx,o="
 
 - name: Copy config file to user home directory
@@ -54,6 +56,7 @@
     dest: /home/abeckett/.kube/config
     remote_src: true
     owner: abeckett
+    group: abeckett
     mode: "u=rw,g=,o="
 
 - name: Replace https://localhost:6443 by https://master-ip:6443

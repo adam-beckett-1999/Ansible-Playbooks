@@ -71,16 +71,16 @@
   vars:
     master_ip: 192.168.0.171
 
+- name: Reboot Virtual Machines
+  hosts: kubernetes_virtual_machines
+  roles: 
+    - reboot
+
 - name: Deploy Portainer Agent to cluster
   hosts: vm_k3s_server_01
   roles:
     - kubernetes-portainer-agent-deploy
     - rancher-install
-
-- name: Reboot Virtual Machines
-  hosts: kubernetes_virtual_machines
-  roles: 
-    - reboot
 
 ##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-01

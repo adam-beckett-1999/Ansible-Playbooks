@@ -8,4 +8,3 @@
     - disable-motd-ubuntu
     - cockpit-install
     - snmp-configure
-    - network-share-mount

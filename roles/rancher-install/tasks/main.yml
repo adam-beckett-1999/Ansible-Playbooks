@@ -11,3 +11,6 @@
     api_version: v1
     kind: Namespace
     state: present
+- name: Add the Rancher-Latest helm repository
+  ansible.builtin.command: helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+

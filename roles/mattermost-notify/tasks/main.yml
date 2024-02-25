@@ -1,0 +1,5 @@
+- name: Send notification message via Mattermost
+  mattermost:
+    url: http://mattermost.hyvecloud.dev
+    api_key: "{{ mattermost_webhook_key }}"
+    text: '{{ ansible_play_name }} playbook/s have been deployed on {{ ansible_play_hosts }}'

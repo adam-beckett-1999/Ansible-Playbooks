@@ -1,4 +1,5 @@
 - name: Update all Virtual Machines on the Proxmox Hypervisor
-  hosts: virtual_machines
+  hosts: docker_virtual_machines
   roles:
     - update
+    - mattermost-notify

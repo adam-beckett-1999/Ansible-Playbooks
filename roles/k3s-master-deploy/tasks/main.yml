@@ -74,11 +74,17 @@
     group: abeckett
     mode: '644'
 
-- name: Set KUBECONFIG
+- name: Set KUBECONFIG export in .bashrc
+  ansible.builtin.lineinfile:
+    dest: "{{ ansible_env.HOME }}/.bashrc"
+    line: "export KUBECONFIG=~/.kube/config"
+    insertafter: EOF
+  when: "'export KUBECONFIG=~/.kube/config' not in lookup('file', '{{ ansible_env.HOME }}/.bashrc')"
+
+- name: Source .bashrc to apply changes
   ansible.builtin.shell:
-    cmd: "export KUBECONFIG=~/.kube/config"
-  environment:
-    KUBECONFIG: "~/.kube/config"
+    cmd: "source {{ ansible_env.HOME }}/.bashrc"
+  when: "'export KUBECONFIG=~/.kube/config' not in lookup('file', '{{ ansible_env.HOME }}/.bashrc')"
 
 - name: Create kubectl symlink
   ansible.builtin.file:

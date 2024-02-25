@@ -80,10 +80,6 @@
     line: "export KUBECONFIG=~/.kube/config"
     insertafter: EOF
 
-- name: Source .bashrc to apply changes
-  ansible.builtin.shell:
-    cmd: "source /home/abeckett/.bashrc"
-
 - name: Create kubectl symlink
   ansible.builtin.file:
     src: /usr/local/bin/k3s

@@ -1,5 +1,5 @@
 - name: Update packages on proxmox hypervisors
-  hosts: proxmox_servers
+  hosts: cluster_01
   roles:
     - update
     - mattermost-notify

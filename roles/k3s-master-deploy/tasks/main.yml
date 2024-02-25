@@ -76,15 +76,15 @@
 
 - name: Set KUBECONFIG export in .bashrc
   ansible.builtin.lineinfile:
-    dest: "{{ ansible_env.HOME }}/.bashrc"
+    dest: "/home/abeckett/.bashrc"
     line: "export KUBECONFIG=~/.kube/config"
     insertafter: EOF
-  when: "'export KUBECONFIG=~/.kube/config' not in lookup('file', '{{ ansible_env.HOME }}/.bashrc')"
+  when: "'export KUBECONFIG=~/.kube/config' not in lookup('file', '/home/abeckett/.bashrc')"
 
 - name: Source .bashrc to apply changes
   ansible.builtin.shell:
-    cmd: "source {{ ansible_env.HOME }}/.bashrc"
-  when: "'export KUBECONFIG=~/.kube/config' not in lookup('file', '{{ ansible_env.HOME }}/.bashrc')"
+    cmd: "source /home/abeckett/.bashrc"
+  when: "'export KUBECONFIG=~/.kube/config' not in lookup('file', '/home/abeckett/.bashrc')"
 
 - name: Create kubectl symlink
   ansible.builtin.file:

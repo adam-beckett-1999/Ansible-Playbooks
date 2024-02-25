@@ -79,12 +79,10 @@
     dest: "/home/abeckett/.bashrc"
     line: "export KUBECONFIG=~/.kube/config"
     insertafter: EOF
-  when: "'export KUBECONFIG=~/.kube/config' not in lookup('file', '/home/abeckett/.bashrc')"
 
 - name: Source .bashrc to apply changes
   ansible.builtin.shell:
     cmd: "source /home/abeckett/.bashrc"
-  when: "'export KUBECONFIG=~/.kube/config' not in lookup('file', '/home/abeckett/.bashrc')"
 
 - name: Create kubectl symlink
   ansible.builtin.file:

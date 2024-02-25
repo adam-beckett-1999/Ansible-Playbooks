@@ -1,4 +1,5 @@
 - name: Prune dangling and un-used images to free space
-  hosts: docker_vms,game_server
+  hosts: docker_virtual_machines
   roles:
     - docker-image-prune
+    - mattermost-notify

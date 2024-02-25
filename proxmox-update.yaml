@@ -1,4 +1,5 @@
-- name: Update and Reboot the Proxmox Hypervisor
+- name: Update packages on proxmox hypervisors
   hosts: proxmox_servers
   roles:
     - update
+    - mattermost-notify

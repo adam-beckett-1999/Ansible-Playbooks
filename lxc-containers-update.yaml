@@ -1,0 +1,5 @@
+- name: Update packages on LXC containers
+  hosts: lxc_containers
+  roles:
+    - update
+    - mattermost-notify

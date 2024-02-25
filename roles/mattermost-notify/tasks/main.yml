@@ -2,4 +2,4 @@
   mattermost:
     url: "{{ mattermost_url }}"
     api_key: "{{ mattermost_webhook_key }}"
-    text: '**[*{{ ansible_play_name }}*]** playbook has been deployed on **{{ inventory_hostname }}**'
+    text: '**[*{{ ansible_play_name }}*]** playbook has been deployed on **{{ inventory_hostname }}** :white_check_mark:'

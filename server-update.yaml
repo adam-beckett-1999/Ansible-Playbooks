@@ -1,4 +1,4 @@
-- name: Update all Virtual Machines on the Proxmox Hypervisor
+- name: Update all Virtual Machines
   hosts: docker_virtual_machines,kubernetes_virtual_machines
   roles:
     - update

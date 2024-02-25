@@ -2,4 +2,4 @@
   mattermost:
     url: "{{ mattermost_url }}"
     api_key: "{{ mattermost_webhook_key }}"
-    text: '{{ ansible_play_name }} playbook/s have been deployed on {{ ansible_play_hosts }}'
+    text: '*{{ ansible_play_name }}* playbook/s have been deployed on {{ inventory_hostname }}'

@@ -10,11 +10,3 @@
     - snmp-configure
   vars:
     user: root
-
-##### SERVICE INSTALL
-- name: Install Docker on LXC-RANCHER-SERVER-01
-  hosts: lxc_rancher_server_01
-  roles: 
-    - docker-install
-  vars:
-    user: root

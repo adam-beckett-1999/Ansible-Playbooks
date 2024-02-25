@@ -74,8 +74,11 @@
     group: abeckett
     mode: '644'
 
-- name: Add KUBECONFIG to PATH
-  ansible.builtin.command: export KUBECONFIG=~/.kube/config
+- name: Set KUBECONFIG
+  ansible.builtin.shell:
+    cmd: "export KUBECONFIG=~/.kube/config"
+  environment:
+    KUBECONFIG: "~/.kube/config"
 
 - name: Create kubectl symlink
   ansible.builtin.file:

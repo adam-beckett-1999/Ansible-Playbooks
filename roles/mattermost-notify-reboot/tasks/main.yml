@@ -1,0 +1,9 @@
+- name: Send notification message via Mattermost
+  mattermost:
+    url: "{{ mattermost_url }}"
+    api_key: "{{ mattermost_webhook_key }}"
+    text: |
+          #### Playbook Deployment Alert
+          | **Playbook**              | **Host**                     | **Status**                                                                                                      |
+          |---------------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------|
+          | *{{ ansible_play_name }}* | **{{ inventory_hostname }}** | ![Mattermost](https://uxwing.com/wp-content/themes/uxwing/download/controller-and-music/reload-button-green-icon.png =40 "Mattermost Icon") |

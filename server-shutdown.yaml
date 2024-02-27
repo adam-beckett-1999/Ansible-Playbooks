@@ -1,4 +1,0 @@
-- name: Shutdown Virtual Machines
-  hosts: virtual_machines
-  roles:
-    - shutdown

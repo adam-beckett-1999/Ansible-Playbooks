@@ -2,4 +2,4 @@
   hosts: docker_virtual_machines
   roles:
     - docker-image-prune
-    - mattermost-notify
+    - mattermost-notify-success

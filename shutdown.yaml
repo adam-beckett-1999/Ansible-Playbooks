@@ -1,4 +1,4 @@
-- name: Shutdown the Proxmox Hypervisor
+- name: Shutdown hosts
   hosts: '*'
   roles:
     - shutdown

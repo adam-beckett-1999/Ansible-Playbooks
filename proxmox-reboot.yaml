@@ -1,4 +1,0 @@
-- name: Reboot the Proxmox Hypervisor
-  hosts: proxmox_servers
-  roles:
-    - reboot

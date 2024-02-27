@@ -2,17 +2,3 @@
   hosts: cluster_01
   roles:
     - update
-  register: result
-  failed_when: result.failed
-
-- name: Update packages on proxmox hypervisors
-  hosts: cluster_01
-  roles:
-    - mattermost-notify-success
-  when: not result.failed
-
-- name: Update packages on proxmox hypervisors
-  hosts: cluster_01
-  roles:
-    - mattermost-notify-failure
-  when: result.failed

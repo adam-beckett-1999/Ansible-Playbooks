@@ -2,17 +2,3 @@
   hosts: docker_virtual_machines,kubernetes_virtual_machines
   roles:
     - update
-  register: result
-  failed_when: result.failed
-
-- name: Update packages on virtual machines
-  hosts: docker_virtual_machines,kubernetes_virtual_machines
-  roles:
-    - mattermost-notify-success
-  when: not result.failed
-
-- name: Update packages on virtual machines
-  hosts: docker_virtual_machines,kubernetes_virtual_machines
-  roles:
-    - mattermost-notify-failure
-  when: result.failed

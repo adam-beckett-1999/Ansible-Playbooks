@@ -1,0 +1,20 @@
+- name: Send success notification message via Mattermost
+  mattermost:
+    url: "{{ mattermost_url }}"
+    api_key: "{{ mattermost_webhook_key }}"
+    text: |
+          #### Playbook Deployment Alert
+          | **Playbook**              | **Host**                     | **Status**                                                                                                      |
+          |---------------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------|
+          | *{{ ansible_play_name }}* | **{{ inventory_hostname }}** | ![Mattermost](https://static-00.iconduck.com/assets.00/success-icon-512x512-qdg1isa0.png =40 "Mattermost Icon") |
+    when: not result|default({}).failed
+- name: Send failure notification message via Mattermost
+  mattermost:
+    url: "{{ mattermost_url }}"
+    api_key: "{{ mattermost_webhook_key }}"
+    text: |
+          #### Playbook Deployment Alert
+          | **Playbook**              | **Host**                     | **Status**                                                                                                      |
+          |---------------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------|
+          | *{{ ansible_play_name }}* | **{{ inventory_hostname }}** | ![Mattermost](https://static-00.iconduck.com/assets.00/success-icon-512x512-qdg1isa0.png =40 "Mattermost Icon") |
+    when: result|default({}).failed

@@ -6,4 +6,4 @@
           #### Playbook Deployment Alert
           | **Playbook**              | **Host**                     | **Status**                                                                                                      |
           |---------------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------|
-          | *{{ ansible_play_name }}* | **{{ inventory_hostname }}** | ![Mattermost](https://static-00.iconduck.com/assets.00/failure-icon-1024x1024-lpdgzomh.png =40 "Mattermost Icon") |
+          | *{{ ansible_play_name }}* | **{{ inventory_hostname }}** | ![Mattermost](https://cdn-icons-png.flaticon.com/512/3541/3541892.png =40 "Mattermost Icon") |

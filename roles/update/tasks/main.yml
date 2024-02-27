@@ -5,14 +5,12 @@
     mode: "0755"
   when:
     - ansible_facts.os_family == "Debian"
-  ignore_errors: true
 - name: Enable Backports repository on Ubuntu Jammy Machines [Linux]
   ansible.builtin.apt_repository:
     repo: deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
     state: present
   when:
     - ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04'
-  ignore_errors: true
 - name: Install all updates [Linux]
   ansible.builtin.apt:
     update_cache: true
@@ -25,7 +23,6 @@
   notify:
     - Send success notification message via Mattermost
     - Send failure notification message via Mattermost
-  ignore_errors: true
 - name: Install all critical and security updates [Windows]
   ansible.windows.win_updates:
     category_names:
@@ -34,4 +31,3 @@
     state: installed
   when:
     - ansible_facts.os_family == "Windows"
-  ignore_errors: true

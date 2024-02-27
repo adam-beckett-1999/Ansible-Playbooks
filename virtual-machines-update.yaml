@@ -2,3 +2,4 @@
   hosts: docker_virtual_machines,kubernetes_virtual_machines
   roles:
     - update
+    - mattermost-notify-success

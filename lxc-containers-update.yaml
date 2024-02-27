@@ -2,4 +2,4 @@
   hosts: lxc_containers
   roles:
     - update
-    - mattermost-notify
+    - mattermost-notify-success

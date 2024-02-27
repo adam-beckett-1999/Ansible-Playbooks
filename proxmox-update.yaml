@@ -1,5 +1,5 @@
 - name: Update packages on proxmox hypervisors
   hosts: cluster_01
-  gather_facts: False
   roles:
     - update
+    - mattermost-notify-success

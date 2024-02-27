@@ -19,11 +19,6 @@
       autoclean: true
     when:
       - ansible_facts.os_family == "Debian"
-    register: result
-    changed_when: true
-    notify:
-      - Send success notification message via Mattermost
-      - Send failure notification message via Mattermost
   - name: Install all critical and security updates [Windows]
     ansible.windows.win_updates:
       category_names:

@@ -22,6 +22,9 @@
   when:
     - ansible_facts.os_family == "Debian"
   register: result
+  notify:
+    - Send success notification message via Mattermost
+    - Send failure notification message via Mattermost
   ignore_errors: true
 - name: Install all critical and security updates [Windows]
   ansible.windows.win_updates:

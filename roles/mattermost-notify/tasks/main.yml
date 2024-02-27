@@ -4,6 +4,6 @@
     api_key: "{{ mattermost_webhook_key }}"
     text: |
           #### Ansible Runtime Alert
-          | **Playbook**              | **Host**                     | **Status**    | ![Mattermost](https://pbs.twimg.com/profile_images/773082785171005440/ppulukVq_400x400.jpg =75 "Mattermost Icon") 
-          |---------------------------|------------------------------|---------------|
-          | *{{ ansible_play_name }}* | **{{ inventory_hostname }}** | Done          |
+          | **Playbook**              | **Host**                     | **Status**                                                                                                      |
+          |---------------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------|
+          | *{{ ansible_play_name }}* | **{{ inventory_hostname }}** | ![Mattermost](https://static-00.iconduck.com/assets.00/success-icon-512x512-qdg1isa0.png =40 "Mattermost Icon") |

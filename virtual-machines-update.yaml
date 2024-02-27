@@ -2,4 +2,17 @@
   hosts: docker_virtual_machines,kubernetes_virtual_machines
   roles:
     - update
-    - mattermost-notify
+  register: result
+  failed_when: result.failed
+
+- name: Send mattermost success alert
+  hosts: docker_virtual_machines,kubernetes_virtual_machines
+  roles:
+    - mattermost-notify-success
+  when: not result.failed
+
+- name: Send mattermost failure alert
+  hosts: docker_virtual_machines,kubernetes_virtual_machines
+  roles:
+    - mattermost-notify-failure
+  when: result.failed

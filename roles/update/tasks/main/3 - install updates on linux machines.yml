@@ -1,0 +1,12 @@
+- name: Install all updates [Linux]
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: dist
+    autoremove: true
+    autoclean: true
+  when:
+    - ansible_facts.os_family == "Debian"
+  register: result
+  notify:
+    - Send success notification message via Mattermost
+    - Send failure notification message via Mattermost

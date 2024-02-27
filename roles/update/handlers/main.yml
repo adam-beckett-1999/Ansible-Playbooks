@@ -7,7 +7,7 @@
             | **Playbook**              | **Host**                     | **Status**                                                                                                      |
             |---------------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------|
             | *{{ ansible_play_name }}* | **{{ inventory_hostname }}** | ![Mattermost](https://static-00.iconduck.com/assets.00/success-icon-512x512-qdg1isa0.png =40 "Mattermost Icon") |
-    when: not result|default({}).failed
+    when: not result.failed
   - name: Send failure notification message via Mattermost
     mattermost:
       url: "{{ mattermost_url }}"
@@ -17,4 +17,4 @@
             | **Playbook**              | **Host**                     | **Status**                                                                                                      |
             |---------------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------|
             | *{{ ansible_play_name }}* | **{{ inventory_hostname }}** | ![Mattermost](https://static-00.iconduck.com/assets.00/success-icon-512x512-qdg1isa0.png =40 "Mattermost Icon") |
-    when: result|default({}).failed
+    when: result.failed

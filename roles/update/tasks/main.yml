@@ -1,0 +1,4 @@
+- ansible.builtin.include_tasks: '1 - preliminary checks.yml'
+- ansible.builtin.include_tasks: '2 - enable backports ubuntu jammy.yml'
+- ansible.builtin.include_tasks: '3 - install updates on linux machines.yml'
+- ansible.builtin.include_tasks: '4 - install updates on windows machines.yml'

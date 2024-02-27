@@ -1,6 +1,0 @@
-- name: Enable Backports repository on Ubuntu Jammy Machines [Linux]
-  ansible.builtin.apt_repository:
-    repo: deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
-    state: present
-  when:
-    - ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04'

@@ -1,0 +1,56 @@
+tasks:
+  - name: Preliminary checks [Linux]
+    ansible.builtin.file:
+      path: /var/lib/apt/lists/
+      state: directory
+      mode: "0755"
+    when:
+      - ansible_facts.os_family == "Debian"
+  - name: Enable Backports repository on Ubuntu Jammy Machines [Linux]
+    ansible.builtin.apt_repository:
+      repo: deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
+      state: present
+    when:
+      - ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04'
+  - name: Install all updates [Linux]
+    ansible.builtin.apt:
+      update_cache: true
+      upgrade: dist
+      autoremove: true
+      autoclean: true
+    when:
+      - ansible_facts.os_family == "Debian"
+    register: result
+    notify:
+      - Send success notification message via Mattermost
+      - Send failure notification message via Mattermost
+  - name: Install all critical and security updates [Windows]
+    ansible.windows.win_updates:
+      category_names:
+        - CriticalUpdates
+        - SecurityUpdates
+      state: installed
+    when:
+      - ansible_facts.os_family == "Windows"
+
+handlers:
+  - name: Send success notification message via Mattermost
+    mattermost:
+      url: "{{ mattermost_url }}"
+      api_key: "{{ mattermost_webhook_key }}"
+      text: |
+            #### Playbook Deployment Alert
+            | **Playbook**              | **Host**                     | **Status**                                                                                                      |
+            |---------------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------|
+            | *{{ ansible_play_name }}* | **{{ inventory_hostname }}** | ![Mattermost](https://static-00.iconduck.com/assets.00/success-icon-512x512-qdg1isa0.png =40 "Mattermost Icon") |
+      when: not result|default({}).failed
+  - name: Send failure notification message via Mattermost
+    mattermost:
+      url: "{{ mattermost_url }}"
+      api_key: "{{ mattermost_webhook_key }}"
+      text: |
+            #### Playbook Deployment Alert
+            | **Playbook**              | **Host**                     | **Status**                                                                                                      |
+            |---------------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------|
+            | *{{ ansible_play_name }}* | **{{ inventory_hostname }}** | ![Mattermost](https://static-00.iconduck.com/assets.00/success-icon-512x512-qdg1isa0.png =40 "Mattermost Icon") |
+      when: result|default({}).failed

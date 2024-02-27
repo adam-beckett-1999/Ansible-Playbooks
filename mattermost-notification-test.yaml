@@ -1,0 +1,7 @@
+- name: Mattermost notification testing playbook
+  hosts: localhost
+  roles:
+    - mattermost-notify-reboot
+    - mattermost-notify-shutdown
+    - mattermost-notify-success
+    - mattermost-notify-failure

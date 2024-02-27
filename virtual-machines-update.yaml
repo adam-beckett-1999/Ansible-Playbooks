@@ -5,13 +5,13 @@
   register: result
   failed_when: result.failed
 
-- name: Send mattermost success alert
+- name: Update packages on virtual machines
   hosts: docker_virtual_machines,kubernetes_virtual_machines
   roles:
     - mattermost-notify-success
   when: not result.failed
 
-- name: Send mattermost failure alert
+- name: Update packages on virtual machines
   hosts: docker_virtual_machines,kubernetes_virtual_machines
   roles:
     - mattermost-notify-failure

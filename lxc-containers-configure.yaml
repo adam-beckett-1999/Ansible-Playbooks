@@ -2,7 +2,6 @@
 - name: Reboot machines, install updates and standard packages, configure SNMP and network shares
   hosts: lxc_containers
   roles: 
-    - reboot
     - update
     - base-packages
     - disable-motd-ubuntu

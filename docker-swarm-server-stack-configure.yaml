@@ -1,0 +1,148 @@
+##### INITIAL CONFIGURATION
+- name: Reboot machines, install updates and standard packages, configure SNMP and network shares
+  hosts: docker_swarm_virtual_machines
+  roles: 
+    - reboot
+    - base-packages
+    - disable-motd-ubuntu
+    - qemu-guest-agent-install
+    - cockpit-install
+    - snmp-configure
+    - network-share-mount
+  vars:
+    user: abeckett
+
+##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
+- name: Take pre-service-configuration snapshot of SWARM-01
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 501
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of SWARM-02
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 502
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of SWARM-03
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 503
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of SWARM-04
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 504
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of SWARM-05
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 505
+    snapshot_name: Pre-service-configuration
+
+##### SERVICE INSTALL
+- name: Install GlusterFS and Docker
+  hosts: docker_swarm_virtual_machines
+  roles: 
+    - glusterfs-service
+    - docker-install
+  vars:
+    user: abeckett
+
+##### SERVICE-SPECIFIC CONFIGURATIONS
+- name: Configure GlusterFS and start the service
+  hosts: swarm_01
+  roles:
+    - glusterfs-configure
+  vars:
+    nodes:
+      - SWARM-02.hyvecloud.local
+      - SWARM-03.hyvecloud.local
+      - SWARM-04.hyvecloud.local
+      - SWARM-05.hyvecloud.local
+    replicas: 3
+    cluster:
+      - SWARM-01.hyvecloud.local
+      - SWARM-02.hyvecloud.local
+      - SWARM-03.hyvecloud.local
+      - SWARM-04.hyvecloud.local
+      - SWARM-05.hyvecloud.local
+
+- name: Mount GlusterFS share to VMs
+  hosts: docker_swarm_virtual_machines
+  roles: 
+    - glusterfs-mount
+
+- name: Initiate swarm on first node
+  hosts: swarm_01
+  roles: 
+    - docker-swarm-create
+
+- name: Connect second manager to swarm
+  hosts: swarm_05
+  roles: 
+    - docker-swarm-manager-join
+
+- name: Connect worker nodes to swarm
+  hosts: swarm_02,swarm_03,swarm_04
+  roles: 
+    - docker-swarm-worker-join
+
+##### REBOOT AND POST-CONFIGURATION SNAPSHOTS
+- name: Reboot Virtual Machines
+  hosts: docker_swarm_virtual_machines
+  roles: 
+    - reboot
+
+- name: Take post-configuration snapshot of SWARM-01
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 501
+    snapshot_name: Post-configuration
+
+- name: Take post-configuration snapshot of SWARM-02
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 502
+    snapshot_name: Post-configuration
+
+- name: Take post-configuration snapshot of SWARM-03
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 503
+    snapshot_name: Post-configuration
+
+- name: Take post-configuration snapshot of SWARM-04
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 504
+    snapshot_name: Post-configuration
+
+- name: Take post-configuration snapshot of SWARM-05
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 505
+    snapshot_name: Post-configuration

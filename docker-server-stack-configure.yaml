@@ -13,7 +13,7 @@
     user: abeckett
 
 ##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
-- name: Take pre-service-configuration snapshot of VM-DOCKER-SERVER-01
+- name: Take pre-service-configuration snapshot of VM-DOCKER-PROXY
   hosts: hypervisor_01
   roles:
     - proxmox-snapshot
@@ -21,7 +21,7 @@
     vm_id: 101
     snapshot_name: Pre-service-configuration
 
-- name: Take pre-service-configuration snapshot of VM-DOCKER-SERVER-02
+- name: Take pre-service-configuration snapshot of VM-DOCKER-MANAGEMENT
   hosts: hypervisor_01
   roles:
     - proxmox-snapshot
@@ -29,7 +29,7 @@
     vm_id: 102
     snapshot_name: Pre-service-configuration
 
-- name: Take pre-service-configuration snapshot of VM-DOCKER-SERVER-03
+- name: Take pre-service-configuration snapshot of VM-DOCKER-MEDIA
   hosts: hypervisor_01
   roles:
     - proxmox-snapshot
@@ -37,7 +37,7 @@
     vm_id: 103
     snapshot_name: Pre-service-configuration
 
-- name: Take pre-service-configuration snapshot of VM-DOCKER-SERVER-04
+- name: Take pre-service-configuration snapshot of VM-DOCKER-SERVICES
   hosts: hypervisor_01
   roles:
     - proxmox-snapshot
@@ -56,33 +56,33 @@
 
 ##### SERVICE-SPECIFIC CONFIGURATIONS
 - name: Configure GlusterFS and start the service
-  hosts: docker_server_04
+  hosts: docker_proxy
   roles:
     - glusterfs-configure
   vars:
     nodes:
-      - VM-DOCKER-SERVER-01.hyvecloud.local
-      - VM-DOCKER-SERVER-02.hyvecloud.local
-      - VM-DOCKER-SERVER-03.hyvecloud.local
+      - VM-DOCKER-MANAGEMENT.hyvecloud.internal
+      - VM-DOCKER-MEDIA.hyvecloud.internal
+      - VM-DOCKER-SERVICES.hyvecloud.internal
     replicas: 4
     cluster:
-      - VM-DOCKER-SERVER-01.hyvecloud.local
-      - VM-DOCKER-SERVER-02.hyvecloud.local
-      - VM-DOCKER-SERVER-03.hyvecloud.local
-      - VM-DOCKER-SERVER-04.hyvecloud.local
+      - VM-DOCKER-PROXY.hyvecloud.internal
+      - VM-DOCKER-MANAGEMENT.hyvecloud.internal
+      - VM-DOCKER-MEDIA.hyvecloud.internal
+      - VM-DOCKER-SERVICES.hyvecloud.internal
 
 - name: Mount glusterfs share to VMs
   hosts: docker_virtual_machines
   roles: 
     - glusterfs-mount
 
-- name: Deploy Portainer to Proxy node
-  hosts: docker_server_04
+- name: Deploy Portainer to Management node
+  hosts: docker_management
   roles: 
     - docker-portainer-deploy
 
 - name: Deploy Portainer-agent to other Docker servers
-  hosts: docker_server_01,docker_server_02,docker_server_03
+  hosts: docker_proxy,docker_media,docker_services
   roles: 
     - docker-portainer-agent-deploy
 
@@ -92,7 +92,7 @@
   roles: 
     - reboot
 
-- name: Take post-configuration snapshot of VM-DOCKER-SERVER-01
+- name: Take post-configuration snapshot of VM-DOCKER-PROXY
   hosts: hypervisor_01
   roles:
     - proxmox-snapshot
@@ -100,7 +100,7 @@
     vm_id: 101
     snapshot_name: Post-configuration
 
-- name: Take post-configuration snapshot of VM-DOCKER-SERVER-02
+- name: Take post-configuration snapshot of VM-DOCKER-MANAGEMENT
   hosts: hypervisor_01
   roles:
     - proxmox-snapshot
@@ -108,7 +108,7 @@
     vm_id: 102
     snapshot_name: Post-configuration
 
-- name: Take post-configuration snapshot of VM-DOCKER-SERVER-03
+- name: Take post-configuration snapshot of VM-DOCKER-MEDIA
   hosts: hypervisor_01
   roles:
     - proxmox-snapshot
@@ -116,7 +116,7 @@
     vm_id: 103
     snapshot_name: Post-configuration
 
-- name: Take post-configuration snapshot of VM-DOCKER-SERVER-04
+- name: Take post-configuration snapshot of VM-DOCKER-SERVICES
   hosts: hypervisor_01
   roles:
     - proxmox-snapshot

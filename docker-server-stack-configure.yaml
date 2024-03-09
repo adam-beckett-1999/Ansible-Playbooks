@@ -6,7 +6,7 @@
     - base-packages
     - disable-motd-ubuntu
     - qemu-guest-agent-install
-    - cockpit-install
+    - webmin-install
     - snmp-configure
     - network-share-mount
   vars:

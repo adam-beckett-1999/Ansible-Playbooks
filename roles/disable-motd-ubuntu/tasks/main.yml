@@ -2,3 +2,9 @@
   ansible.builtin.shell: |
         chmod -x /etc/update-motd.d/*
   changed_when: false
+- name: Disable the MOTD service to stop errors
+  ansible.builtin.systemd_service:
+      name: motd-news.service
+      enabled: false
+      state: stopped
+      masked: true

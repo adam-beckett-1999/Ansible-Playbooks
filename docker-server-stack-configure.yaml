@@ -75,6 +75,8 @@
   hosts: docker_virtual_machines
   roles: 
     - glusterfs-mount
+  vars:
+    user: abeckett
 
 - name: Deploy Portainer to Management node
   hosts: docker_management

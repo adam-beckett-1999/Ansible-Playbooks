@@ -71,11 +71,6 @@
       - VM-DOCKER-MEDIA.hyvecloud.internal
       - VM-DOCKER-SERVICES.hyvecloud.internal
 
-- name: Mount glusterfs share to VMs
-  hosts: docker_virtual_machines
-  roles: 
-    - glusterfs-mount
-
 - name: Deploy Portainer to Management node
   hosts: docker_management
   roles: 

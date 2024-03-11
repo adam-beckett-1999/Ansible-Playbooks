@@ -75,6 +75,8 @@
   hosts: docker_management
   roles: 
     - docker-portainer-deploy
+  vars:
+    user: abeckett
 
 - name: Deploy Portainer-agent to other Docker servers
   hosts: docker_proxy,docker_media,docker_services

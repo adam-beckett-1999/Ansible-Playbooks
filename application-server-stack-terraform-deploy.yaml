@@ -7,7 +7,7 @@
     - terraform-apply
   vars:
     vm_stack: app-servers
-    project_dir: /home/abeckett/terraform/proxmox/app-servers
+    project_dir: /home/terraform/proxmox/app-servers
 
 ##### FIRST BOOT AND PAUSE FOR UPDATES
 - name: Start vm-app-server-01

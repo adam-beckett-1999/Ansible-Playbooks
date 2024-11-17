@@ -2,4 +2,3 @@
   hosts: cluster_01
   roles:
     - update
-    - mattermost-notify-success

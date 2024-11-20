@@ -14,6 +14,11 @@
     dest: /etc/snmp/snmpd.conf
     mode: '777'
     owner: root
+- name: Download the distro script for LibreNMS to identify OS version
+  get_url:
+    url: https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
+    dest: /usr/bin/distro
+    mode: '0755'
 - name: Start and enable SNMPd systemd service.
   ansible.builtin.systemd:
     name: snmpd

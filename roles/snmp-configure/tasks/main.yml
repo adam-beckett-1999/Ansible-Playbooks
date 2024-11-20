@@ -24,12 +24,3 @@
   ansible.builtin.systemd:
     name: snmpd
     state: restarted
-- name: Test that SNMP is working
-  community.general.snmp_facts:
-    host: '{{ inventory_hostname }}'
-    version: v2c
-    community: HyvecloudSNMP
-  register: response
-- name: Print the results of the test
-  ansible.builtin.debug:
-    var: response

@@ -5,7 +5,6 @@
     - update
     - base-packages
     - disable-motd-ubuntu
-    - cockpit-install
     - snmp-configure
   vars:
     user: root

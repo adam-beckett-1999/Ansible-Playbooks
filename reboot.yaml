@@ -2,4 +2,3 @@
   hosts: '*'
   roles:
     - reboot
-    - mattermost-notify-reboot

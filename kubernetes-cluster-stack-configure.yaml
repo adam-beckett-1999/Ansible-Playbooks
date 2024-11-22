@@ -6,12 +6,12 @@
     - base-packages
     - disable-motd-ubuntu
     - qemu-guest-agent-install
-    - cockpit-install
+    - webmin-install
     - snmp-configure
     - network-share-mount
     - k3s-prerequisites
   vars:
-    k3s_version: v1.27.10+k3s2
+    k3s_version: v1.31.2+k3s1
     user: abeckett
 
 ##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
@@ -20,7 +20,7 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 201
+    vm_id: 301
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-K3S-SERVER-02
@@ -28,7 +28,7 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 202
+    vm_id: 302
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-K3S-SERVER-03
@@ -36,7 +36,7 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 203
+    vm_id: 303
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-K3S-SERVER-04
@@ -44,7 +44,7 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 204
+    vm_id: 304
     snapshot_name: Pre-service-configuration
 
 - name: Take pre-service-configuration snapshot of VM-K3S-SERVER-05
@@ -52,7 +52,7 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 205
+    vm_id: 305
     snapshot_name: Pre-service-configuration
 
 ##### K3S INSTALL AND DEPLOYMENT
@@ -61,7 +61,7 @@
   roles:
     - k3s-master-deploy
   vars:
-    master_ip: 192.168.0.171
+    master_ip: 192.168.0.181
     ansible_user: abeckett
 
 - name: Deploy K3s to worker nodes
@@ -69,7 +69,7 @@
   roles:
     - k3s-node-deploy
   vars:
-    master_ip: 192.168.0.171
+    master_ip: 192.168.0.181
 
 - name: Reboot Virtual Machines
   hosts: kubernetes_virtual_machines
@@ -80,7 +80,6 @@
   hosts: vm_k3s_server_01
   roles:
     - kubernetes-portainer-agent-deploy
-    - rancher-install
 
 ##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-01
@@ -88,7 +87,7 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 201
+    vm_id: 301
     snapshot_name: Post-service-configuration
 
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-02
@@ -96,7 +95,7 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 202
+    vm_id: 302
     snapshot_name: Post-service-configuration
 
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-03
@@ -104,7 +103,7 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 203
+    vm_id: 303
     snapshot_name: Post-service-configuration
 
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-04
@@ -112,7 +111,7 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 204
+    vm_id: 304
     snapshot_name: Post-service-configuration
 
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-05
@@ -120,5 +119,5 @@
   roles:
     - proxmox-snapshot
   vars:
-    vm_id: 205
+    vm_id: 305
     snapshot_name: Post-service-configuration

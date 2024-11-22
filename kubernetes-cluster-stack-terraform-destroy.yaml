@@ -1,7 +1,0 @@
-- name: Destroy current Terraform Kubernetes Cluster deployment on Proxmox
-  hosts: localhost
-  gather_facts: false
-  roles:
-    - terraform-destroy
-  vars:
-    project_dir: /home/terraform/proxmox/kubernetes-cluster

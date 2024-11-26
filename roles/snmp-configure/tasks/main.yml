@@ -5,9 +5,6 @@
       - snmp
       - libsnmp-dev
     state: present
-- name: Install pysnmp for testing SNMP on hosts
-  ansible.builtin.pip:
-    name: pysnmp
 - name: Configure SNMP
   ansible.builtin.template:
     src: snmp.conf.j2

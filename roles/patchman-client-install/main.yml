@@ -26,3 +26,5 @@
     minute: "0"
     hour: "1"
     job: "/usr/bin/patchman-client"
+- name: Run Patchman Client
+  command: /usr/bin/patchman-client

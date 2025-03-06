@@ -25,6 +25,6 @@
     name: "Run Patchman Client daily"
     minute: "0"
     hour: "1"
-    job: "/usr/bin/patchman-client"
+    job: "/usr/sbin/patchman-client"
 - name: Run Patchman Client
-  ansible.builtin.command: /usr/bin/patchman-client
+  ansible.builtin.command: /usr/sbin/patchman-client

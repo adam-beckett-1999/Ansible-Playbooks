@@ -1,4 +1,7 @@
 - name: Install the patchman client on servers
   hosts: docker_virtual_machines,game_server_virtual_machines,lxc_containers
   roles:
+    - pause
     - patchman-client-install
+  vars:
+    time: 5

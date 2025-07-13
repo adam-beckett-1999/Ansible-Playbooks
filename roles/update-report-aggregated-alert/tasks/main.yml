@@ -47,7 +47,7 @@
     embed_fields: "{{ embed_fields + [item_field] }}"
   vars:
     item_field:
-      name: "{{ item.hostname | default('Unknown Host') }} (📦 {{ item.upgradable | default([]) | length }}, ⚠ {{ item.security | default([]) | length }} sec)"
+      name: "{{ item.hostname | default('Unknown Host') }} (📦 {{ item.upgradable | default([]) | length }}, ⚠️ {{ item.security | default([]) | length }} sec)"
       value: |
         **🔐 Security Updates:**
         {% if item.security | default([]) | length > 0 %}
@@ -64,7 +64,6 @@
         {% endif %}
 
         ​ 
-        _________________________________________________
       inline: false
   loop: "{{ all_reports }}"
   run_once: true

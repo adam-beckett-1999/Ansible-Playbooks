@@ -42,32 +42,89 @@
   set_fact:
     embed_fields: []
 
-- name: Append embed field and visual spacer for each report
+- name: Append embed field and visual spacer for each report (with truncation)
   set_fact:
     embed_fields: "{{ embed_fields + [item_field, spacer_field] }}"
   vars:
-    item_field:
-      name: "{{ item.hostname | default('Unknown Host') }} (📦 {{ item.upgradable | default([]) | length }}, ⚠ {{ item.security | default([]) | length }} sec)"
-      value: |
-        **🔐 Security Updates:**
-        {% if item.security | default([]) | length > 0 %}
-        {{ item.security | map('regex_replace', '^', '• ') | join('\n') }}
-        {% else %}
-        ✅ No security updates
-        {% endif %}
+    truncated_value: >-
+      {{
+        (
+          (
+            '**🔐 Security Updates:**\n' +
+            (
+              item.security | default([]) | length > 0
+              and (item.security | map('regex_replace', '^', '• ') | join('\n'))
+              or '✅ No security updates'
+            ) +
+            '\n\n**📦 All Upgradable Packages:**\n' +
+            (
+              item.upgradable | default([]) | length > 0
+              and (item.upgradable | map('regex_replace', '^', '• ') | join('\n'))
+              or '✅ System is fully up-to-date'
+            )
+          )[:1020] ~ '…'
+          if (
+            (
+              '**🔐 Security Updates:**\n' +
+              (
+                item.security | default([]) | length > 0
+                and (item.security | map('regex_replace', '^', '• ') | join('\n'))
+                or '✅ No security updates'
+              ) +
+              '\n\n**📦 All Upgradable Packages:**\n' +
+              (
+                item.upgradable | default([]) | length > 0
+                and (item.upgradable | map('regex_replace', '^', '• ') | join('\n'))
+                or '✅ System is fully up-to-date'
+              )
+            ) | length > 1024
+          )
+          else
+          (
+            '**🔐 Security Updates:**\n' +
+            (
+              item.security | default([]) | length > 0
+              and (item.security | map('regex_replace', '^', '• ') | join('\n'))
+              or '✅ No security updates'
+            ) +
+            '\n\n**📦 All Upgradable Packages:**\n' +
+            (
+              item.upgradable | default([]) | length > 0
+              and (item.upgradable | map('regex_replace', '^', '• ') | join('\n'))
+              or '✅ System is fully up-to-date'
+            )
+          )
+      }}
 
-        **📦 All Upgradable Packages:**
-        {% if item.upgradable | default([]) | length > 0 %}
-        {{ item.upgradable | map('regex_replace', '^', '• ') | join('\n') }}
-        {% else %}
-        ✅ System is fully up-to-date
-        {% endif %}
+    item_field:
+      name: >-
+        {{
+          (
+            item.hostname | default('Unknown Host') ~
+            ' (📦 ' ~ (item.upgradable | default([]) | length) ~
+            ', ⚠ ' ~ (item.security | default([]) | length) ~ ' sec)'
+          )[:250] ~ '…'
+          if (
+            (
+              item.hostname | default('Unknown Host') ~
+              ' (📦 ' ~ (item.upgradable | default([]) | length) ~
+              ', ⚠ ' ~ (item.security | default([]) | length) ~ ' sec)'
+            ) | length > 256
+          )
+          else
+          (
+            item.hostname | default('Unknown Host') ~
+            ' (📦 ' ~ (item.upgradable | default([]) | length) ~
+            ', ⚠ ' ~ (item.security | default([]) | length) ~ ' sec)'
+          )
+        }}
+      value: "{{ truncated_value }}"
       inline: false
 
-    #spacer_field:
-      #name: "\u200B"
-      #value: "\u200B"
-      #inline: false
+    spacer_field:
+      name: "\u200B"
+      value: "\u200B"
+      inline: false
   loop: "{{ all_reports }}"
   run_once: true
 

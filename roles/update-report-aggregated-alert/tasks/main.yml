@@ -63,7 +63,7 @@
         ✅ System is fully up-to-date
         {% endif %}
 
-        ​  # ← This is an actual zero-width space
+        ​ 
       inline: false
   loop: "{{ all_reports }}"
   run_once: true

@@ -114,7 +114,7 @@
                 "type": 2,
                 "style": 5,
                 "label": "Run Update Playbook",
-                "url": "{{ trigger_vms_lxcs_update_playbook_url }}"
+                "url": "{{ vms_lxcs_trigger_update_playbook_url }}"
               }
             ]
           }

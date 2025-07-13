@@ -44,24 +44,26 @@
       {{
         all_reports | map('combine', {
           'field': {
-            'name': report_data.hostname ~
-                    ' (📦 ' ~ (report_data.upgradable | length) ~
-                    ', ⚠️ ' ~ (report_data.security | length) ~ ' sec)',
+            'name': (
+              report_data.get('hostname', 'Unknown Host') ~
+              ' (📦 ' ~ (report_data.get('upgradable', []) | length) ~
+              ', ⚠️ ' ~ (report_data.get('security', []) | length) ~ ' sec)'
+            ),
             'value': (
               '**🔐 Security Updates:**\n' ~
               (
-                report_data.security | length > 0
+                report_data.get('security', []) | length > 0
                 | ternary(
-                    report_data.security | map('regex_replace', '^', '• ') | join('\n'),
+                    report_data.get('security', []) | map('regex_replace', '^', '• ') | join('\n'),
                     '✅ No security updates'
                 )
               )
               ~ '\n\n' ~
               '**📦 All Upgradable Packages:**\n' ~
               (
-                report_data.upgradable | length > 0
+                report_data.get('upgradable', []) | length > 0
                 | ternary(
-                    report_data.upgradable | map('regex_replace', '^', '• ') | join('\n'),
+                    report_data.get('upgradable', []) | map('regex_replace', '^', '• ') | join('\n'),
                     '✅ System is fully up-to-date'
                 )
               )

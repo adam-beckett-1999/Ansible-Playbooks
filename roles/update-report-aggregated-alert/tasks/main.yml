@@ -51,14 +51,14 @@
       value: |
         **🔐 Security Updates:**
         {% if item.security | default([]) | length > 0 %}
-        {{ item.security | join(',  ') }}
+        {{ item.security | map('regex_replace', '^', '• ') | join(',  ') }}
         {% else %}
         ✅ No security updates
         {% endif %}
         
         **📦 All Upgradable Packages:**
         {% if item.upgradable | default([]) | length > 0 %}
-        {{ item.upgradable | join(',  ') }}
+        {{ item.upgradable | map('regex_replace', '^', '• ') | join(',  ') }}
         {% else %}
         ✅ System is fully up-to-date
         {% endif %}
@@ -78,7 +78,7 @@
     body_format: json
     body:
       embeds:
-        - title: "🔐 Aggregate Security Update Report"
+        - title: "🔐 Update Report for VMs & LXCs"
           description: "Summary across {{ all_reports | length }} hosts"
           color: 16753920
           fields: "{{ embed_fields }}"

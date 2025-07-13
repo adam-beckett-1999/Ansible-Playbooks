@@ -86,7 +86,7 @@
             text: "Reported at {{ local_time_uk }}"
   run_once: true
 
-- name: Send Discord prompt with button to trigger update playbook
+- name: Send Discord prompt with styled embed and button
   uri:
     url: "{{ update_report_discord_webhook_url }}"
     method: POST
@@ -95,12 +95,17 @@
     status_code: 204
     body_format: json
     body:
-      content: "**Do you want to trigger the update playbook now?**\nClick the button below to start the update process."
+      embeds:
+        - title: "⚙️ Update Playbook Trigger"
+          description: "Do you want to trigger the update playbook now?\nClick the button below to start the update process."
+          color: 3447003   # A nice blue color
+          footer:
+            text: "Triggered from Ansible"
       components:
         - type: 1
           components:
             - type: 2
-              style: 5
+              style: 5           # Link style button
               label: "Run Update Playbook"
               url: "{{ trigger_update_playbook_url }}"
   run_once: true

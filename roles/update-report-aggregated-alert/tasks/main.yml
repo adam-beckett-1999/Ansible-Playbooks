@@ -47,7 +47,7 @@
     embed_fields: "{{ embed_fields + [item_field] }}"
   vars:
     item_field:
-      name: "{{ item.hostname | default('Unknown Host') }} (📦 {{ item.upgradable | default([]) | length }}, ⚠️ {{ item.security | default([]) | length }} sec)"
+      name: "{{ item.hostname | default('Unknown Host') }} (📦 {{ item.upgradable | default([]) | length }}, ⚠️ {{ item.security | default([]) | length }})"
       value: |
         **🔐 Security Updates:**
         {% if item.security | default([]) | length > 0 %}
@@ -81,7 +81,7 @@
         - title: "🔐 Aggregate Security Update Report"
           description: "Summary across {{ all_reports | length }} hosts"
           color: 16753920
-          fields: "{{ embed_fields }}"
+          fields: "{{ embed_fields | to_nice_yaml | from_yaml }}"
           footer:
             text: "Reported at {{ local_time_uk }}"
   run_once: true

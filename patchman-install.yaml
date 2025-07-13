@@ -1,4 +1,4 @@
 - name: Install the patchman client on servers
-  hosts: game_server_virtual_machines,lxc_containers
+  hosts: lxc_containers,virtual_machines
   roles:
     - patchman-client-install

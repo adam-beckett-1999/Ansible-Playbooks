@@ -1,0 +1,7 @@
+- name: Update packages on LXC containers
+  hosts: lxc_containers,virtual_machines
+  roles:
+    - update
+    - reboot-required-check
+  vars:
+    reboot_status_discord_webhook_url: "{{ lookup('env', 'VMS_LXCS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"

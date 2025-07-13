@@ -4,4 +4,4 @@
     - update
     - reboot-required-check
   vars:
-    update_report_discord_webhook_url: "{{ lookup('env', 'PVE_CLUSTERS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"
+    reboot_status_discord_webhook_url: "{{ lookup('env', 'PVE_CLUSTERS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"

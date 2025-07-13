@@ -27,12 +27,14 @@
   set_fact:
     local_time_uk: "{{ lookup('pipe', 'date -d \"' + ansible_date_time.iso8601 + '\" \"+%Y-%m-%d %H:%M:%S %Z\"') }}"
 
-- name: Collect report data from all hosts
+- name: Collect report data from hosts that defined it
   set_fact:
     all_reports: >-
       {{
         ansible_play_hosts_all
-        | map('extract', hostvars, 'report_data')
+        | map('extract', hostvars)
+        | selectattr('report_data', 'defined')
+        | map(attribute='report_data')
         | list
       }}
 

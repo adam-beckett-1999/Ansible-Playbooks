@@ -51,14 +51,14 @@
       value: |
         **🔐 Security Updates:**
         {% if item.security | default([]) | length > 0 %}
-        {{ item.security | map('regex_replace', '^', '• ') | join('\n') }}
+        {{ item.security | join(',  ') }}
         {% else %}
         ✅ No security updates
         {% endif %}
         
         **📦 All Upgradable Packages:**
         {% if item.upgradable | default([]) | length > 0 %}
-        {{ item.upgradable | map('regex_replace', '^', '• ') | join('\n') }}
+        {{ item.upgradable | join(',  ') }}
         {% else %}
         ✅ System is fully up-to-date
         {% endif %}

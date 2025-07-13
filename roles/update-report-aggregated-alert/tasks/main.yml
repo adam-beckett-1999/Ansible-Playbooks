@@ -42,9 +42,9 @@
   set_fact:
     embed_fields: []
 
-- name: Append embed field for each report
+- name: Append embed field and visual spacer for each report
   set_fact:
-    embed_fields: "{{ embed_fields + [item_field] }}"
+    embed_fields: "{{ embed_fields + [item_field, spacer_field] }}"
   vars:
     item_field:
       name: "{{ item.hostname | default('Unknown Host') }} (📦 {{ item.upgradable | default([]) | length }}, ⚠ {{ item.security | default([]) | length }} sec)"
@@ -62,6 +62,11 @@
         {% else %}
         ✅ System is fully up-to-date
         {% endif %}
+      inline: false
+
+    spacer_field:
+      name: "\u200B"
+      value: "\u200B"
       inline: false
   loop: "{{ all_reports }}"
   run_once: true

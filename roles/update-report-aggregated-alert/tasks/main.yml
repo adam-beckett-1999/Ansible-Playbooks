@@ -42,49 +42,26 @@
   set_fact:
     embed_fields: []
 
-- name: Append embed field and visual spacer for each report (with truncation)
+- name: Append embed field for each report
   set_fact:
-    embed_fields: "{{ embed_fields + [item_field, spacer_field] }}"
+    embed_fields: "{{ embed_fields + [item_field] }}"
   vars:
-    # Build the full value string first
-    full_value: |
-      **🔐 Security Updates:**
-      {% if item.security | default([]) | length > 0 %}
-      {{ item.security | map('regex_replace', '^', '• ') | join('\n') }}
-      {% else %}
-      ✅ No security updates
-      {% endif %}
-
-      **📦 All Upgradable Packages:**
-      {% if item.upgradable | default([]) | length > 0 %}
-      {{ item.upgradable | map('regex_replace', '^', '• ') | join('\n') }}
-      {% else %}
-      ✅ System is fully up-to-date
-      {% endif %}
-
-    # Truncate value safely to 1024 chars for Discord
-    truncated_value: >-
-      {{ (full_value[:1021] + '…') if full_value | length > 1024 else full_value }}
-
-    # Compose and truncate the name string safely to 256 chars
-    full_name: >-
-      {{
-        item.hostname | default('Unknown Host') ~
-        ' (📦 ' ~ (item.upgradable | default([]) | length) ~
-        ', ⚠ ' ~ (item.security | default([]) | length) ~ ' sec)'
-      }}
-
-    truncated_name: >-
-      {{ (full_name[:253] + '…') if full_name | length > 256 else full_name }}
-
     item_field:
-      name: "{{ truncated_name }}"
-      value: "{{ truncated_value }}"
-      inline: false
+      name: "{{ item.hostname | default('Unknown Host') }} (📦 {{ item.upgradable | default([]) | length }}, ⚠ {{ item.security | default([]) | length }} sec)"
+      value: |
+        **🔐 Security Updates:**
+        {% if item.security | default([]) | length > 0 %}
+        {{ item.security | map('regex_replace', '^', '• ') | join('\n') }}
+        {% else %}
+        ✅ No security updates
+        {% endif %}
 
-    spacer_field:
-      name: "\u200B"
-      value: "\u200B"
+        **📦 All Upgradable Packages:**
+        {% if item.upgradable | default([]) | length > 0 %}
+        {{ item.upgradable | map('regex_replace', '^', '• ') | join('\n') }}
+        {% else %}
+        ✅ System is fully up-to-date
+        {% endif %}
       inline: false
   loop: "{{ all_reports }}"
   run_once: true
@@ -105,5 +82,4 @@
           fields: "{{ embed_fields }}"
           footer:
             text: "Reported at {{ local_time_uk }}"
-  when: embed_fields | length > 0
   run_once: true

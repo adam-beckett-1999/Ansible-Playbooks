@@ -19,13 +19,13 @@
 - name: Parse lists into facts
   set_fact:
     report_data:
-      inventory_hostname: "{{ inventory_hostname }}"
-      upgradable_packages: "{{ apt_upgradable_raw.stdout_lines }}"
-      security_updates: "{{ security_updates_raw.stdout_lines }}"
+      hostname: "{{ inventory_hostname }}"
+      upgradable: "{{ apt_upgradable_raw.stdout_lines | default([]) }}"
+      security: "{{ security_updates_raw.stdout_lines | default([]) }}"
 
 - name: Convert UTC time to UK local time (BST/GMT)
   set_fact:
-    local_time_uk: "{{ lookup('pipe', 'date -d \"' + ansible_date_time.iso8601 + '\" \"+%Y-%m-%d %H:%M:%S %Z\"') }}"
+    local_time_uk: "{{ lookup('pipe', 'date \"+%Y-%m-%d %H:%M:%S %Z\"') }}"
 
 - name: Collect report data from hosts that defined it
   set_fact:
@@ -38,40 +38,33 @@
         | list
       }}
 
-- name: Build embed fields for each host with full package details
+- name: Initialise embed_fields list
   set_fact:
-    embed_fields: >-
-      {{
-        all_reports | map('combine', {
-          'field': {
-            'name': (
-              report_data.get('hostname', 'Unknown Host') ~
-              ' (📦 ' ~ (report_data.get('upgradable', []) | length) ~
-              ', ⚠️ ' ~ (report_data.get('security', []) | length) ~ ' sec)'
-            ),
-            'value': (
-              '**🔐 Security Updates:**\n' ~
-              (
-                report_data.get('security', []) | length > 0
-                | ternary(
-                    report_data.get('security', []) | map('regex_replace', '^', '• ') | join('\n'),
-                    '✅ No security updates'
-                )
-              )
-              ~ '\n\n' ~
-              '**📦 All Upgradable Packages:**\n' ~
-              (
-                report_data.get('upgradable', []) | length > 0
-                | ternary(
-                    report_data.get('upgradable', []) | map('regex_replace', '^', '• ') | join('\n'),
-                    '✅ System is fully up-to-date'
-                )
-              )
-            ),
-            'inline': false
-          }
-        }) | map(attribute='field') | list
-      }}
+    embed_fields: []
+
+- name: Append embed field for each report
+  set_fact:
+    embed_fields: "{{ embed_fields + [item_field] }}"
+  vars:
+    item_field:
+      name: "{{ item.hostname | default('Unknown Host') }} (📦 {{ item.upgradable | default([]) | length }}, ⚠ {{ item.security | default([]) | length }} sec)"
+      value: |
+        **🔐 Security Updates:**
+        {% if item.security | default([]) | length > 0 %}
+        {{ item.security | map('regex_replace', '^', '• ') | join('\n') }}
+        {% else %}
+        ✅ No security updates
+        {% endif %}
+
+        **📦 All Upgradable Packages:**
+        {% if item.upgradable | default([]) | length > 0 %}
+        {{ item.upgradable | map('regex_replace', '^', '• ') | join('\n') }}
+        {% else %}
+        ✅ System is fully up-to-date
+        {% endif %}
+      inline: false
+  loop: "{{ all_reports }}"
+  run_once: true
 
 - name: Send single aggregated Discord alert
   uri:
@@ -89,3 +82,4 @@
           fields: "{{ embed_fields }}"
           footer:
             text: "Reported at {{ local_time_uk }}"
+  run_once: true

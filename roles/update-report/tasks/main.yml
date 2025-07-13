@@ -1,0 +1,41 @@
+- name: Update apt cache (Debian/Ubuntu)
+  ansible.builtin.apt:
+    update_cache: yes
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Get list of upgradable packages
+  ansible.builtin.shell: apt list --upgradable 2>/dev/null | tail -n +2
+  register: apt_upgradable_raw
+  changed_when: false
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Get list of security updates
+  ansible.builtin.shell: |
+    unattended-upgrade --dry-run -d | grep "Checking: " | cut -d' ' -f2
+  register: security_updates_raw
+  changed_when: false
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Parse lists into facts
+  set_fact:
+    upgradable_packages: "{{ apt_upgradable_raw.stdout_lines }}"
+    security_updates: "{{ security_updates_raw.stdout_lines }}"
+
+- name: Create a summary report
+  set_fact:
+    security_summary: |
+      🔐 **Update Report** for `{{ inventory_hostname }}`
+      📦 Total upgradable packages: `{{ upgradable_packages | length }}`
+      ⚠️ Security-related packages: `{{ security_updates | length }}`
+      {{ security_updates | map('regex_replace', '^', '🔸 ') | join('\n') }}
+
+- name: Send report to Discord
+  ansible.builtin.uri:
+    url: "{{ discord_webhook_url }}"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      content: "{{ security_summary }}"
+  delegate_to: localhost

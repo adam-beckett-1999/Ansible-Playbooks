@@ -1,0 +1,6 @@
+- name: Security update report and Discord notification
+  hosts: pve_core_cluster_01,pve_mini_cluster_01,lxc_containers
+  roles:
+    - update-report
+  vars:
+    discord_webhook_url: "https://discord.com/api/webhooks/your_webhook_here"

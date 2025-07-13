@@ -63,7 +63,6 @@
         ✅ System is fully up-to-date
         {% endif %}
          
-        \u200B
 
       inline: false
   loop: "{{ all_reports }}"

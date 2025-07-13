@@ -63,12 +63,10 @@
         ✅ System is fully up-to-date
         {% endif %}
 
-        \u200B
-
+        ​  # ← This is an actual zero-width space
       inline: false
   loop: "{{ all_reports }}"
   run_once: true
-
 
 - name: Send single aggregated Discord alert
   uri:

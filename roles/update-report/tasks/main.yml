@@ -31,7 +31,7 @@
 
 - name: Send report to Discord
   ansible.builtin.uri:
-    url: "{{ discord_webhook_url }}"
+    url: "{{ update_report_discord_webhook_url }}"
     method: POST
     headers:
       Content-Type: "application/json"

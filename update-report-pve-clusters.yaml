@@ -1,6 +1,9 @@
 - name: Security update report and Discord notification
   hosts: pve_core_cluster_01,pve_mini_cluster_01
   roles:
-    - update-report-single-alert
+    - update-report-aggregated-alert
   vars:
     update_report_discord_webhook_url: "{{ lookup('env', 'PVE_CLUSTERS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"
+    pve_clusters_trigger_update_playbook_url: "{{ lookup('env', 'PVE_CLUSTERS_TRIGGER_UPDATE_PLAYBOOK_URL') }}"
+    discord_bot_token: "{{ lookup('env', 'DISCORD_BOT_TOKEN') }}"
+    pve_clusters_discord_channel_url: "{{ lookup('env', 'VMS_LXCS_DISCORD_CHANNEL_URL') }}"

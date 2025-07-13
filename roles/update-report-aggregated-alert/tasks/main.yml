@@ -42,11 +42,6 @@
   set_fact:
     embed_fields: []
 
-- name: Debug generated embed payload
-  debug:
-    var: embed_fields
-  run_once: true
-
 - name: Append embed field and visual spacer for each report
   set_fact:
     embed_fields: "{{ embed_fields + [item_field, spacer_field] }}"
@@ -69,10 +64,10 @@
         {% endif %}
       inline: false
 
-    spacer_field:
-      name: "\u200B"
-      value: "\u200B"
-      inline: false
+    #spacer_field:
+      #name: "\u200B"
+      #value: "\u200B"
+      #inline: false
   loop: "{{ all_reports }}"
   run_once: true
 

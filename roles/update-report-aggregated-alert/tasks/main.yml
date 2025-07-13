@@ -112,9 +112,9 @@
             "components": [
               {
                 "type": 2,
-                "style": 1,
+                "style": 5,
                 "label": "Run Update Playbook",
-                "url": "{{ vms_lxcs_trigger_update_playbook_url }}"
+                "url": "{{ trigger_vms_lxcs_update_playbook_url }}"
               }
             ]
           }

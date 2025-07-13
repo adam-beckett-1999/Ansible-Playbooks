@@ -35,6 +35,7 @@
 #    method: POST
 #    headers:
 #      Content-Type: "application/json"
+#    status_code: 204
 #    body_format: json
 #    body:
 #      content: "{{ security_summary }}"
@@ -46,6 +47,7 @@
     method: POST
     headers:
       Content-Type: "application/json"
+    status_code: 204
     body_format: json
     body:
       embeds:

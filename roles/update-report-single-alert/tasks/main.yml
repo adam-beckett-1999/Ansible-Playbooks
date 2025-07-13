@@ -59,3 +59,39 @@
   retries: 5
   delay: 2
   delegate_to: localhost
+
+- name: Send Discord prompt with styled embed and button via bot API
+  uri:
+    url: "{{ discord_channel_url }}"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Bot {{ discord_bot_token }}"
+    body_format: json
+    body: |
+      {
+        "embeds": [
+          {
+            "title": "⚙️ Update Playbook Trigger",
+            "description": "Do you want to trigger the update playbook now?\nClick the button below to start the update process.",
+            "color": 3447003,
+            "footer": {
+              "text": "Triggered from Ansible"
+            }
+          }
+        ],
+        "components": [
+          {
+            "type": 1,
+            "components": [
+              {
+                "type": 2,
+                "style": 5,
+                "label": "Run Update Playbook",
+                "url": "{{ trigger_update_playbook_url }}"
+              }
+            ]
+          }
+        ]
+      }
+  run_once: true

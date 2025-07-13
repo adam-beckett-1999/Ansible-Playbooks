@@ -88,7 +88,7 @@
 
 - name: Send Discord prompt with styled embed and button via bot API
   uri:
-    url: "{{ vms_lxcs_discord_channel_url }}"
+    url: "{{ discord_channel_url }}"
     method: POST
     headers:
       Content-Type: "application/json"
@@ -114,7 +114,7 @@
                 "type": 2,
                 "style": 5,
                 "label": "Run Update Playbook",
-                "url": "{{ vms_lxcs_trigger_update_playbook_url }}"
+                "url": "{{ trigger_update_playbook_url }}"
               }
             ]
           }

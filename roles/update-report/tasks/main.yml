@@ -24,7 +24,7 @@
 - name: Create a summary report
   set_fact:
     security_summary: |
-      🔐 **Update Report** for `{{ inventory_hostname }}`
+      🔧 **Update Report** for `{{ inventory_hostname }}`
       📦 Total upgradable packages: `{{ upgradable_packages | length }}`
       ⚠️ Security-related packages: `{{ security_updates | length }}`
       {{ security_updates | map('regex_replace', '^', '🔸 ') | join('\n') }}
@@ -51,7 +51,7 @@
     body_format: json
     body:
       embeds:
-        - title: "🔐 Update Report"
+        - title: "🔧 Update Report"
           description: "Summary for `{{ inventory_hostname }}`"
           color: 16753920  # Orange-ish highlight (in decimal, 0xFFA500)
           fields:

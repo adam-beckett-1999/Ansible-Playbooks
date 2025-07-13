@@ -84,6 +84,18 @@
           fields: "{{ embed_fields }}"
           footer:
             text: "Reported at {{ local_time_uk }}"
+  run_once: true
+
+- name: Send Discord prompt with button to trigger update playbook
+  uri:
+    url: "{{ update_report_discord_webhook_url }}"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    status_code: 204
+    body_format: json
+    body:
+      content: "**Do you want to trigger the update playbook now?**\nClick the button below to start the update process."
       components:
         - type: 1
           components:

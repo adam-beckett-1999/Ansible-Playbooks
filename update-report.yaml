@@ -2,3 +2,5 @@
   hosts: pve_core_cluster_01,pve_mini_cluster_01,lxc_containers
   roles:
     - update-report
+  vars:
+    update_report_discord_webhook_url: "{{ lookup('env', 'UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"

@@ -92,4 +92,5 @@
           fields: "{{ embed_fields }}"
           footer:
             text: "Reported at {{ local_time_uk }}"
+  when: embed_fields | length > 0
   run_once: true

@@ -68,7 +68,7 @@
   loop: "{{ all_reports }}"
   run_once: true
 
-- name: Send Discord webhook with raw JSON body (bytes)
+- name: Send Discord webhook with raw JSON body
   uri:
     url: "{{ update_report_discord_webhook_url }}"
     method: POST
@@ -76,17 +76,17 @@
       Content-Type: "application/json"
     status_code: 204
     body_format: raw
-    body: |
+    body: >-
       {{
         {
           "embeds": [
             {
               "title": "🔐 Aggregate Security Update Report",
-              "description": "Summary across {{ all_reports | length }} hosts",
+              "description": "Summary across %d hosts" % (all_reports | length),
               "color": 16753920,
-              "fields": {{ embed_fields | to_json }},
+              "fields": embed_fields,
               "footer": {
-                "text": "Reported at {{ local_time_uk }}"
+                "text": "Reported at %s" % local_time_uk
               }
             }
           ]

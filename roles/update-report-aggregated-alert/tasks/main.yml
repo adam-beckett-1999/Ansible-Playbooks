@@ -75,13 +75,19 @@
     headers:
       Content-Type: "application/json"
     status_code: 204
-    body_format: json
-    body:
-      embeds:
-        - title: "🔐 Aggregate Security Update Report"
-          description: "Summary across {{ all_reports | length }} hosts"
-          color: 16753920
-          fields: "{{ embed_fields | to_nice_yaml | from_yaml }}"
-          footer:
-            text: "Reported at {{ local_time_uk }}"
+    body: |
+      {
+        "embeds": [
+          {
+            "title": "🔐 Aggregate Security Update Report",
+            "description": "Summary across {{ all_reports | length }} hosts",
+            "color": 16753920,
+            "fields": {{ embed_fields | to_json }},
+            "footer": {
+              "text": "Reported at {{ local_time_uk }}"
+            }
+          }
+        ]
+      }
+    body_format: raw
   run_once: true

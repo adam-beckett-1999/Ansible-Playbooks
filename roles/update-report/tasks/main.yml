@@ -29,7 +29,18 @@
       ⚠️ Security-related packages: `{{ security_updates | length }}`
       {{ security_updates | map('regex_replace', '^', '🔸 ') | join('\n') }}
 
-- name: Send report to Discord
+#- name: Send report to Discord
+#  ansible.builtin.uri:
+#    url: "{{ update_report_discord_webhook_url }}"
+#    method: POST
+#    headers:
+#      Content-Type: "application/json"
+#    body_format: json
+#    body:
+#      content: "{{ security_summary }}"
+#  delegate_to: localhost
+
+- name: Send report to Discord using embed
   ansible.builtin.uri:
     url: "{{ update_report_discord_webhook_url }}"
     method: POST
@@ -37,5 +48,24 @@
       Content-Type: "application/json"
     body_format: json
     body:
-      content: "{{ security_summary }}"
+      embeds:
+        - title: "🔐 Update Report"
+          description: "Summary for `{{ inventory_hostname }}`"
+          color: 16753920  # Orange-ish highlight (in decimal, 0xFFA500)
+          fields:
+            - name: "📦 Total Upgradable Packages"
+              value: "`{{ upgradable_packages | length }}`"
+              inline: true
+            - name: "⚠️ Security Updates"
+              value: "`{{ security_updates | length }}`"
+              inline: true
+            - name: "🔸 Affected Packages"
+              value: >-
+                {% if security_updates | length > 0 %}
+                  {{ security_updates | map('regex_replace', '^', '• ') | join('\n') }}
+                {% else %}
+                  No security updates found.
+                {% endif %}
+          footer:
+            text: "Reported by Ansible at {{ ansible_date_time.iso8601 }}"
   delegate_to: localhost

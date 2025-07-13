@@ -21,29 +21,9 @@
     upgradable_packages: "{{ apt_upgradable_raw.stdout_lines }}"
     security_updates: "{{ security_updates_raw.stdout_lines }}"
 
-- name: Create a summary report
-  set_fact:
-    security_summary: |
-      🔧 **Update Report** for `{{ inventory_hostname }}`
-      📦 Total upgradable packages: `{{ upgradable_packages | length }}`
-      ⚠️ Security-related packages: `{{ security_updates | length }}`
-      {{ security_updates | map('regex_replace', '^', '🔸 ') | join('\n') }}
-
 - name: Convert UTC time to UK local time (BST/GMT)
   set_fact:
     local_time_uk: "{{ lookup('pipe', 'date -d \"' + ansible_date_time.iso8601 + '\" \"+%Y-%m-%d %H:%M:%S %Z\"') }}"
-
-#- name: Send report to Discord
-#  ansible.builtin.uri:
-#    url: "{{ update_report_discord_webhook_url }}"
-#    method: POST
-#    headers:
-#      Content-Type: "application/json"
-#    status_code: 204
-#    body_format: json
-#    body:
-#      content: "{{ security_summary }}"
-#  delegate_to: localhost
 
 - name: Send report to Discord using embed
   ansible.builtin.uri:

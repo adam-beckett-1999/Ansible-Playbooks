@@ -1,0 +1,87 @@
+- name: Update apt cache (Debian/Ubuntu)
+  ansible.builtin.apt:
+    update_cache: yes
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Get list of upgradable packages
+  ansible.builtin.shell: apt list --upgradable 2>/dev/null | tail -n +2
+  register: apt_upgradable_raw
+  changed_when: false
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Get list of security updates
+  ansible.builtin.shell: |
+    unattended-upgrade --dry-run -d | grep "Checking: " | cut -d' ' -f2
+  register: security_updates_raw
+  changed_when: false
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Parse lists into facts
+  set_fact:
+    report_data:
+      inventory_hostname: "{{ inventory_hostname }}"
+      upgradable_packages: "{{ apt_upgradable_raw.stdout_lines }}"
+      security_updates: "{{ security_updates_raw.stdout_lines }}"
+
+- name: Convert UTC time to UK local time (BST/GMT)
+  set_fact:
+    local_time_uk: "{{ lookup('pipe', 'date -d \"' + ansible_date_time.iso8601 + '\" \"+%Y-%m-%d %H:%M:%S %Z\"') }}"
+
+- name: Collect report data from all hosts
+  set_fact:
+    all_reports: >-
+      {{
+        ansible_play_hosts_all
+        | map('extract', hostvars, 'report_data')
+        | list
+      }}
+
+- name: Build embed fields for each host with full package details
+  set_fact:
+    embed_fields: >-
+      {{
+        all_reports | map('combine', {
+          'field': {
+            'name': report_data.hostname ~
+                    ' (📦 ' ~ (report_data.upgradable | length) ~
+                    ', ⚠️ ' ~ (report_data.security | length) ~ ' sec)',
+            'value': (
+              '**🔐 Security Updates:**\n' ~
+              (
+                report_data.security | length > 0
+                | ternary(
+                    report_data.security | map('regex_replace', '^', '• ') | join('\n'),
+                    '✅ No security updates'
+                )
+              )
+              ~ '\n\n' ~
+              '**📦 All Upgradable Packages:**\n' ~
+              (
+                report_data.upgradable | length > 0
+                | ternary(
+                    report_data.upgradable | map('regex_replace', '^', '• ') | join('\n'),
+                    '✅ System is fully up-to-date'
+                )
+              )
+            ),
+            'inline': false
+          }
+        }) | map(attribute='field') | list
+      }}
+
+- name: Send single aggregated Discord alert
+  uri:
+    url: "{{ update_report_discord_webhook_url }}"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    status_code: 204
+    body_format: json
+    body:
+      embeds:
+        - title: "🔐 Aggregate Security Update Report"
+          description: "Summary across {{ all_reports | length }} hosts"
+          color: 16753920
+          fields: "{{ embed_fields }}"
+          footer:
+            text: "Reported at {{ local_time_uk }}"

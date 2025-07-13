@@ -1,0 +1,6 @@
+- name: Security update report and Discord notification
+  hosts: lxc_containers
+  roles:
+    - update-report-aggregated
+  vars:
+    update_report_discord_webhook_url: "{{ lookup('env', 'VMS_LXCS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"

@@ -29,6 +29,10 @@
       ⚠️ Security-related packages: `{{ security_updates | length }}`
       {{ security_updates | map('regex_replace', '^', '🔸 ') | join('\n') }}
 
+- name: Convert UTC time to UK local time (BST/GMT)
+  set_fact:
+    local_time_uk: "{{ lookup('pipe', 'date -d \"' + ansible_date_time.iso8601 + '\" \"+%Y-%m-%d %H:%M:%S %Z\"') }}"
+
 #- name: Send report to Discord
 #  ansible.builtin.uri:
 #    url: "{{ update_report_discord_webhook_url }}"
@@ -69,5 +73,9 @@
                   No security updates found.
                 {% endif %}
           footer:
-            text: "Reported by Ansible at {{ ansible_date_time.iso8601 }}"
+            text: "Reported by Ansible at {{ local_time_uk }}"
+  register: discord_response
+  until: discord_response.status == 204
+  retries: 5
+  delay: 2
   delegate_to: localhost

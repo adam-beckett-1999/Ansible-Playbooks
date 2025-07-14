@@ -88,7 +88,7 @@
                 "type": 2,
                 "style": 1,
                 "label": "Run Update Playbook",
-                "custom_id": "{{ semaphore_url_id }}"
+                "custom_id": "{{ semaphore_id }}"
               }
             ]
           }

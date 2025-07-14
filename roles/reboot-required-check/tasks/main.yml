@@ -31,4 +31,9 @@
           color: "{{ 16711680 if reboot_required else 65280 }}"  # Red or Green
           footer:
             text: "Checked at {{ ansible_date_time.iso8601 }}"
+  register: discord_response
+  until: discord_response.status == 204
+  retries: 5
+  delay: 2
+  delegate_to: localhost
   when: ansible_facts['os_family'] == "Debian"

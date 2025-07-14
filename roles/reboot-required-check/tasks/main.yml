@@ -2,18 +2,24 @@
   stat:
     path: /var/run/reboot-required
   register: reboot_check
-  when: ansible_facts['os_family'] == "Debian"
+  when: 
+  - ansible_facts['os_family'] == "Debian"
+  - "'lxc' not in inventory_hostname | lower"
 
 - name: Set reboot_required fact
   set_fact:
     reboot_required: "{{ reboot_check.stat.exists | default(false) }}"
-  when: ansible_facts['os_family'] == "Debian"
+  when: 
+  - ansible_facts['os_family'] == "Debian"
+  - "'lxc' not in inventory_hostname | lower"
 
 - name: Debug reboot status
   debug:
     msg: >
       Reboot is {{ 'REQUIRED' if reboot_required else 'not required' }}
-  when: ansible_facts['os_family'] == "Debian"
+  when: 
+  - ansible_facts['os_family'] == "Debian"
+  - "'lxc' not in inventory_hostname | lower"
 
 - name: Send Discord alert about reboot requirement
   uri:
@@ -36,4 +42,6 @@
   retries: 5
   delay: 2
   delegate_to: localhost
-  when: ansible_facts['os_family'] == "Debian"
+  when: 
+  - ansible_facts['os_family'] == "Debian"
+  - "'lxc' not in inventory_hostname | lower"

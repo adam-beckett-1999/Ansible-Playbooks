@@ -86,43 +86,7 @@
             text: "Reported at {{ local_time_uk }}"
   run_once: true
 
-- name: Send Discord prompt with styled embed and button via bot API
-  uri:
-    url: "{{ discord_channel_url }}"
-    method: POST
-    headers:
-      Content-Type: "application/json"
-      Authorization: "Bot {{ discord_bot_token }}"
-    body_format: json
-    body: |
-      {
-        "embeds": [
-          {
-            "title": "⚙️ Update Playbook Trigger",
-            "description": "Do you want to trigger the update playbook now?\nClick the button below to start the update process.",
-            "color": 3447003,
-            "footer": {
-              "text": "Triggered from Ansible"
-            }
-          }
-        ],
-        "components": [
-          {
-            "type": 1,
-            "components": [
-              {
-                "type": 2,
-                "style": 5,
-                "label": "Run Update Playbook",
-                "url": "{{ trigger_update_playbook_url }}"
-              }
-            ]
-          }
-        ]
-      }
-  run_once: true
-
-- name: Send Discord prompt with styled embed and interactive button via bot API (TESTING)
+- name: Send Discord prompt with styled embed and interactive button via bot API
   uri:
     url: "{{ discord_channel_url }}"
     method: POST
@@ -150,7 +114,7 @@
                 "type": 2,
                 "style": 1,
                 "label": "Run Update Playbook",
-                "custom_id": "run_update"
+                "custom_id": "{{ semaphore_url_id }}"
               }
             ]
           }

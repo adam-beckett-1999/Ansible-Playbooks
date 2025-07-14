@@ -4,6 +4,6 @@
     - update-report-aggregated-alert
   vars:
     update_report_discord_webhook_url: "{{ lookup('env', 'VMS_LXCS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"
-    trigger_update_playbook_url: "{{ lookup('env', 'VMS_LXCS_TRIGGER_UPDATE_PLAYBOOK_URL') }}"
+    semaphore_url_id: semaphore_2
     discord_bot_token: "{{ lookup('env', 'DISCORD_BOT_TOKEN') }}"
     discord_channel_url: "{{ lookup('env', 'VMS_LXCS_DISCORD_CHANNEL_URL') }}"

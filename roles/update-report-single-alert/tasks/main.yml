@@ -89,15 +89,15 @@
           color: 16753920  # Orange-ish highlight (in decimal, 0xFFA500)
           fields:
             - name: "📦 Total Upgradable Packages"
-              value: "`{{ upgradable_packages | length }}`"
+              value: "`{{ report_data.upgradable | length }}`"
               inline: true
             - name: "⚠️ Security Updates"
-              value: "`{{ security_updates | length }}`"
+              value: "`{{ report_data.security | length }}`"
               inline: true
             - name: "🔸 Affected Packages"
               value: >-
-                {% if security_updates | length > 0 %}
-                  {{ security_updates | map('regex_replace', '^', '• ') | join('\n') }}
+                {% if report_data.security | length > 0 %}
+                  {{ report_data.security | map('regex_replace', '^', '• ') | join('\n') }}
                 {% else %}
                   No security updates found.
                 {% endif %}

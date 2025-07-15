@@ -1,27 +1,74 @@
-- name: Update apt cache (Debian/Ubuntu)
+- name: Update apt cache [Linux - Debian]
   ansible.builtin.apt:
     update_cache: yes
   when: ansible_facts['os_family'] == "Debian"
 
-- name: Get list of upgradable packages
+- name: Get list of upgradable packages [Debian]
   ansible.builtin.shell: apt list --upgradable 2>/dev/null | tail -n +2
   register: apt_upgradable_raw
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
 
-- name: Get list of security updates
+- name: Get list of security updates [Debian]
   ansible.builtin.shell: |
     unattended-upgrade --dry-run -d | grep "Checking: " | cut -d' ' -f2
   register: security_updates_raw
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
 
-- name: Parse lists into facts
+- name: Ensure dnf plugins are installed [RedHat]
+  ansible.builtin.package:
+    name: dnf-plugins-core
+    state: present
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Get list of upgradable packages [RedHat]
+  ansible.builtin.shell: dnf check-update || true
+  register: dnf_upgradable_raw
+  changed_when: false
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Get list of security updates [RedHat]
+  ansible.builtin.shell: dnf updateinfo list security all || true
+  register: dnf_security_raw
+  changed_when: false
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Get Windows update list (search only)
+  ansible.windows.win_updates:
+    category_names:
+      - SecurityUpdates
+      - CriticalUpdates
+    state: searched
+  register: win_update_result
+  when: ansible_facts['os_family'] == "Windows"
+
+- name: Parse and collect report data [Debian]
   set_fact:
     report_data:
       hostname: "{{ inventory_hostname }}"
+      os_family: Debian
       upgradable: "{{ apt_upgradable_raw.stdout_lines | default([]) }}"
       security: "{{ security_updates_raw.stdout_lines | default([]) }}"
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Parse and collect report data [RedHat]
+  set_fact:
+    report_data:
+      hostname: "{{ inventory_hostname }}"
+      os_family: RedHat
+      upgradable: "{{ dnf_upgradable_raw.stdout_lines | default([]) }}"
+      security: "{{ dnf_security_raw.stdout_lines | default([]) }}"
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Parse and collect report data [Windows]
+  set_fact:
+    report_data:
+      hostname: "{{ inventory_hostname }}"
+      os_family: Windows
+      upgradable: "{{ win_update_result.updates | map(attribute='title') | list }}"
+      security: "{{ win_update_result.updates | selectattr('categories', 'contains', 'SecurityUpdates') | map(attribute='title') | list }}"
+  when: ansible_facts['os_family'] == "Windows"
 
 - name: Convert UTC time to UK local time (BST/GMT)
   set_fact:

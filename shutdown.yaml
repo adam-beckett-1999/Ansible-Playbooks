@@ -1,0 +1,4 @@
+- name: Shutdown hosts
+  hosts: '*'
+  roles:
+    - shutdown

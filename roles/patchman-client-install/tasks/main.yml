@@ -1,0 +1,89 @@
+- name: Download OpenBytes GPG key [Ubuntu/Debian]
+  ansible.builtin.get_url:
+    url: https://repo.openbytes.ie/openbytes.gpg
+    dest: /usr/share/keyrings/openbytes.gpg
+    mode: '0644'
+  when:
+      - ansible_facts.os_family == "Debian"
+- name: Download OpenBytes GPG key [RedHat/CentOS/Rocky]
+  ansible.builtin.get_url:
+    url: https://repo.openbytes.ie/openbytes.gpg
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-openbytes
+    mode: '0644'
+  when:
+      - ansible_facts.os_family == "RedHat"
+- name: Add Patchman repository [Debian]
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/patchman.list
+    content: "deb [signed-by=/usr/share/keyrings/openbytes.gpg] https://repo.openbytes.ie/patchman/debian bookworm main"
+    mode: '0644'
+  when:
+      - ansible_distribution == "Debian"
+- name: Add Patchman repository [Ubuntu]
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/patchman.list
+    content: "deb [signed-by=/usr/share/keyrings/openbytes.gpg] https://repo.openbytes.ie/patchman/ubuntu jammy main"
+    mode: '0644'
+  when:
+      - ansible_distribution == "Debian"
+- name: Add Patchman repository [RedHat/CentOS/Rocky]
+  ansible.builtin.copy:
+    dest: /etc/yum.repos.d/openbytes.repo
+    content: |
+      [openbytes]
+      name=openbytes
+      baseurl=https://repo.openbytes.ie/patchman/el9
+      enabled=1
+      gpgcheck=1
+      gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-openbytes
+    mode: '0644'
+  when:
+      - ansible_facts.os_family == "RedHat"
+- name: Set crypto policies to DEFAULT:SHA1 [RedHat/CentOS/Rocky]
+  ansible.builtin.command:
+    cmd: update-crypto-policies --set DEFAULT:SHA1
+  changed_when: true
+  when:
+      - ansible_facts.os_family == "RedHat"
+- name: Install EPEL release [RedHat/CentOS/Rocky]
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present
+  when:
+      - ansible_facts.os_family == "RedHat"
+- name: Update APT package cache [Ubuntu/Debian]
+  ansible.builtin.apt:
+    update_cache: yes
+  when:
+      - ansible_facts.os_family == "Debian"
+- name: Update DNF cache [RedHat/CentOS/Rocky]
+  ansible.builtin.command:
+    cmd: dnf makecache
+  changed_when: true
+  when:
+      - ansible_facts.os_family == "RedHat"
+- name: Install Patchman Client [Ubuntu/Debian]
+  ansible.builtin.apt:
+    name: patchman-client
+    state: present
+  when:
+      - ansible_facts.os_family == "Debian"
+- name: Install Patchman Client [RedHat/CentOS/Rocky]
+  ansible.builtin.dnf:
+    name: patchman-client
+    state: present
+  when:
+      - ansible_facts.os_family == "RedHat"
+- name: Update Patchman Client configuration
+  ansible.builtin.replace:
+    path: /etc/patchman/patchman-client.conf
+    regexp: 'https://patchman.example.com'
+    replace: 'http://192.168.10.151/patchman/'
+- name: Create cronjob for Patchman Client
+  ansible.builtin.cron:
+    name: "Run Patchman Client daily"
+    minute: "0"
+    hour: "1"
+    job: "/usr/sbin/patchman-client"
+- name: Run Patchman Client
+  ansible.builtin.command: /usr/sbin/patchman-client

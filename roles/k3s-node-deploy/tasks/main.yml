@@ -5,6 +5,7 @@
     owner: root
     group: root
     mode: '755'
+
 - name: Enable and check K3s service
   ansible.builtin.systemd:
     name: k3s-node

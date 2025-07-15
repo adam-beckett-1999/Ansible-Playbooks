@@ -1,5 +1,7 @@
-- name: Update and Reboot the Proxmox Hypervisor
-  hosts: proxmox_servers
+- name: Update packages on proxmox hypervisors
+  hosts: pve_core_cluster_01,pve_mini_cluster_01
   roles:
     - update
-    - reboot
+    - reboot-required-check
+  vars:
+    reboot_status_discord_webhook_url: "{{ lookup('env', 'PVE_CLUSTERS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"

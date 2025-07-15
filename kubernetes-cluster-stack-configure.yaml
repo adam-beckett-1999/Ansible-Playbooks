@@ -1,0 +1,123 @@
+##### INITIAL CONFIGURATION
+- name: Reboot machines, install updates and base packages, configure SNMP and network shares
+  hosts: kubernetes_virtual_machines
+  roles: 
+    - reboot
+    - base-packages
+    - disable-motd-ubuntu
+    - qemu-guest-agent-install
+    - webmin-install
+    - snmp-configure
+    - network-share-mount
+    - k3s-prerequisites
+  vars:
+    k3s_version: v1.31.2+k3s1
+    user: abeckett
+
+##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
+- name: Take pre-service-configuration snapshot of VM-K3S-SERVER-01
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 301
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of VM-K3S-SERVER-02
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 302
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of VM-K3S-SERVER-03
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 303
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of VM-K3S-SERVER-04
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 304
+    snapshot_name: Pre-service-configuration
+
+- name: Take pre-service-configuration snapshot of VM-K3S-SERVER-05
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 305
+    snapshot_name: Pre-service-configuration
+
+##### K3S INSTALL AND DEPLOYMENT
+- name: Deploy K3s to master node
+  hosts: vm_k3s_server_01
+  roles:
+    - k3s-master-deploy
+  vars:
+    master_ip: 192.168.10.191
+    ansible_user: abeckett
+
+- name: Deploy K3s to worker nodes
+  hosts: vm_k3s_server_02,vm_k3s_server_03,vm_k3s_server_04,vm_k3s_server_05
+  roles:
+    - k3s-node-deploy
+  vars:
+    master_ip: 192.168.10.191
+
+- name: Reboot Virtual Machines
+  hosts: kubernetes_virtual_machines
+  roles: 
+    - reboot
+
+- name: Deploy Portainer Agent to cluster
+  hosts: vm_k3s_server_01
+  roles:
+    - kubernetes-portainer-agent-deploy
+
+##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
+- name: Take post-service-configuration snapshot of VM-K3S-SERVER-01
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 301
+    snapshot_name: Post-service-configuration
+
+- name: Take post-service-configuration snapshot of VM-K3S-SERVER-02
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 302
+    snapshot_name: Post-service-configuration
+
+- name: Take post-service-configuration snapshot of VM-K3S-SERVER-03
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 303
+    snapshot_name: Post-service-configuration
+
+- name: Take post-service-configuration snapshot of VM-K3S-SERVER-04
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 304
+    snapshot_name: Post-service-configuration
+
+- name: Take post-service-configuration snapshot of VM-K3S-SERVER-05
+  hosts: hypervisor_01
+  roles:
+    - proxmox-snapshot
+  vars:
+    vm_id: 305
+    snapshot_name: Post-service-configuration

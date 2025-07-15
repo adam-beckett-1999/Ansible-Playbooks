@@ -1,0 +1,3 @@
+- name: Run install script for Cubecoders AMP with extra args for headless installation
+  ansible.builtin.shell: |
+    bash <(wget -qO- getamp.sh) USE_ANSWERS=y ANSWER_AMPUSER="{{ ampuser }}" ANSWER_AMPPASS="{{ amppass }}" ANSWER_SYSPASSWORD="{{ syspass }}" ANSWER_INSTALLJAVA=y ANSWER_INSTALLSRCDSLIBS=y ANSWER_INSTALLDOCKER=y EXT_HOSTNAME="{{ externalhostname }}"

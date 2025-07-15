@@ -1,0 +1,4 @@
+- name: Reboot hosts
+  hosts: '*'
+  roles:
+    - reboot

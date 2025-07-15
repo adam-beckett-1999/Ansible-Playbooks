@@ -1,0 +1,11 @@
+##### INITIAL CONFIGURATION
+- name: Install updates and standard packages, configure SNMP and network shares
+  hosts: lxc_containers
+  roles: 
+    - update
+    - base-packages
+    - disable-motd-ubuntu
+    - webmin-install
+    - snmp-configure
+  vars:
+    user: root

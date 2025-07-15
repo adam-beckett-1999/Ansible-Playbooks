@@ -1,0 +1,47 @@
+- name: Check if reboot is required
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_check
+  when: 
+  - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat"
+  - "'lxc' not in inventory_hostname | lower"
+
+- name: Set reboot_required fact
+  set_fact:
+    reboot_required: "{{ reboot_check.stat.exists | default(false) }}"
+  when: 
+  - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat"
+  - "'lxc' not in inventory_hostname | lower"
+
+- name: Debug reboot status
+  debug:
+    msg: >
+      Reboot is {{ 'REQUIRED' if reboot_required else 'not required' }}
+  when: 
+  - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat"
+  - "'lxc' not in inventory_hostname | lower"
+
+- name: Send Discord alert about reboot requirement
+  uri:
+    url: "{{ reboot_status_discord_webhook_url }}"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    status_code: 204
+    body_format: json
+    body:
+      embeds:
+        - title: "🔁 Reboot Check"
+          description: >-
+            Host `{{ inventory_hostname }}` has {{ '🔴 a pending reboot' if reboot_required else '✅ no reboot required' }}.
+          color: "{{ 16711680 if reboot_required else 65280 }}"  # Red or Green
+          footer:
+            text: "Checked at {{ ansible_date_time.iso8601 }}"
+  register: discord_response
+  until: discord_response.status == 204
+  retries: 5
+  delay: 2
+  delegate_to: localhost
+  when: 
+  - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat"
+  - "'lxc' not in inventory_hostname | lower"

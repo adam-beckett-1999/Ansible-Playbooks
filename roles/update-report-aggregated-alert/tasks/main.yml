@@ -43,11 +43,6 @@
   register: win_update_result
   when: ansible_facts['os_family'] == "Windows"
 
-- name: Debug Windows update structure
-  debug:
-    var: win_update_result
-  when: ansible_facts['os_family'] == "Windows"
-
 - name: Parse and collect report data [Debian]
   set_fact:
     report_data:
@@ -71,8 +66,8 @@
     report_data:
       hostname: "{{ inventory_hostname }}"
       os_family: Windows
-      upgradable: "{{ (win_update_result.updates | default([])) | map(attribute='title') | list }}"
-      security: "{{ (win_update_result.updates | default([])) | map(attribute='title') | list }}"
+      upgradable: "{{ (win_update_result.updates | default({})).values() | map(attribute='title') | list }}"
+      security: "{{ (win_update_result.updates | default({})).values() | selectattr('categories', 'contains', 'Security Updates') | map(attribute='title') | list }}"
   when: ansible_facts['os_family'] == "Windows"
 
 - name: Convert UTC time to UK local time (BST/GMT)
@@ -100,18 +95,30 @@
     embed_fields: "{{ embed_fields + [item_field] }}"
   vars:
     item_field:
-      name: "{{ item.hostname | default('Unknown Host') }} (📦 {{ item.upgradable | default([]) | length }}, ⚠️ {{ item.security | default([]) | length }})"
+      name: "{{ (item.hostname | default('Unknown Host'))[:100] }} (📦 {{ item.upgradable | default([]) | length }}, ⚠️ {{ item.security | default([]) | length }})"
       value: |
         **🔐 Security Updates:**
         {% if item.security | default([]) | length > 0 %}
-        {{ item.security | map('regex_replace', '^', '• ') | join(',  ') }}
+        {% set security_list = item.security | map('regex_replace', '^', '• ') | list %}
+        {% if security_list | join('  ') | length > 800 %}
+        {{ security_list[:5] | join('  ') }}
+        ... and {{ (item.security | length) - 5 }} more
+        {% else %}
+        {{ security_list | join('  ') }}
+        {% endif %}
         {% else %}
         ✅ No security updates
         {% endif %}
         
         **📦 All Upgradable Packages:**
         {% if item.upgradable | default([]) | length > 0 %}
-        {{ item.upgradable | map('regex_replace', '^', '• ') | join(',  ') }}
+        {% set upgradable_list = item.upgradable | map('regex_replace', '^', '• ') | list %}
+        {% if upgradable_list | join('  ') | length > 800 %}
+        {{ upgradable_list[:5] | join('  ') }}
+        ... and {{ (item.upgradable | length) - 5 }} more
+        {% else %}
+        {{ upgradable_list | join('  ') }}
+        {% endif %}
         {% else %}
         ✅ System is fully up-to-date
         {% endif %}
@@ -139,6 +146,11 @@
             text: "Reported at {{ local_time_uk }}"
   run_once: true
   delegate_to: localhost
+
+- name: Wait to avoid Discord rate limits
+  pause:
+    seconds: 2
+  run_once: true
 
 - name: Send Discord prompt with styled embed and interactive button via bot API
   uri:

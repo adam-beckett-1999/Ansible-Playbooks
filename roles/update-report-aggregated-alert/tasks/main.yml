@@ -132,6 +132,7 @@
           footer:
             text: "Reported at {{ local_time_uk }}"
   run_once: true
+  delegate_to: localhost
 
 - name: Send Discord prompt with styled embed and interactive button via bot API
   uri:
@@ -156,3 +157,4 @@
               label: "Run Update Playbook"
               custom_id: "{{ custom_id }}"
   run_once: true
+  delegate_to: localhost

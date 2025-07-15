@@ -132,3 +132,4 @@
               label: "Run Update Playbook"
               custom_id: "{{ custom_id }}"
   run_once: true
+  delegate_to: localhost

@@ -1,5 +1,5 @@
 - name: Security update report and Discord notification
-  hosts: lxc_containers,virtual_machines
+  hosts: virtual_infrastructure
   roles:
     - update-report-aggregated-alert
   vars:

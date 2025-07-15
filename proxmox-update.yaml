@@ -1,5 +1,5 @@
 - name: Update packages on proxmox hypervisors
-  hosts: pve_core_cluster_01,pve_mini_cluster_01
+  hosts: proxmox_clusters
   roles:
     - update
     - reboot-required-check

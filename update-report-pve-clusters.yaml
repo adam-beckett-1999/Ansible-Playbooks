@@ -1,5 +1,5 @@
 - name: Security update report and Discord notification
-  hosts: pve_core_cluster_01,pve_mini_cluster_01
+  hosts: proxmox_clusters
   roles:
     - update-report-single-alert
   vars:

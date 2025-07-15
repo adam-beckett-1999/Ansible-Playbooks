@@ -1,5 +1,5 @@
-- name: Update packages on LXC containers
-  hosts: lxc_containers,virtual_machines
+- name: Update packages on VMs and Linux containers
+  hosts: virtual_infrastructure
   roles:
     - update
     - reboot-required-check

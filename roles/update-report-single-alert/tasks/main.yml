@@ -69,7 +69,7 @@
       hostname: "{{ inventory_hostname }}"
       os_family: Windows
       upgradable: "{{ win_update_result.updates.values() | map(attribute='title') | list if win_update_result.updates is defined else [] }}"
-      security: "{{ win_update_result.updates.values() | selectattr('categories', 'intersect', ['Security Updates', 'Critical Updates', 'Definition Updates']) | map(attribute='title') | list if win_update_result.updates is defined else [] }}"
+      security: "{{ win_update_result.updates.values() | selectattr('categories', 'search', '(Security Updates|Critical Updates|Definition Updates)') | map(attribute='title') | list if win_update_result.updates is defined else [] }}"
   when: ansible_facts['os_family'] == "Windows"
 
 - name: Convert UTC time to UK local time (BST/GMT)

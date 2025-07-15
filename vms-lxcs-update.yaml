@@ -1,4 +1,4 @@
-- name: Update packages on LXC containers
+- name: Update packages on VMs and Linux containers
   hosts: lxc_containers,virtual_machines
   roles:
     - update

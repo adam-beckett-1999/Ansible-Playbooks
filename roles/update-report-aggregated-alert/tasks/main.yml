@@ -78,12 +78,13 @@
   set_fact:
     all_reports: >-
       {{
-        ansible_play_hosts_all
+        ansible_play_hosts
         | map('extract', hostvars)
         | selectattr('report_data', 'defined')
         | map(attribute='report_data')
         | list
       }}
+  run_once: true
 
 - name: Initialise embed_fields list
   set_fact:

@@ -31,7 +31,7 @@
 - name: Install all critical and security updates [Windows]
   ansible.windows.win_updates:
     category_names:
-      - CriticalUpdates
-      - SecurityUpdates
+      - Critical Updates
+      - Security Updates
     state: installed
   when: ansible_facts.os_family == "Windows"

@@ -1,4 +1,4 @@
-- name: Install qemu-guest-agent service for proper compatibility with proxmox hypervisor
+- name: Install qemu-guest-agent service for proper compatibility with Proxmox management
   ansible.builtin.apt:
     name:
       - qemu-guest-agent

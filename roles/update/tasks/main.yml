@@ -33,5 +33,29 @@
     category_names:
       - Critical Updates
       - Security Updates
+      - Updates
+      - Definition Updates
     state: installed
+  register: win_update_result
   when: ansible_facts.os_family == "Windows"
+
+- name: Reboot if required when windows updates stuck waiting on reboot before the rest will install [Windows]
+  ansible.windows.win_reboot:
+    msg: "Rebooting to complete updates"
+    pre_reboot_delay: 30
+    post_reboot_delay: 60
+  when:
+    - ansible_facts.os_family == "Windows"
+    - win_update_result.reboot_required | default(false)
+
+- name: Run Windows update check & install again after reboot [Windows]
+  ansible.windows.win_updates:
+    category_names:
+      - Critical Updates
+      - Security Updates
+      - Updates
+      - Definition Updates
+    state: installed
+  when:
+    - ansible_facts.os_family == "Windows"
+    - win_update_result.reboot_required | default(false)

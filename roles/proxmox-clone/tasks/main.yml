@@ -1,24 +1,26 @@
 - name: Clone virtual-machine template to new VM
   community.general.proxmox_kvm:
-    node: HYPERVISOR-01
+    node: "{{ proxmox_node }}"
     api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: 127.0.0.1
+    api_token_id: "{{ proxmox_token_id }}"
+    api_token_secret: "{{ proxmox_token_secret }}"
+    api_host: "{{ proxmox_node }}"
     clone: template
     vmid: "{{ template_id }}"
     name: "{{ vm_name }}"
     newid: "{{ vm_id }}"
-    storage: pool-1
+    storage: "{{ storage_pool }}"
     format: raw
     timeout: 120
   async: 120
   poll: 10
 - name: Edit cloned virtual-machine with new cloud-init parameters
   community.general.proxmox_kvm:
-    node: phs-hv-01
+    node: "{{ proxmox_node }}"
     api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: 127.0.0.1
+    api_token_id: "{{ proxmox_token_id }}"
+    api_token_secret: "{{ proxmox_token_secret }}"
+    api_host: "{{ proxmox_node }}"
     name: "{{ vm_name }}"
     tags: "{{ tags }}"
     cores: "{{ cores }}"
@@ -27,24 +29,26 @@
     ciuser: "{{ username }}"
     cipassword: "{{ password }}"
     sshkeys: "{{ sshkeys }}"
-    nameservers: 192.168.0.210
+    nameservers: "{{ nameservers }}"
     ipconfig:
       ipconfig0: "{{ ip_address }}"
     update: true
 - name: Re-size cloned virtual-machine disk
   community.general.proxmox_disk:
     api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: 127.0.0.1
+    api_token_id: "{{ proxmox_token_id }}"
+    api_token_secret: "{{ proxmox_token_secret }}"
+    api_host: "{{ proxmox_node }}"
     name: "{{ vm_name }}"
     disk: scsi0
     size: "{{ disk_size }}"
     state: resized
 - name: Start cloned virtual-machine
   community.general.proxmox_kvm:
-    node: phs-hv-01
+    node: "{{ proxmox_node }}"
     api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: 127.0.0.1
+    api_token_id: "{{ proxmox_token_id }}"
+    api_token_secret: "{{ proxmox_token_secret }}"
+    api_host: "{{ proxmox_node }}"
     name: "{{ vm_name }}"
     state: started

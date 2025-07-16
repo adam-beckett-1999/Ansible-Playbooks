@@ -64,6 +64,11 @@
   register: win_reboot_required
   when: ansible_facts['os_family'] == "Windows"
 
+- name: Set reboot_required fact [Windows]
+  set_fact:
+    reboot_required: "{{ win_reboot_required.stdout | trim | bool }}"
+  when: ansible_facts['os_family'] == "Windows"
+
 - name: Send Discord alert about reboot requirement before updates [Windows]
   uri:
     url: "{{ reboot_status_discord_webhook_url }}"
@@ -76,8 +81,8 @@
       embeds:
         - title: "🔁 Reboot required before updates can be installed"
           description: >-
-            Host `{{ inventory_hostname }}` has {{ '🔴 a pending reboot' if win_reboot_required.stdout == 'True' else '✅ no reboot required' }}.
-          color: "{{ 16711680 if win_reboot_required.stdout == 'True' else 65280 }}"
+            Host `{{ inventory_hostname }}` has {{ '🔴 a pending reboot' if reboot_required else '✅ no reboot required' }}.
+          color: "{{ 16711680 if reboot_required else 65280 }}"  # Red or Green
           footer:
             text: "Checked at {{ ansible_date_time.iso8601 }}"
   register: discord_response
@@ -85,9 +90,9 @@
   retries: 5
   delay: 2
   delegate_to: localhost
-  when:
-    - win_reboot_required.stdout == 'True'
-    - ansible_facts['os_family'] == 'Windows'
+  when: 
+  - ansible_facts['os_family'] == "Windows"
+  - reboot_required | default(false)
 
 - name: Reboot if a previous update or change is pending [Windows]
   ansible.windows.win_reboot:
@@ -96,7 +101,7 @@
     post_reboot_delay: 60
   when:
     - ansible_facts.os_family == "Windows"
-    - win_reboot_required.stdout == 'True'
+    - reboot_required | default(false)
 
 - name: Install all critical and security updates [Windows]
   ansible.windows.win_updates:

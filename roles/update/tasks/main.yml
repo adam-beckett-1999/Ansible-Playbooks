@@ -28,6 +28,57 @@
     update_cache: true
   when: ansible_facts.os_family == "RedHat"
 
+
+# Windows: Check and perform reboot if required before updates, then run update+reboot loop
+- name: Check whether a Windows reboot is required before installing pending updates [Windows]
+  ansible.windows.win_shell: |
+    $rebootRequired = $false
+    if (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired" -ErrorAction SilentlyContinue) { $rebootRequired = $true }
+    if (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending" -ErrorAction SilentlyContinue) { $rebootRequired = $true }
+    $sessionManager = Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" -Name "PendingFileRenameOperations" -ErrorAction SilentlyContinue
+    if ($sessionManager) { $rebootRequired = $true }
+    try {
+        $sccmClient = Invoke-WmiMethod -Class CCM_ClientSDK -Name DetermineIfRebootPending -Namespace root\ccm\clientsdk -ErrorAction SilentlyContinue
+        if ($sccmClient -and ($sccmClient.RebootPending -or $sccmClient.IsHardRebootPending)) { $rebootRequired = $true }
+    } catch {}
+    Write-Output $rebootRequired
+  register: win_reboot_required
+  when: ansible_facts['os_family'] == "Windows"
+
+- name: Send Discord alert about reboot requirement before updates [Windows]
+  uri:
+    url: "{{ reboot_status_discord_webhook_url }}"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    status_code: 204
+    body_format: json
+    body:
+      embeds:
+        - title: "🔁 Reboot required before updates can be installed"
+          description: >-
+            Host `{{ inventory_hostname }}` has {{ '🔴 a pending reboot' if win_reboot_required.stdout == 'True' else '✅ no reboot required' }}.
+          color: "{{ 16711680 if win_reboot_required.stdout == 'True' else 65280 }}"
+          footer:
+            text: "Checked at {{ ansible_date_time.iso8601 }}"
+  register: discord_response
+  until: discord_response.status == 204
+  retries: 5
+  delay: 2
+  delegate_to: localhost
+  when:
+    - win_reboot_required.stdout == 'True'
+    - ansible_facts['os_family'] == 'Windows'
+
+- name: Reboot if a previous update or change is pending [Windows]
+  ansible.windows.win_reboot:
+    msg: "Rebooting before starting updates (pending reboot detected)"
+    pre_reboot_delay: 30
+    post_reboot_delay: 60
+  when:
+    - ansible_facts.os_family == "Windows"
+    - win_reboot_required.stdout == 'True'
+
 - name: Install all critical and security updates [Windows]
   ansible.windows.win_updates:
     category_names:
@@ -38,24 +89,3 @@
     state: installed
   register: win_update_result
   when: ansible_facts.os_family == "Windows"
-
-- name: Reboot if required when windows updates stuck waiting on reboot before the rest will install [Windows]
-  ansible.windows.win_reboot:
-    msg: "Rebooting to complete updates"
-    pre_reboot_delay: 30
-    post_reboot_delay: 60
-  when:
-    - ansible_facts.os_family == "Windows"
-    - win_update_result.reboot_required | default(false)
-
-- name: Run Windows update check & install again after reboot [Windows]
-  ansible.windows.win_updates:
-    category_names:
-      - Critical Updates
-      - Security Updates
-      - Updates
-      - Definition Updates
-    state: installed
-  when:
-    - ansible_facts.os_family == "Windows"
-    - win_update_result.reboot_required | default(false)

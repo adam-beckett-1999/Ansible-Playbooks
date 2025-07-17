@@ -15,7 +15,7 @@
   set_fact:
     all_vms_lxcs_parsed: []
 
-- name: Build VM/LXC list
+- name: Build VM/LXC list from parsed data
   set_fact:
     all_vms_lxcs_parsed: "{{ all_vms_lxcs_parsed + [{'type': parts[3], 'id': parts[0], 'name': parts[1], 'state': parts[2]}] }}"
   vars:
@@ -24,6 +24,7 @@
   when:
     - item not in ['VM_START', 'LXC_START', 'END_DATA']
     - parts | length == 4
+    - item != ""
 
 - name: Debug - Show parsed VM/LXC data
   debug:
@@ -39,6 +40,26 @@
 - name: Debug - Show HA resources
   debug:
     var: ha_resources.stdout_lines
+
+- name: Create HA entries for LXCs that exist in HA but not in pct list
+  set_fact:
+    missing_lxcs: []
+
+- name: Find LXCs that are in HA config but not in parsed list
+  set_fact:
+    missing_lxcs: "{{ missing_lxcs + [{'type': 'lxc', 'id': item, 'name': 'lxc-' + item, 'state': 'unknown'}] }}"
+  loop: "{{ ha_resources.stdout_lines }}"
+  when: 
+    - item not in (all_vms_lxcs_parsed | selectattr('type', 'equalto', 'lxc') | map(attribute='id') | list)
+    - item not in (all_vms_lxcs_parsed | selectattr('type', 'equalto', 'vm') | map(attribute='id') | list)
+
+- name: Add missing LXCs to parsed list
+  set_fact:
+    all_vms_lxcs_parsed: "{{ all_vms_lxcs_parsed + missing_lxcs }}"
+
+- name: Debug - Show complete VM/LXC data after adding missing LXCs
+  debug:
+    var: all_vms_lxcs_parsed
 
 - name: Separate HA and non-HA VMs/LXCs
   set_fact:
@@ -65,14 +86,9 @@
     proxmox_non_ha_vms_lxcs: "{{ non_ha_vms_lxcs }}"
     cacheable: yes
 
-- name: Gather initial HA-Managed VMs/LXCs on this node
+- name: Gather initial HA-Managed VMs/LXCs on this node (simplified approach)
   shell: |
-    ha-manager status | awk '/^service/ {
-      # Extract the service name and node from format: service ct:100 (PVE-TEST-NODE-01, started)
-      if ($2 ~ /^(vm|ct):/ && $3 ~ /^'$(hostname)'/) {
-        print $2
-      }
-    }' || true
+    ha-manager status | grep "service.*$(hostname)" | awk '{print $2}' || echo ""
   register: vms_on_node_result
   changed_when: false
 
@@ -82,5 +98,5 @@
 
 - name: Set fact for initial HA-Managed VMs/LXCs on this node
   set_fact:
-    vms_on_node: "{{ vms_on_node_result.stdout_lines }}"
+    vms_on_node: "{{ vms_on_node_result.stdout_lines | select('match', '^(vm|ct):') | list }}"
     cacheable: yes

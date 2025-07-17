@@ -1,0 +1,23 @@
+- name: Get all VMs and LXCs
+  shell: |
+    qm list --full | awk 'NR>1 {print "vm:" $1 ":" $2 ":" $3}'
+    pct list --full | awk 'NR>1 {print "lxc:" $1 ":" $2 ":" $3}'
+  register: all_vms_lxcs_raw
+
+- name: Parse VM/LXC list and filter non-HA managed
+  set_fact:
+    non_ha_vms_lxcs: >-
+      {{
+        all_vms_lxcs_raw.stdout_lines
+        | map('split', ':')
+        | selectattr('1', 'in', ['vm', 'lxc'])
+        | selectattr('2', 'search', '^((?!ha).)*$')  # Exclude HA managed (adjust as needed)
+        | map('extract', [1,2,3])
+        | map('list')
+        | map('combine', [{'type': item.0, 'id': item.1, 'state': item.2}])
+        | list
+      }}
+
+- name: Set fact for non-HA VMs/LXCs
+  set_fact:
+    proxmox_non_ha_vms_lxcs: "{{ non_ha_vms_lxcs }}"

@@ -1,0 +1,9 @@
+- name: Gather initial VMs/LXCs on this node
+  shell: |
+    ha-manager status | awk '/^Resources:/,/^$/ {if ($2 == "started" && $3 == "'$(hostname)'") print $1}'
+  register: vms_on_node_result
+  changed_when: false
+
+- name: Set fact for VMs/LXCs on this node
+  set_fact:
+    vms_on_node: "{{ vms_on_node_result.stdout_lines }}"

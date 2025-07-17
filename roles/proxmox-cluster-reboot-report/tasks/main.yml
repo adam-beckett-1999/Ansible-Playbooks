@@ -16,9 +16,39 @@
 - name: Format embed fields for Discord
   set_fact:
     embed_fields: >-
+      {%- set fields = [] -%}
+      {%- for report in all_reports -%}
+      {{ fields.append({
+        'name': report.host,
+        'value': (report.vms | join(', ')) ~ ' | ',
+        'inline': False
+      }) }}
+      {%- endfor -%}
+      {{ fields }}
+  run_once: true
+
+- name: Format non-HA VM/LXC list for Discord
+  set_fact:
+    non_ha_list_formatted: |
+      {% for item in proxmox_non_ha_vms_lxcs %}
+      - {{ item.type|upper }} {{ item.id }}: {{ item.state|upper }}
+      {% endfor %}
+  when: proxmox_non_ha_vms_lxcs is defined
+  run_once: true
+
+- name: Add non-HA VM/LXC field to embed fields
+  set_fact:
+    embed_fields: >-
       {{
-        all_reports | map(attribute='host') | zip(all_reports | map(attribute='vms')) | map('join', ': ') | map('regex_replace', '^(.*?): (.*)$', {'name': '\\1', 'value': '\\2 | ', 'inline': False}) | list
+        embed_fields + [
+          {
+            'name': 'Non-HA VMs/LXCs',
+            'value': non_ha_list_formatted | default('None found'),
+            'inline': False
+          }
+        ]
       }}
+  when: proxmox_non_ha_vms_lxcs is defined
   run_once: true
 
 - name: Set local time for report

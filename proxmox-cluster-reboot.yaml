@@ -5,16 +5,10 @@
   vars:
     vms_on_node: []
   pre_tasks:
-    - name: Gather initial VMs/LXCs on this node
-      shell: |
-        ha-manager status | awk '/^Resources:/,/^$/ {if ($2 == "started" && $3 == "'$(hostname)'") print $1}'
-      register: vms_on_node_result
-      changed_when: false
-
-    - name: Set fact for VMs/LXCs on this node
-      set_fact:
-        vms_on_node: "{{ vms_on_node_result.stdout_lines }}"
+    
   roles:
+    - proxmox-check-vms
+    - proxmox-migration-check-vms-initial
     - proxmox-node-reboot
     - proxmox-migration-check-vms-returned
 

@@ -1,7 +1,39 @@
+- name: Debug - Check if initial data file exists
+  stat:
+    path: "/tmp/proxmox_initial_data_{{ inventory_hostname }}.yml"
+  register: initial_data_file
+  delegate_to: localhost
+
+- name: Debug - Show file status
+  debug:
+    msg: "Initial data file exists: {{ initial_data_file.stat.exists }}"
+
 - name: Load initial VM/LXC data from file (fallback for variable persistence)
   include_vars: "/tmp/proxmox_initial_data_{{ inventory_hostname }}.yml"
   delegate_to: localhost
-  when: proxmox_non_ha_vms_lxcs is not defined
+  when: 
+    - proxmox_non_ha_vms_lxcs is not defined
+    - initial_data_file.stat.exists
+
+- name: Debug - Check proxmox_non_ha_vms_lxcs variable
+  debug:
+    msg: "proxmox_non_ha_vms_lxcs: {{ proxmox_non_ha_vms_lxcs | default('UNDEFINED') }}"
+
+- name: Test - Get current VMs/LXCs directly
+  shell: |
+    echo "=== QM LIST ==="
+    qm list
+    echo "=== PCT LIST ==="
+    pct list
+    echo "=== HA CONFIG ==="
+    ha-manager config
+    echo "=== HA STATUS ==="
+    ha-manager status
+  register: test_vm_data
+
+- name: Debug - Show direct VM data
+  debug:
+    var: test_vm_data.stdout_lines
 
 - name: Get current HA status for all resources
   shell: |

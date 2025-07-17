@@ -1,13 +1,39 @@
-- name: Get all VMs and LXCs with their states
+- name: Test raw VM and LXC commands separately
+  shell: |
+    echo "=== QM LIST RAW ==="
+    qm list
+    echo "=== PCT LIST RAW ==="
+    pct list
+  register: raw_vm_lxc_test
+
+- name: Debug - Show raw command outputs
+  debug:
+    var: raw_vm_lxc_test.stdout_lines
+
+- name: Test awk patterns separately
+  shell: |
+    echo "=== QM LIST AWK TEST ==="
+    qm list | awk 'NR>1 && NF>=4 {print "FOUND VM: " $1":"$4":"$2":vm"}'
+    echo "=== PCT LIST AWK TEST ==="
+    pct list | awk 'NR>1 && NF>=4 {print "FOUND LXC: " $1":"$4":"$2":lxc"}'
+  register: awk_test
+
+- name: Debug - Show awk test results
+  debug:
+    var: awk_test.stdout_lines
+
+- name: Get all VMs and LXCs with their states (SIMPLIFIED)
   shell: |
     echo "VM_START"
+    qm list | awk 'NR>1 {print "VM_FIELDS: " NF " LINE: " $0}'
     qm list | awk 'NR>1 && NF>=4 {print $1":"$4":"$2":vm"}'
-    echo "LXC_START"
+    echo "LXC_START"  
+    pct list | awk 'NR>1 {print "LXC_FIELDS: " NF " LINE: " $0}'
     pct list | awk 'NR>1 && NF>=4 {print $1":"$4":"$2":lxc"}'
     echo "END_DATA"
   register: all_vms_lxcs_raw
 
-- name: Debug - Show raw VM/LXC data
+- name: Debug - Show raw VM/LXC data with field counts
   debug:
     var: all_vms_lxcs_raw.stdout_lines
 
@@ -25,6 +51,8 @@
     - item not in ['VM_START', 'LXC_START', 'END_DATA']
     - parts | length == 4
     - item != ""
+    - not item.startswith('VM_FIELDS:')
+    - not item.startswith('LXC_FIELDS:')
 
 - name: Debug - Show parsed VM/LXC data from lists
   debug:

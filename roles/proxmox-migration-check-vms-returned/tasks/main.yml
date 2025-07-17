@@ -10,83 +10,69 @@
   debug:
     var: inventory_hostname
 
-- name: Get list of VMs/LXCs currently running on this node (USE ANSIBLE HOSTNAME)
-  shell: |
-    ha-manager status | awk '/^service/ {
-      if ($2 ~ /^(vm|ct):/ && $0 ~ "{{ inventory_hostname }}") {
-        print $2
-      }
-    }'
-  register: vms_now_on_node_raw
-  changed_when: false
-  failed_when: false
-
-- name: Debug - Show raw output from HA status
-  debug:
-    var: vms_now_on_node_raw
-
-- name: Show what the awk command is actually looking for
-  shell: |
-    echo "Looking for hostname: {{ inventory_hostname }}"
-  register: hostname_check
-  changed_when: false
-
-- name: Debug - Show hostname being searched
-  debug:
-    var: hostname_check.stdout
-
-- name: Filter to only valid vm/ct entries (same as initial check)
-  set_fact:
-    vms_now_on_node_filtered: "{{ vms_now_on_node_raw.stdout_lines | select('regex', '^(vm|ct):') | list }}"
-
-- name: Debug - Show filtered entries
-  debug:
-    var: vms_now_on_node_filtered
-
-- name: Create vms_now_on_node for compatibility
-  set_fact:
-    vms_now_on_node:
-      stdout_lines: "{{ vms_now_on_node_filtered }}"
-
-- name: Debug - Show VMs currently on node
-  debug:
-    var: vms_now_on_node.stdout_lines
-
-- name: Debug - Show comparison data
-  debug:
-    msg:
-      - "Expected VMs (vms_on_node): {{ vms_on_node }}"
-      - "Current VMs (vms_now_on_node): {{ vms_now_on_node.stdout_lines }}"
-      - "Missing VMs: {{ vms_on_node | difference(vms_now_on_node.stdout_lines) }}"
-      - "Extra VMs: {{ vms_now_on_node.stdout_lines | difference(vms_on_node) }}"
-
-- name: Show full HA status for troubleshooting
-  shell: ha-manager status
-  register: full_ha_status
-  changed_when: false
-
-- name: Debug - Full HA status
-  debug:
-    var: full_ha_status.stdout_lines
-
 - name: Check if vms_on_node variable exists
   fail:
     msg: "vms_on_node variable not found. Initial VM check may have failed."
   when: vms_on_node is not defined
 
-- name: Check if all VMs/LXCs have returned to this node
-  assert:
-    that:
-      - vms_on_node | difference(vms_now_on_node.stdout_lines) | length == 0
-    fail_msg: "Not all VMs/LXCs have returned to this node. Missing: {{ vms_on_node | difference(vms_now_on_node.stdout_lines) }}. Check the full HA status debug output above."
-    success_msg: "All VMs/LXCs have returned to this node: {{ vms_on_node }}"
-  register: check_result
-  until: check_result is succeeded
-  retries: 15
+- name: Wait for all VMs/LXCs to return to this node (with retries)
+  block:
+    - name: Get list of VMs/LXCs currently running on this node
+      shell: |
+        ha-manager status | awk '/^service/ {
+          if ($2 ~ /^(vm|ct):/ && $0 ~ "{{ inventory_hostname }}") {
+            print $2
+          }
+        }'
+      register: vms_now_on_node_raw
+      changed_when: false
+      failed_when: false
+
+    - name: Filter to only valid vm/ct entries
+      set_fact:
+        vms_now_on_node_filtered: "{{ vms_now_on_node_raw.stdout_lines | select('regex', '^(vm|ct):') | list }}"
+
+    - name: Debug - Show current check iteration
+      debug:
+        msg:
+          - "Expected VMs (vms_on_node): {{ vms_on_node }}"
+          - "Current VMs (vms_now_on_node): {{ vms_now_on_node_filtered }}"
+          - "Missing VMs: {{ vms_on_node | difference(vms_now_on_node_filtered) }}"
+          - "Extra VMs: {{ vms_now_on_node_filtered | difference(vms_on_node) }}"
+
+    - name: Check if all VMs/LXCs have returned
+      assert:
+        that:
+          - vms_on_node | difference(vms_now_on_node_filtered) | length == 0
+        fail_msg: "Not all VMs/LXCs have returned to this node. Missing: {{ vms_on_node | difference(vms_now_on_node_filtered) }}"
+        success_msg: "All VMs/LXCs have returned to this node: {{ vms_on_node }}"
+
+  rescue:
+    - name: Show full HA status for troubleshooting on failure
+      shell: ha-manager status
+      register: full_ha_status
+      changed_when: false
+
+    - name: Debug - Full HA status on failure
+      debug:
+        var: full_ha_status.stdout_lines
+
+    - name: Re-raise the failure
+      fail:
+        msg: "VM/LXC return check failed. See debug output above."
+
+  # This is the retry loop
+  register: vm_return_check
+  until: vm_return_check is succeeded
+  retries: 20
   delay: 30
 
 - name: Set final state for reporting
   set_fact:
-    final_ha_vms_on_node: "{{ vms_now_on_node.stdout_lines }}"
+    final_ha_vms_on_node: "{{ vms_now_on_node_filtered }}"
     migration_check_completed: true
     cacheable: yes
+
+- name: Final success message
+  debug:
+    msg: "✅ All VMs/LXCs have successfully returned to {{ inventory_hostname }}: {{ vms_now_on_node_filtered }}"

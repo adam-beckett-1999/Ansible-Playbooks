@@ -1,15 +1,20 @@
 - name: Wait for HA migrations to settle before checking VMs/LXCs
   pause:
-    seconds: 300
+    seconds: 30
 
 - name: Get list of VMs/LXCs currently running on this node
   shell: |
     ha-manager status | awk '/^Resources:/,/^$/ {if ($2 == "started" && $3 == "'$(hostname)'") print $1}'
   register: vms_now_on_node
+  changed_when: false
 
-- name: Compare original and current VMs/LXCs
+- name: Check if all VMs/LXCs have returned to this node
   assert:
     that:
       - vms_on_node | difference(vms_now_on_node.stdout_lines) | length == 0
     fail_msg: "Not all VMs/LXCs have returned to this node."
     success_msg: "All VMs/LXCs have returned to this node."
+  register: check_result
+  until: check_result is succeeded
+  retries: 10         # Number of times to retry
+  delay: 30           # Wait 30 seconds between retries

@@ -10,10 +10,10 @@
   debug:
     var: inventory_hostname
 
-- name: Get list of VMs/LXCs currently running on this node (FIXED PATTERN)
+- name: Get list of VMs/LXCs currently running on this node (USE ANSIBLE HOSTNAME)
   shell: |
     ha-manager status | awk '/^service/ {
-      if ($2 ~ /^(vm|ct):/ && $0 ~ "'$(hostname)'") {
+      if ($2 ~ /^(vm|ct):/ && $0 ~ "{{ inventory_hostname }}") {
         print $2
       }
     }'
@@ -27,7 +27,7 @@
 
 - name: Show what the awk command is actually looking for
   shell: |
-    echo "Looking for hostname: $(hostname)"
+    echo "Looking for hostname: {{ inventory_hostname }}"
   register: hostname_check
   changed_when: false
 

@@ -104,10 +104,10 @@
     proxmox_non_ha_vms_lxcs: "{{ non_ha_vms_lxcs }}"
     cacheable: yes
 
-- name: Gather initial HA-Managed VMs/LXCs on this node - FIXED PATTERN
+- name: Gather initial HA-Managed VMs/LXCs on this node - USE ANSIBLE HOSTNAME
   shell: |
     ha-manager status | awk '/^service/ {
-      if ($2 ~ /^(vm|ct):/ && $0 ~ "'$(hostname)'") {
+      if ($2 ~ /^(vm|ct):/ && $0 ~ "{{ inventory_hostname }}") {
         print $2
       }
     }'

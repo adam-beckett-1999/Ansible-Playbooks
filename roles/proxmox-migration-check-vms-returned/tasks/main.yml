@@ -13,11 +13,19 @@
   register: vms_now_on_node_raw
   changed_when: false
 
+- name: Debug - Show raw output from HA status
+  debug:
+    var: vms_now_on_node_raw.stdout_lines
+
 - name: Filter to only valid vm/ct entries
   set_fact:
-    vms_now_on_node_filtered: "{{ vms_now_on_node_raw.stdout_lines | select('match', '^(vm|ct):') | list }}"
+    vms_now_on_node_filtered: "{{ vms_now_on_node_raw.stdout_lines | select('regex', '^(vm|ct):') | list }}"
 
-- name: Create mock vms_now_on_node for compatibility
+- name: Debug - Show filtered entries
+  debug:
+    var: vms_now_on_node_filtered
+
+- name: Create vms_now_on_node for compatibility
   set_fact:
     vms_now_on_node:
       stdout_lines: "{{ vms_now_on_node_filtered }}"

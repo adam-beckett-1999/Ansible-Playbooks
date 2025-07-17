@@ -4,10 +4,10 @@
   become: yes
   vars:
     vms_on_node: []
+    all_reports: []
   pre_tasks:
     
   roles:
-    - proxmox-check-vms
     - proxmox-migration-check-vms-initial
     - proxmox-node-reboot
     - proxmox-migration-check-vms-returned
@@ -18,5 +18,6 @@
   become: yes
   vars:
     reboot_report_discord_webhook_url: "{{ lookup('env', 'REBOOT_REPORT_DISCORD_WEBHOOK_URL') }}"
+    all_reports: []
   roles:
     - proxmox-cluster-reboot-report

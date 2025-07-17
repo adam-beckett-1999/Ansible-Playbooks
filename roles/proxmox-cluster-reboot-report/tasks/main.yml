@@ -1,15 +1,32 @@
-- name: Gather running VMs/LXCs on this host
+- name: Gather current HA VM/LXC status on this host
   shell: |
-    ha-manager status | awk '/^Resources:/,/^$/' | grep started | grep $(hostname) | awk '{print $1}'
-  register: running_vms
+    ha-manager status | awk '/^Resources:/,/^$/' | grep $(hostname) | awk '{print $1":"$2}'
+  register: ha_vms_status
 
-- name: Set fact for running VMs/LXCs
+- name: Parse HA VM/LXC status
   set_fact:
-    host_vms: "{{ running_vms.stdout_lines }}"
+    host_ha_vms: >-
+      {%- set vms = [] -%}
+      {%- for line in ha_vms_status.stdout_lines -%}
+        {%- set parts = line.split(':') -%}
+        {%- if parts|length >= 2 -%}
+          {{ vms.append({'name': parts[0], 'state': parts[1]}) }}
+        {%- endif -%}
+      {%- endfor -%}
+      {{ vms }}
 
-- name: Add host and VMs to global list
+- name: Filter non-HA VMs/LXCs for this host
   set_fact:
-    all_reports: "{{ all_reports | default([]) + [ { 'host': inventory_hostname, 'vms': host_vms } ] }}"
+    host_non_ha_vms: "{{ proxmox_non_ha_vms_lxcs | default([]) }}"
+
+- name: Add host data to global report
+  set_fact:
+    all_reports: >-
+      {{ all_reports | default([]) + [{
+        'host': inventory_hostname,
+        'ha_vms': host_ha_vms,
+        'non_ha_vms': host_non_ha_vms
+      }] }}
   delegate_facts: true
   run_once: true
 
@@ -18,37 +35,26 @@
     embed_fields: >-
       {%- set fields = [] -%}
       {%- for report in all_reports -%}
-      {{ fields.append({
-        'name': report.host,
-        'value': (report.vms | join(', ')) ~ ' | ',
-        'inline': False
-      }) }}
+        {%- set ha_vm_list = [] -%}
+        {%- for vm in report.ha_vms -%}
+          {{ ha_vm_list.append(vm.name + " (" + vm.state + ")") }}
+        {%- endfor -%}
+        {%- set non_ha_vm_list = [] -%}
+        {%- for vm in report.non_ha_vms -%}
+          {{ non_ha_vm_list.append(vm.type|upper + " " + vm.id + ":" + vm.name + " (" + vm.state + ")") }}
+        {%- endfor -%}
+        {{ fields.append({
+          'name': '🖥️ ' + report.host + ' - HA VMs/LXCs',
+          'value': (ha_vm_list | join('\n')) if ha_vm_list else 'None',
+          'inline': False
+        }) }}
+        {{ fields.append({
+          'name': '📦 ' + report.host + ' - Non-HA VMs/LXCs',
+          'value': (non_ha_vm_list | join('\n')) if non_ha_vm_list else 'None',
+          'inline': False
+        }) }}
       {%- endfor -%}
       {{ fields }}
-  run_once: true
-
-- name: Format non-HA VM/LXC list for Discord
-  set_fact:
-    non_ha_list_formatted: |
-      {% for item in proxmox_non_ha_vms_lxcs %}
-      - {{ item.type|upper }} {{ item.id }}: {{ item.state|upper }}
-      {% endfor %}
-  when: proxmox_non_ha_vms_lxcs is defined
-  run_once: true
-
-- name: Add non-HA VM/LXC field to embed fields
-  set_fact:
-    embed_fields: >-
-      {{
-        embed_fields + [
-          {
-            'name': 'Non-HA VMs/LXCs',
-            'value': non_ha_list_formatted | default('None found'),
-            'inline': False
-          }
-        ]
-      }}
-  when: proxmox_non_ha_vms_lxcs is defined
   run_once: true
 
 - name: Set local time for report
@@ -68,7 +74,7 @@
     body:
       embeds:
         - title: "✅ Proxmox Cluster Reboot Successful"
-          description: "All nodes rebooted. Here is the list of running VMs/LXCs and their hosts:"
+          description: "All nodes rebooted successfully. Current VM/LXC status:"
           color: 3066993
           fields: "{{ embed_fields }}"
           footer:

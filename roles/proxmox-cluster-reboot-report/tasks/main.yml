@@ -19,25 +19,9 @@
   debug:
     msg: "proxmox_non_ha_vms_lxcs: {{ proxmox_non_ha_vms_lxcs | default('UNDEFINED') }}"
 
-- name: Test - Get current VMs/LXCs directly
-  shell: |
-    echo "=== QM LIST ==="
-    qm list
-    echo "=== PCT LIST ==="
-    pct list
-    echo "=== HA CONFIG ==="
-    ha-manager config
-    echo "=== HA STATUS ==="
-    ha-manager status
-  register: test_vm_data
-
-- name: Debug - Show direct VM data
-  debug:
-    var: test_vm_data.stdout_lines
-
 - name: Get current HA status for all resources
   shell: |
-    ha-manager status | awk '/^Resources:/,/^$/ {if (NF >= 3 && $1 != "Resources:" && $1 != "") print $1":"$2":"$3}'
+    ha-manager status | awk '/^service/ {print $2":"$4":"$3}' | sed 's/[(),]//g'
   register: current_ha_status
   failed_when: false
 
@@ -58,7 +42,7 @@
   when:
     - parts | length >= 3
     - parts[2] == inventory_hostname
-    - parts[1] in ['started', 'stopped']
+    - parts[1] in ['started', 'stopped', 'relocate']
 
 - name: Debug - Current HA VMs on this host
   debug:

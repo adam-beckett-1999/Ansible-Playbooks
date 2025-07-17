@@ -1,9 +1,9 @@
 - name: Get all VMs and LXCs with their states
   shell: |
     echo "VM_START"
-    qm list | awk 'NR>1 {print $1":"$2":"$3":vm"}'
+    qm list | awk 'NR>1 && NF>=4 {print $1":"$4":"$2":vm"}'
     echo "LXC_START"
-    pct list | awk 'NR>1 {print $1":"$2":"$3":lxc"}'
+    pct list | awk 'NR>1 && NF>=4 {print $1":"$4":"$2":lxc"}'
     echo "END_DATA"
   register: all_vms_lxcs_raw
 
@@ -67,7 +67,7 @@
 
 - name: Gather initial HA-Managed VMs/LXCs on this node
   shell: |
-    ha-manager status | awk '/^Resources:/,/^$/ {if ($2 == "started" && $3 == "'$(hostname)'") print $1}'
+    ha-manager status | awk '/^service/ {if ($2 ~ /^(vm|ct):/ && $4 == "started") print $2}' | grep -F "$(hostname)"
   register: vms_on_node_result
   changed_when: false
 

@@ -26,7 +26,7 @@
     - parts | length == 4
     - item != ""
 
-- name: Debug - Show parsed VM/LXC data
+- name: Debug - Show parsed VM/LXC data from lists
   debug:
     var: all_vms_lxcs_parsed
 
@@ -41,23 +41,41 @@
   debug:
     var: ha_resources.stdout_lines
 
-- name: Create HA entries for LXCs that exist in HA but not in pct list
-  set_fact:
-    missing_lxcs: []
+- name: Get detailed info for each HA resource from HA status
+  shell: |
+    ha-manager status | awk '/^service/ {
+      if ($2 ~ /^(vm|ct):/) {
+        # Extract ID from vm:123 or ct:123
+        split($2, parts, ":")
+        resource_type = parts[1]
+        resource_id = parts[2]
+        # Extract node from (NODE-NAME, state)
+        gsub(/[(),]/, "", $3)
+        node = $3
+        gsub(/[(),]/, "", $4)
+        state = $4
+        print resource_id":"resource_type":"state":"node
+      }
+    }'
+  register: ha_status_details
+  changed_when: false
+  failed_when: false
 
-- name: Find LXCs that are in HA config but not in parsed list
-  set_fact:
-    missing_lxcs: "{{ missing_lxcs + [{'type': 'lxc', 'id': item, 'name': 'lxc-' + item, 'state': 'unknown'}] }}"
-  loop: "{{ ha_resources.stdout_lines }}"
-  when: 
-    - item not in (all_vms_lxcs_parsed | selectattr('type', 'equalto', 'lxc') | map(attribute='id') | list)
-    - item not in (all_vms_lxcs_parsed | selectattr('type', 'equalto', 'vm') | map(attribute='id') | list)
+- name: Debug - Show HA status details
+  debug:
+    var: ha_status_details.stdout_lines
 
-- name: Add missing LXCs to parsed list
+- name: Add HA resources with their current status
   set_fact:
-    all_vms_lxcs_parsed: "{{ all_vms_lxcs_parsed + missing_lxcs }}"
+    all_vms_lxcs_parsed: "{{ all_vms_lxcs_parsed + [{'type': parts[1], 'id': parts[0], 'name': parts[1] + '-' + parts[0], 'state': parts[2], 'node': parts[3]}] }}"
+  vars:
+    parts: "{{ item.split(':') }}"
+  loop: "{{ ha_status_details.stdout_lines }}"
+  when:
+    - parts | length >= 4
+    - parts[0] not in (all_vms_lxcs_parsed | selectattr('type', 'equalto', parts[1]) | map(attribute='id') | list)
 
-- name: Debug - Show complete VM/LXC data after adding missing LXCs
+- name: Debug - Show complete VM/LXC data after adding HA resources
   debug:
     var: all_vms_lxcs_parsed
 
@@ -88,7 +106,11 @@
 
 - name: Gather initial HA-Managed VMs/LXCs on this node (simplified approach)
   shell: |
-    ha-manager status | grep "service.*$(hostname)" | awk '{print $2}' || echo ""
+    ha-manager status | awk '/^service/ {
+      if ($2 ~ /^(vm|ct):/ && $3 ~ /^'$(hostname)'/) {
+        print $2
+      }
+    }' || echo ""
   register: vms_on_node_result
   changed_when: false
 
@@ -98,5 +120,5 @@
 
 - name: Set fact for initial HA-Managed VMs/LXCs on this node
   set_fact:
-    vms_on_node: "{{ vms_on_node_result.stdout_lines | select('match', '^(vm|ct):') | list }}"
+    vms_on_node: "{{ vms_on_node_result.stdout_lines | select('regex', '^(vm|ct):') | list }}"
     cacheable: yes

@@ -7,9 +7,13 @@
     var: vms_on_node
     verbosity: 1
 
-- name: Get list of VMs/LXCs currently running on this node (use same format as initial check)
+- name: Get list of VMs/LXCs currently running on this node (EXACT SAME COMMAND AS INITIAL CHECK)
   shell: |
-    ha-manager status | grep "service.*$(hostname)" | awk '{print $2}' || echo ""
+    ha-manager status | awk '/^service/ {
+      if ($2 ~ /^(vm|ct):/ && $3 ~ /^'$(hostname)'/) {
+        print $2
+      }
+    }' || echo ""
   register: vms_now_on_node_raw
   changed_when: false
 
@@ -17,7 +21,7 @@
   debug:
     var: vms_now_on_node_raw.stdout_lines
 
-- name: Filter to only valid vm/ct entries
+- name: Filter to only valid vm/ct entries (same as initial check)
   set_fact:
     vms_now_on_node_filtered: "{{ vms_now_on_node_raw.stdout_lines | select('regex', '^(vm|ct):') | list }}"
 
@@ -33,7 +37,6 @@
 - name: Debug - Show VMs currently on node
   debug:
     var: vms_now_on_node.stdout_lines
-    verbosity: 1
 
 - name: Debug - Show comparison data
   debug:
@@ -41,6 +44,16 @@
       - "Expected VMs (vms_on_node): {{ vms_on_node }}"
       - "Current VMs (vms_now_on_node): {{ vms_now_on_node.stdout_lines }}"
       - "Missing VMs: {{ vms_on_node | difference(vms_now_on_node.stdout_lines) }}"
+      - "Extra VMs: {{ vms_now_on_node.stdout_lines | difference(vms_on_node) }}"
+
+- name: Show full HA status for troubleshooting
+  shell: ha-manager status
+  register: full_ha_status
+  changed_when: false
+
+- name: Debug - Full HA status
+  debug:
+    var: full_ha_status.stdout_lines
 
 - name: Check if vms_on_node variable exists
   fail:
@@ -51,12 +64,12 @@
   assert:
     that:
       - vms_on_node | difference(vms_now_on_node.stdout_lines) | length == 0
-    fail_msg: "Not all VMs/LXCs have returned to this node. Missing: {{ vms_on_node | difference(vms_now_on_node.stdout_lines) }}"
+    fail_msg: "Not all VMs/LXCs have returned to this node. Missing: {{ vms_on_node | difference(vms_now_on_node.stdout_lines) }}. Check the full HA status debug output above."
     success_msg: "All VMs/LXCs have returned to this node: {{ vms_on_node }}"
   register: check_result
   until: check_result is succeeded
-  retries: 10         # Number of times to retry
-  delay: 30           # Wait 30 seconds between retries
+  retries: 15
+  delay: 30
 
 - name: Set final state for reporting
   set_fact:

@@ -1,0 +1,9 @@
+- name: Reboot the node
+  reboot:
+    reboot_timeout: 900
+
+- name: Wait for node to be reachable after reboot
+  wait_for_connection:
+    timeout: 600
+
+

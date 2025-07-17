@@ -1,0 +1,47 @@
+- name: Gather running VMs/LXCs on this host
+  shell: |
+    ha-manager status | awk '/^Resources:/,/^$/' | grep started | grep $(hostname) | awk '{print $1}'
+  register: running_vms
+
+- name: Set fact for running VMs/LXCs
+  set_fact:
+    host_vms: "{{ running_vms.stdout_lines }}"
+
+- name: Add host and VMs to global list
+  set_fact:
+    all_reports: "{{ all_reports | default([]) + [ { 'host': inventory_hostname, 'vms': host_vms } ] }}"
+  delegate_facts: true
+  run_once: true
+
+- name: Format embed fields for Discord
+  set_fact:
+    embed_fields: >-
+      {{
+        all_reports | map(attribute='host') | zip(all_reports | map(attribute='vms')) | map('join', ': ') | map('regex_replace', '^(.*?): (.*)$', {'name': '\\1', 'value': '\\2 | ', 'inline': False}) | list
+      }}
+  run_once: true
+
+- name: Set local time for report
+  set_fact:
+    local_time_uk: "{{ lookup('pipe', 'date -u +\"%Y-%m-%d %H:%M:%S UTC\"') }}"
+  run_once: true
+  delegate_to: localhost
+
+- name: Send single aggregated Discord alert
+  uri:
+    url: "{{ reboot_report_discord_webhook_url }}"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    status_code: 204
+    body_format: json
+    body:
+      embeds:
+        - title: "✅ Proxmox Cluster Reboot Successful"
+          description: "All nodes rebooted. Here is the list of running VMs/LXCs and their hosts:"
+          color: 3066993
+          fields: "{{ embed_fields }}"
+          footer:
+            text: "Reported at {{ local_time_uk }}"
+  run_once: true
+  delegate_to: localhost

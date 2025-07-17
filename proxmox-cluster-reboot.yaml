@@ -1,0 +1,28 @@
+- name: Rolling reboot of Proxmox HA cluster
+  hosts: pve_test_cluster_01
+  serial: 1
+  become: yes
+  vars:
+    vms_on_node: []
+  pre_tasks:
+    - name: Gather initial VMs/LXCs on this node
+      shell: |
+        ha-manager status | awk '/^Resources:/,/^$/ {if ($2 == "started" && $3 == "'$(hostname)'") print $1}'
+      register: vms_on_node_result
+      changed_when: false
+
+    - name: Set fact for VMs/LXCs on this node
+      set_fact:
+        vms_on_node: "{{ vms_on_node_result.stdout_lines }}"
+  roles:
+    - proxmox-node-reboot
+    - proxmox-migration-check-vms-returned
+
+- name: Gather VM/LXC info for reporting and send final report in Discord
+  hosts: pve_test_cluster_01
+  gather_facts: no
+  become: yes
+  vars:
+    reboot_report_discord_webhook_url: "{{ lookup('env', 'REBOOT_REPORT_DISCORD_WEBHOOK_URL') }}"
+  roles:
+    - proxmox-cluster-reboot-report

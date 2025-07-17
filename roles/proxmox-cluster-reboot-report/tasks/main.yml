@@ -42,6 +42,12 @@
   run_once: true
   delegate_to: localhost
 
+- name: Get unique nodes from cluster data
+  set_fact:
+    cluster_nodes: "{{ cluster_vms_sorted | map(attribute='node') | unique | list }}"
+  run_once: true
+  delegate_to: localhost
+
 - name: Create Discord message content
   set_fact:
     discord_message: |
@@ -49,7 +55,8 @@
 
       **Cluster:** {{ ansible_domain | default('Unknown') }}
       **Date:** {{ ansible_date_time.iso8601 }}
-      **Nodes Rebooted:** {{ groups['proxmox_nodes'] | length }}
+      **Nodes Rebooted:** {{ ansible_play_hosts | length }}
+      **Nodes in Cluster:** {{ cluster_nodes | length }}
 
       ### 📊 Current VM/LXC Status:
       ```

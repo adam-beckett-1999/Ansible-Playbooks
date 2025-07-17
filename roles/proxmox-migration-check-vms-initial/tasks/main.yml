@@ -67,9 +67,18 @@
 
 - name: Gather initial HA-Managed VMs/LXCs on this node
   shell: |
-    ha-manager status | awk '/^service/ {if ($2 ~ /^(vm|ct):/ && $4 == "started") print $2}' | grep -F "$(hostname)"
+    ha-manager status | awk '/^service/ {
+      # Extract the service name and node from format: service ct:100 (PVE-TEST-NODE-01, started)
+      if ($2 ~ /^(vm|ct):/ && $3 ~ /^'$(hostname)'/) {
+        print $2
+      }
+    }' || true
   register: vms_on_node_result
   changed_when: false
+
+- name: Debug - Show VMs on this node
+  debug:
+    var: vms_on_node_result.stdout_lines
 
 - name: Set fact for initial HA-Managed VMs/LXCs on this node
   set_fact:

@@ -11,12 +11,13 @@
         all_vms_lxcs_raw.stdout_lines
         | map('split', ':')
         | selectattr('1', 'in', ['vm', 'lxc'])
-        | selectattr('2', 'search', '^((?!ha).)*$')  # Exclude HA managed (adjust as needed)
+        | selectattr('2', 'search', '^((?!ha).)*$')
         | map('extract', [1,2,3])
         | map('list')
         | map('combine', [{'type': item.0, 'id': item.1, 'state': item.2}])
         | list
       }}
+# Exclude HA managed (adjust as needed)
 
 - name: Set fact for non-HA VMs/LXCs
   set_fact:

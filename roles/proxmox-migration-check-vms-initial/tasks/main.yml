@@ -104,21 +104,26 @@
     proxmox_non_ha_vms_lxcs: "{{ non_ha_vms_lxcs }}"
     cacheable: yes
 
-- name: Gather initial HA-Managed VMs/LXCs on this node (simplified approach)
+- name: Gather initial HA-Managed VMs/LXCs on this node - FIXED PATTERN
   shell: |
     ha-manager status | awk '/^service/ {
-      if ($2 ~ /^(vm|ct):/ && $3 ~ /^'$(hostname)'/) {
+      if ($2 ~ /^(vm|ct):/ && $0 ~ "'$(hostname)'") {
         print $2
       }
-    }' || echo ""
+    }'
   register: vms_on_node_result
   changed_when: false
+  failed_when: false
 
-- name: Debug - Show VMs on this node
+- name: Debug - Show raw VMs on this node result
   debug:
-    var: vms_on_node_result.stdout_lines
+    var: vms_on_node_result
 
 - name: Set fact for initial HA-Managed VMs/LXCs on this node
   set_fact:
     vms_on_node: "{{ vms_on_node_result.stdout_lines | select('regex', '^(vm|ct):') | list }}"
     cacheable: yes
+
+- name: Debug - Show final vms_on_node value
+  debug:
+    var: vms_on_node

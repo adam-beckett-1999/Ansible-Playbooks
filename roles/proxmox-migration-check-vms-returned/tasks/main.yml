@@ -5,21 +5,35 @@
 - name: Debug - Show initial VMs that should return
   debug:
     var: vms_on_node
-    verbosity: 1
 
-- name: Get list of VMs/LXCs currently running on this node (EXACT SAME COMMAND AS INITIAL CHECK)
+- name: Debug - Show current hostname
+  debug:
+    var: inventory_hostname
+
+- name: Get list of VMs/LXCs currently running on this node (FIXED PATTERN)
   shell: |
     ha-manager status | awk '/^service/ {
-      if ($2 ~ /^(vm|ct):/ && $3 ~ /^'$(hostname)'/) {
+      if ($2 ~ /^(vm|ct):/ && $0 ~ "'$(hostname)'") {
         print $2
       }
-    }' || echo ""
+    }'
   register: vms_now_on_node_raw
   changed_when: false
+  failed_when: false
 
 - name: Debug - Show raw output from HA status
   debug:
-    var: vms_now_on_node_raw.stdout_lines
+    var: vms_now_on_node_raw
+
+- name: Show what the awk command is actually looking for
+  shell: |
+    echo "Looking for hostname: $(hostname)"
+  register: hostname_check
+  changed_when: false
+
+- name: Debug - Show hostname being searched
+  debug:
+    var: hostname_check.stdout
 
 - name: Filter to only valid vm/ct entries (same as initial check)
   set_fact:

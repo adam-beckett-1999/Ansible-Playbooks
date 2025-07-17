@@ -18,6 +18,24 @@
   failed_when: false
   run_once: true
 
+- name: Debug cluster_vms_raw
+  debug:
+    var: cluster_vms_raw.stdout_lines
+  run_once: true
+  delegate_to: localhost
+
+- name: Debug raw ha-manager output
+  debug:
+    var: cluster_vms_raw.stdout
+  run_once: true
+  delegate_to: localhost
+
+- name: Filter valid VM/LXC lines
+  set_fact:
+    cluster_vms_lines: "{{ cluster_vms_raw.stdout_lines | select('match', '^(vm|ct):[0-9]+:') | list }}"
+  run_once: true
+  delegate_to: localhost
+
 - name: Parse cluster VM/LXC data
   set_fact:
     cluster_vms: []
@@ -26,13 +44,11 @@
 
 - name: Build cluster VM/LXC list
   set_fact:
-    cluster_vms: "{{ cluster_vms + [{'service': parts[0], 'node': parts[1], 'state': parts[2]}] }}"
+    cluster_vms: "{{ cluster_vms + [{'service': parts[0] ~ ':' ~ parts[1], 'node': parts[2], 'state': parts[3]}] }}"
   vars:
     parts: "{{ item.split(':') }}"
-  loop: "{{ cluster_vms_raw.stdout_lines }}"
-  when: 
-    - parts | length == 3
-    - item != ""
+  loop: "{{ cluster_vms_lines }}"
+  when: parts | length == 4
   run_once: true
   delegate_to: localhost
 

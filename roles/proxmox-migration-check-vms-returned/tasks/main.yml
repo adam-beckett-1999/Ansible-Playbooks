@@ -2,19 +2,40 @@
   pause:
     seconds: 30
 
+- name: Debug - Show initial VMs that should return
+  debug:
+    var: vms_on_node
+    verbosity: 1
+
 - name: Get list of VMs/LXCs currently running on this node
   shell: |
     ha-manager status | awk '/^Resources:/,/^$/ {if ($2 == "started" && $3 == "'$(hostname)'") print $1}'
   register: vms_now_on_node
   changed_when: false
 
+- name: Debug - Show VMs currently on node
+  debug:
+    var: vms_now_on_node.stdout_lines
+    verbosity: 1
+
+- name: Check if vms_on_node variable exists
+  fail:
+    msg: "vms_on_node variable not found. Initial VM check may have failed."
+  when: vms_on_node is not defined
+
 - name: Check if all VMs/LXCs have returned to this node
   assert:
     that:
       - vms_on_node | difference(vms_now_on_node.stdout_lines) | length == 0
-    fail_msg: "Not all VMs/LXCs have returned to this node."
-    success_msg: "All VMs/LXCs have returned to this node."
+    fail_msg: "Not all VMs/LXCs have returned to this node. Missing: {{ vms_on_node | difference(vms_now_on_node.stdout_lines) }}"
+    success_msg: "All VMs/LXCs have returned to this node: {{ vms_on_node }}"
   register: check_result
   until: check_result is succeeded
   retries: 10         # Number of times to retry
   delay: 30           # Wait 30 seconds between retries
+
+- name: Set final state for reporting
+  set_fact:
+    final_ha_vms_on_node: "{{ vms_now_on_node.stdout_lines }}"
+    migration_check_completed: true
+    cacheable: yes

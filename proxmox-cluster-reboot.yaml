@@ -5,8 +5,7 @@
   vars:
     vms_on_node: []
     all_reports: []
-  pre_tasks:
-    
+  gather_facts: yes
   roles:
     - proxmox-migration-check-vms-initial
     - proxmox-node-reboot
@@ -14,7 +13,7 @@
 
 - name: Gather VM/LXC info for reporting and send final report in Discord
   hosts: pve_test_cluster_01
-  gather_facts: no
+  gather_facts: yes
   become: yes
   vars:
     reboot_report_discord_webhook_url: "{{ lookup('env', 'REBOOT_REPORT_DISCORD_WEBHOOK_URL') }}"

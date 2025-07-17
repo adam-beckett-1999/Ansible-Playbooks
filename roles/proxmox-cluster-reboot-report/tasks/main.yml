@@ -2,68 +2,87 @@
   shell: |
     ha-manager status | awk '/^Resources:/,/^$/' | grep $(hostname) | awk '{print $1":"$2}'
   register: ha_vms_status
+  failed_when: false
 
-- name: Parse HA VM/LXC status
-  set_fact:
-    host_ha_vms: >-
-      {%- set vms = [] -%}
-      {%- for line in ha_vms_status.stdout_lines -%}
-        {%- set parts = line.split(':') -%}
-        {%- if parts|length >= 2 -%}
-          {{ vms.append({'name': parts[0], 'state': parts[1]}) }}
-        {%- endif -%}
-      {%- endfor -%}
-      {{ vms }}
+- name: Get HA resource IDs for filtering
+  shell: |
+    ha-manager config | grep -E '^(vm|ct):' | awk -F: '{print $2}'
+  register: ha_resource_ids
+  changed_when: false
+  failed_when: false
 
-- name: Filter non-HA VMs/LXCs for this host
+- name: Process current HA VMs data
   set_fact:
-    host_non_ha_vms: "{{ proxmox_non_ha_vms_lxcs | default([]) }}"
+    current_ha_vms_list: []
 
-- name: Add host data to global report
+- name: Build current HA VMs list
   set_fact:
-    all_reports: >-
-      {{ all_reports | default([]) + [{
-        'host': inventory_hostname,
-        'ha_vms': host_ha_vms,
-        'non_ha_vms': host_non_ha_vms
-      }] }}
+    current_ha_vms_list: "{{ current_ha_vms_list + [line.split(':')[0] + ' (' + line.split(':')[1] + ')'] }}"
+  loop: "{{ ha_vms_status.stdout_lines }}"
+  when: ha_vms_status.stdout_lines | length > 0
+
+- name: Use pre-reboot non-HA VM/LXC data from initial check
+  set_fact:
+    pre_reboot_non_ha_list: []
+
+- name: Build pre-reboot non-HA VMs list from initial data
+  set_fact:
+    pre_reboot_non_ha_list: "{{ pre_reboot_non_ha_list + [item.type|upper + ' ' + item.id + ':' + item.name + ' (' + item.state + ')'] }}"
+  loop: "{{ hostvars[inventory_hostname].proxmox_non_ha_vms_lxcs | default([]) }}"
+  when: hostvars[inventory_hostname].proxmox_non_ha_vms_lxcs is defined
+
+- name: Create report using pre-reboot data
+  set_fact:
+    host_report_data:
+      hostname: "{{ inventory_hostname }}"
+      ha_vms_text: "{{ current_ha_vms_list | join('\n') if current_ha_vms_list | length > 0 else 'None' }}"
+      non_ha_vms_text: "{{ pre_reboot_non_ha_list | join('\n') if pre_reboot_non_ha_list | length > 0 else 'None' }}"
+
+- name: Initialize global reports list on first host
+  set_fact:
+    all_host_reports: []
+  when: inventory_hostname == groups['pve_test_cluster_01'][0]
+
+- name: Collect reports from all hosts
+  set_fact:
+    all_host_reports: "{{ all_host_reports | default([]) + [host_report_data] }}"
+  delegate_to: "{{ groups['pve_test_cluster_01'][0] }}"
   delegate_facts: true
-  run_once: true
 
-- name: Format embed fields for Discord
+- name: Create Discord embed fields
   set_fact:
-    embed_fields: >-
-      {%- set fields = [] -%}
-      {%- for report in all_reports -%}
-        {%- set ha_vm_list = [] -%}
-        {%- for vm in report.ha_vms -%}
-          {{ ha_vm_list.append(vm.name + " (" + vm.state + ")") }}
-        {%- endfor -%}
-        {%- set non_ha_vm_list = [] -%}
-        {%- for vm in report.non_ha_vms -%}
-          {{ non_ha_vm_list.append(vm.type|upper + " " + vm.id + ":" + vm.name + " (" + vm.state + ")") }}
-        {%- endfor -%}
-        {{ fields.append({
-          'name': '🖥️ ' + report.host + ' - HA VMs/LXCs',
-          'value': (ha_vm_list | join('\n')) if ha_vm_list else 'None',
-          'inline': False
-        }) }}
-        {{ fields.append({
-          'name': '📦 ' + report.host + ' - Non-HA VMs/LXCs',
-          'value': (non_ha_vm_list | join('\n')) if non_ha_vm_list else 'None',
-          'inline': False
-        }) }}
-      {%- endfor -%}
-      {{ fields }}
-  run_once: true
+    discord_embed_fields: []
+  when: inventory_hostname == groups['pve_test_cluster_01'][0]
 
-- name: Set local time for report
+- name: Build HA VM fields
   set_fact:
-    local_time_uk: "{{ lookup('pipe', 'date -u +\"%Y-%m-%d %H:%M:%S UTC\"') }}"
-  run_once: true
-  delegate_to: localhost
+    discord_embed_fields: "{{ discord_embed_fields + [ha_field] }}"
+  vars:
+    ha_field:
+      name: "🖥️ {{ item.hostname }} - HA VMs/LXCs (Current State)"
+      value: "{{ item.ha_vms_text }}"
+      inline: false
+  loop: "{{ all_host_reports }}"
+  when: inventory_hostname == groups['pve_test_cluster_01'][0]
 
-- name: Send single aggregated Discord alert
+- name: Build non-HA VM fields
+  set_fact:
+    discord_embed_fields: "{{ discord_embed_fields + [non_ha_field] }}"
+  vars:
+    non_ha_field:
+      name: "📦 {{ item.hostname }} - Non-HA VMs/LXCs (Pre-Reboot State)"
+      value: "{{ item.non_ha_vms_text }}"
+      inline: false
+  loop: "{{ all_host_reports }}"
+  when: inventory_hostname == groups['pve_test_cluster_01'][0]
+
+- name: Get current timestamp
+  command: date -u '+%Y-%m-%d %H:%M:%S UTC'
+  register: current_timestamp
+  when: inventory_hostname == groups['pve_test_cluster_01'][0]
+  changed_when: false
+
+- name: Send Discord notification
   uri:
     url: "{{ reboot_report_discord_webhook_url }}"
     method: POST
@@ -74,10 +93,10 @@
     body:
       embeds:
         - title: "✅ Proxmox Cluster Reboot Successful"
-          description: "All nodes rebooted successfully. Current VM/LXC status:"
+          description: "All nodes rebooted successfully. VM/LXC status report:"
           color: 3066993
-          fields: "{{ embed_fields }}"
+          fields: "{{ discord_embed_fields }}"
           footer:
-            text: "Reported at {{ local_time_uk }}"
+            text: "Reported at {{ current_timestamp.stdout }}"
+  when: inventory_hostname == groups['pve_test_cluster_01'][0]
   run_once: true
-  delegate_to: localhost

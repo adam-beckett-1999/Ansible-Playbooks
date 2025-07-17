@@ -6,49 +6,54 @@
     pct list | awk 'NR>1 {print $1":"$2":"$3}'
   register: all_vms_lxcs_raw
 
-- name: Parse VM/LXC list
+- name: Initialize VM/LXC lists
   set_fact:
-    all_vms_lxcs_parsed: >-
-      {%- set vms = [] -%}
-      {%- set lxcs = [] -%}
-      {%- set current_section = "" -%}
-      {%- for line in all_vms_lxcs_raw.stdout_lines -%}
-        {%- if line == "=== VMs ===" -%}
-          {%- set current_section = "vm" -%}
-        {%- elif line == "=== LXCs ===" -%}
-          {%- set current_section = "lxc" -%}
-        {%- elif line and current_section -%}
-          {%- set parts = line.split(':') -%}
-          {%- if parts|length >= 3 -%}
-            {%- if current_section == "vm" -%}
-              {{ vms.append({'type': 'vm', 'id': parts[0], 'name': parts[1], 'state': parts[2]}) }}
-            {%- else -%}
-              {{ lxcs.append({'type': 'lxc', 'id': parts[0], 'name': parts[1], 'state': parts[2]}) }}
-            {%- endif -%}
-          {%- endif -%}
-        {%- endif -%}
-      {%- endfor -%}
-      {{ vms + lxcs }}
+    all_vms_lxcs_parsed: []
+
+- name: Parse VM data
+  set_fact:
+    all_vms_lxcs_parsed: "{{ all_vms_lxcs_parsed + [{'type': 'vm', 'id': parts[0], 'name': parts[1], 'state': parts[2]}] }}"
+  vars:
+    parts: "{{ item.split(':') }}"
+  loop: "{{ all_vms_lxcs_raw.stdout_lines }}"
+  when: 
+    - item != "=== VMs ==="
+    - item != "=== LXCs ==="
+    - item != ""
+    - parts | length >= 3
+    - all_vms_lxcs_raw.stdout_lines.index(item) > all_vms_lxcs_raw.stdout_lines.index("=== VMs ===")
+    - all_vms_lxcs_raw.stdout_lines.index(item) < all_vms_lxcs_raw.stdout_lines.index("=== LXCs ===")
+
+- name: Parse LXC data
+  set_fact:
+    all_vms_lxcs_parsed: "{{ all_vms_lxcs_parsed + [{'type': 'lxc', 'id': parts[0], 'name': parts[1], 'state': parts[2]}] }}"
+  vars:
+    parts: "{{ item.split(':') }}"
+  loop: "{{ all_vms_lxcs_raw.stdout_lines }}"
+  when: 
+    - item != "=== VMs ==="
+    - item != "=== LXCs ==="
+    - item != ""
+    - parts | length >= 3
+    - all_vms_lxcs_raw.stdout_lines.index(item) > all_vms_lxcs_raw.stdout_lines.index("=== LXCs ===")
 
 - name: Get HA-managed resources
   shell: |
-    ha-manager config | grep -E '^(vm|ct):' | awk -F: '{print $1":"$2}'
+    ha-manager config | grep -E '^(vm|ct):' | awk -F: '{print $2}'
   register: ha_resources
   changed_when: false
+  failed_when: false
 
 - name: Separate HA and non-HA VMs/LXCs
   set_fact:
-    ha_vms_lxcs: >-
-      {%- set ha_ids = ha_resources.stdout_lines | map('split', ':') | map('last') | list -%}
-      {{ all_vms_lxcs_parsed | selectattr('id', 'in', ha_ids) | list }}
-    non_ha_vms_lxcs: >-
-      {%- set ha_ids = ha_resources.stdout_lines | map('split', ':') | map('last') | list -%}
-      {{ all_vms_lxcs_parsed | rejectattr('id', 'in', ha_ids) | list }}
+    ha_vms_lxcs: "{{ all_vms_lxcs_parsed | selectattr('id', 'in', ha_resources.stdout_lines) | list }}"
+    non_ha_vms_lxcs: "{{ all_vms_lxcs_parsed | rejectattr('id', 'in', ha_resources.stdout_lines) | list }}"
 
-- name: Set global facts for VM/LXC data
+- name: Set global facts for VM/LXC data (persisted across roles)
   set_fact:
     proxmox_ha_vms_lxcs: "{{ ha_vms_lxcs }}"
     proxmox_non_ha_vms_lxcs: "{{ non_ha_vms_lxcs }}"
+    cacheable: yes
 
 - name: Gather initial HA-Managed VMs/LXCs on this node
   shell: |
@@ -56,6 +61,8 @@
   register: vms_on_node_result
   changed_when: false
 
-- name: Set fact for initial HA-Managed VMs/LXCs on this node
+- name: Set fact for initial HA-Managed VMs/LXCs on this node (persisted)
   set_fact:
     vms_on_node: "{{ vms_on_node_result.stdout_lines }}"
+    initial_ha_vms_on_node: "{{ vms_on_node_result.stdout_lines }}"
+    cacheable: yes

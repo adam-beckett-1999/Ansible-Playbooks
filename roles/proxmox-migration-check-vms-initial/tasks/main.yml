@@ -6,6 +6,10 @@
     pct list | awk 'NR>1 {print $1":"$2":"$3}'
   register: all_vms_lxcs_raw
 
+- name: Debug - Show raw VM/LXC data
+  debug:
+    var: all_vms_lxcs_raw.stdout_lines
+
 - name: Initialize VM/LXC lists
   set_fact:
     all_vms_lxcs_parsed: []
@@ -37,6 +41,10 @@
     - parts | length >= 3
     - all_vms_lxcs_raw.stdout_lines.index(item) > all_vms_lxcs_raw.stdout_lines.index("=== LXCs ===")
 
+- name: Debug - Show parsed VM/LXC data
+  debug:
+    var: all_vms_lxcs_parsed
+
 - name: Get HA-managed resources
   shell: |
     ha-manager config | grep -E '^(vm|ct):' | awk -F: '{print $2}'
@@ -44,10 +52,20 @@
   changed_when: false
   failed_when: false
 
+- name: Debug - Show HA resources
+  debug:
+    var: ha_resources.stdout_lines
+
 - name: Separate HA and non-HA VMs/LXCs
   set_fact:
     ha_vms_lxcs: "{{ all_vms_lxcs_parsed | selectattr('id', 'in', ha_resources.stdout_lines) | list }}"
     non_ha_vms_lxcs: "{{ all_vms_lxcs_parsed | rejectattr('id', 'in', ha_resources.stdout_lines) | list }}"
+
+- name: Debug - Show separated VM/LXC data
+  debug:
+    msg:
+      - "HA VMs/LXCs: {{ ha_vms_lxcs }}"
+      - "Non-HA VMs/LXCs: {{ non_ha_vms_lxcs }}"
 
 - name: Set global facts for VM/LXC data (persisted across roles)
   set_fact:

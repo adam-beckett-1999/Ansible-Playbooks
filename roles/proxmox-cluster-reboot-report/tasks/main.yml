@@ -21,6 +21,10 @@
   loop: "{{ ha_vms_status.stdout_lines }}"
   when: ha_vms_status.stdout_lines | length > 0
 
+- name: Debug - Show proxmox_non_ha_vms_lxcs data
+  debug:
+    msg: "Non-HA VMs/LXCs for {{ inventory_hostname }}: {{ proxmox_non_ha_vms_lxcs | default('UNDEFINED') }}"
+
 - name: Use pre-reboot non-HA VM/LXC data from initial check
   set_fact:
     pre_reboot_non_ha_list: []
@@ -28,8 +32,8 @@
 - name: Build pre-reboot non-HA VMs list from initial data
   set_fact:
     pre_reboot_non_ha_list: "{{ pre_reboot_non_ha_list + [item.type|upper + ' ' + item.id + ':' + item.name + ' (' + item.state + ')'] }}"
-  loop: "{{ hostvars[inventory_hostname].proxmox_non_ha_vms_lxcs | default([]) }}"
-  when: hostvars[inventory_hostname].proxmox_non_ha_vms_lxcs is defined
+  loop: "{{ proxmox_non_ha_vms_lxcs | default([]) }}"
+  when: proxmox_non_ha_vms_lxcs is defined
 
 - name: Create report using pre-reboot data
   set_fact:
@@ -38,48 +42,58 @@
       ha_vms_text: "{{ current_ha_vms_list | join('\n') if current_ha_vms_list | length > 0 else 'None' }}"
       non_ha_vms_text: "{{ pre_reboot_non_ha_list | join('\n') if pre_reboot_non_ha_list | length > 0 else 'None' }}"
 
-- name: Initialize global reports list on first host
-  set_fact:
-    all_host_reports: []
-  when: inventory_hostname == groups['pve_test_cluster_01'][0]
+- name: Debug - Show host report data
+  debug:
+    var: host_report_data
 
-- name: Collect reports from all hosts
+- name: Store report in a temporary file for collection
+  copy:
+    content: "{{ host_report_data | to_json }}"
+    dest: "/tmp/proxmox_report_{{ inventory_hostname }}.json"
+  delegate_to: localhost
+
+- name: Wait for all hosts to complete their reporting
+  pause:
+    seconds: 5
+  run_once: true
+
+- name: Collect all host reports from temp files
   set_fact:
-    all_host_reports: "{{ all_host_reports | default([]) + [host_report_data] }}"
-  delegate_to: "{{ groups['pve_test_cluster_01'][0] }}"
-  delegate_facts: true
+    all_collected_reports: []
+  run_once: true
+
+- name: Read each host report file
+  set_fact:
+    all_collected_reports: "{{ all_collected_reports + [lookup('file', '/tmp/proxmox_report_' + item + '.json') | from_json] }}"
+  loop: "{{ groups['pve_test_cluster_01'] }}"
+  run_once: true
+
+- name: Debug - Show all collected reports
+  debug:
+    var: all_collected_reports
+  run_once: true
 
 - name: Create Discord embed fields
   set_fact:
     discord_embed_fields: []
-  when: inventory_hostname == groups['pve_test_cluster_01'][0]
+  run_once: true
 
-- name: Build HA VM fields
+- name: Build HA VM fields for all hosts
   set_fact:
-    discord_embed_fields: "{{ discord_embed_fields + [ha_field] }}"
-  vars:
-    ha_field:
-      name: "🖥️ {{ item.hostname }} - HA VMs/LXCs (Current State)"
-      value: "{{ item.ha_vms_text }}"
-      inline: false
-  loop: "{{ all_host_reports }}"
-  when: inventory_hostname == groups['pve_test_cluster_01'][0]
+    discord_embed_fields: "{{ discord_embed_fields + [{'name': '🖥️ ' + item.hostname + ' - HA VMs/LXCs (Current State)', 'value': item.ha_vms_text, 'inline': false}] }}"
+  loop: "{{ all_collected_reports }}"
+  run_once: true
 
-- name: Build non-HA VM fields
+- name: Build non-HA VM fields for all hosts
   set_fact:
-    discord_embed_fields: "{{ discord_embed_fields + [non_ha_field] }}"
-  vars:
-    non_ha_field:
-      name: "📦 {{ item.hostname }} - Non-HA VMs/LXCs (Pre-Reboot State)"
-      value: "{{ item.non_ha_vms_text }}"
-      inline: false
-  loop: "{{ all_host_reports }}"
-  when: inventory_hostname == groups['pve_test_cluster_01'][0]
+    discord_embed_fields: "{{ discord_embed_fields + [{'name': '📦 ' + item.hostname + ' - Non-HA VMs/LXCs (Pre-Reboot State)', 'value': item.non_ha_vms_text, 'inline': false}] }}"
+  loop: "{{ all_collected_reports }}"
+  run_once: true
 
 - name: Get current timestamp
   command: date -u '+%Y-%m-%d %H:%M:%S UTC'
   register: current_timestamp
-  when: inventory_hostname == groups['pve_test_cluster_01'][0]
+  run_once: true
   changed_when: false
 
 - name: Send Discord notification
@@ -98,5 +112,12 @@
           fields: "{{ discord_embed_fields }}"
           footer:
             text: "Reported at {{ current_timestamp.stdout }}"
-  when: inventory_hostname == groups['pve_test_cluster_01'][0]
+  run_once: true
+
+- name: Clean up temporary report files
+  file:
+    path: "/tmp/proxmox_report_{{ item }}.json"
+    state: absent
+  loop: "{{ groups['pve_test_cluster_01'] }}"
+  delegate_to: localhost
   run_once: true

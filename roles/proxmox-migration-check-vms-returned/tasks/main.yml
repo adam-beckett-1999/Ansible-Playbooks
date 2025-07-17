@@ -7,16 +7,32 @@
     var: vms_on_node
     verbosity: 1
 
-- name: Get list of VMs/LXCs currently running on this node
+- name: Get list of VMs/LXCs currently running on this node (use same format as initial check)
   shell: |
-    ha-manager status | awk '/^Resources:/,/^$/ {if ($2 == "started" && $3 == "'$(hostname)'") print $1}'
-  register: vms_now_on_node
+    ha-manager status | grep "service.*$(hostname)" | awk '{print $2}' || echo ""
+  register: vms_now_on_node_raw
   changed_when: false
+
+- name: Filter to only valid vm/ct entries
+  set_fact:
+    vms_now_on_node_filtered: "{{ vms_now_on_node_raw.stdout_lines | select('match', '^(vm|ct):') | list }}"
+
+- name: Create mock vms_now_on_node for compatibility
+  set_fact:
+    vms_now_on_node:
+      stdout_lines: "{{ vms_now_on_node_filtered }}"
 
 - name: Debug - Show VMs currently on node
   debug:
     var: vms_now_on_node.stdout_lines
     verbosity: 1
+
+- name: Debug - Show comparison data
+  debug:
+    msg:
+      - "Expected VMs (vms_on_node): {{ vms_on_node }}"
+      - "Current VMs (vms_now_on_node): {{ vms_now_on_node.stdout_lines }}"
+      - "Missing VMs: {{ vms_on_node | difference(vms_now_on_node.stdout_lines) }}"
 
 - name: Check if vms_on_node variable exists
   fail:

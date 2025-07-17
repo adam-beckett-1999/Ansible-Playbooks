@@ -27,7 +27,7 @@
   failed_when: false
   until: (vms_now_on_node_raw.stdout_lines | select('regex', '^(vm|ct):') | list) | difference(vms_on_node) | length == 0 and vms_on_node | difference((vms_now_on_node_raw.stdout_lines | select('regex', '^(vm|ct):') | list)) | length == 0
   retries: 20
-  delay: 30
+  delay: 5
 
 - name: Filter to only valid vm/ct entries
   set_fact:
@@ -41,29 +41,12 @@
       - "Missing VMs: {{ vms_on_node | difference(vms_now_on_node_filtered) }}"
       - "Extra VMs: {{ vms_now_on_node_filtered | difference(vms_on_node) }}"
 
-- name: Show full HA status for troubleshooting
-  shell: ha-manager status
-  register: full_ha_status
-  changed_when: false
-  when: vms_on_node | difference(vms_now_on_node_filtered) | length > 0
-
-- name: Debug - Full HA status
-  debug:
-    var: full_ha_status.stdout_lines
-  when: full_ha_status is defined
-
 - name: Final assertion check
   assert:
     that:
       - vms_on_node | difference(vms_now_on_node_filtered) | length == 0
-    fail_msg: "Not all VMs/LXCs have returned to this node. Missing: {{ vms_on_node | difference(vms_now_on_node_filtered) }}. Check the HA status debug output above."
+    fail_msg: "Not all VMs/LXCs have returned to this node. Missing: {{ vms_on_node | difference(vms_now_on_node_filtered) }}"
     success_msg: "All VMs/LXCs have returned to this node: {{ vms_on_node }}"
-
-- name: Set final state for reporting
-  set_fact:
-    final_ha_vms_on_node: "{{ vms_now_on_node_filtered }}"
-    migration_check_completed: true
-    cacheable: yes
 
 - name: Final success message
   debug:

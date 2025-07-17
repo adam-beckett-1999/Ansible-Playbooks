@@ -1,74 +1,84 @@
-- name: Gather current HA VM/LXC status on this host
+- name: Load initial VM/LXC data from file (fallback for variable persistence)
+  include_vars: "/tmp/proxmox_initial_data_{{ inventory_hostname }}.yml"
+  delegate_to: localhost
+  when: proxmox_non_ha_vms_lxcs is not defined
+
+- name: Get current HA status for all resources
   shell: |
-    ha-manager status | awk '/^Resources:/,/^$/' | grep $(hostname) | awk '{print $1":"$2}'
-  register: ha_vms_status
+    ha-manager status | awk '/^Resources:/,/^$/ {if (NF >= 3 && $1 != "Resources:" && $1 != "") print $1":"$2":"$3}'
+  register: current_ha_status
   failed_when: false
 
-- name: Get HA resource IDs for filtering
-  shell: |
-    ha-manager config | grep -E '^(vm|ct):' | awk -F: '{print $2}'
-  register: ha_resource_ids
-  changed_when: false
-  failed_when: false
-
-- name: Process current HA VMs data
-  set_fact:
-    current_ha_vms_list: []
-
-- name: Build current HA VMs list
-  set_fact:
-    current_ha_vms_list: "{{ current_ha_vms_list + [line.split(':')[0] + ' (' + line.split(':')[1] + ')'] }}"
-  loop: "{{ ha_vms_status.stdout_lines }}"
-  when: ha_vms_status.stdout_lines | length > 0
-
-- name: Debug - Show proxmox_non_ha_vms_lxcs data
+- name: Debug - Show current HA status
   debug:
-    msg: "Non-HA VMs/LXCs for {{ inventory_hostname }}: {{ proxmox_non_ha_vms_lxcs | default('UNDEFINED') }}"
+    var: current_ha_status.stdout_lines
 
-- name: Use pre-reboot non-HA VM/LXC data from initial check
+- name: Filter HA VMs/LXCs currently on this host
+  set_fact:
+    current_ha_on_host: []
+
+- name: Build current HA VMs list for this host
+  set_fact:
+    current_ha_on_host: "{{ current_ha_on_host + [parts[0] + ' (' + parts[1] + ')'] }}"
+  vars:
+    parts: "{{ item.split(':') }}"
+  loop: "{{ current_ha_status.stdout_lines }}"
+  when:
+    - parts | length >= 3
+    - parts[2] == inventory_hostname
+    - parts[1] in ['started', 'stopped']
+
+- name: Debug - Current HA VMs on this host
+  debug:
+    var: current_ha_on_host
+
+- name: Build pre-reboot non-HA VMs list
   set_fact:
     pre_reboot_non_ha_list: []
 
-- name: Build pre-reboot non-HA VMs list from initial data
+- name: Add non-HA VMs to list
   set_fact:
     pre_reboot_non_ha_list: "{{ pre_reboot_non_ha_list + [item.type|upper + ' ' + item.id + ':' + item.name + ' (' + item.state + ')'] }}"
   loop: "{{ proxmox_non_ha_vms_lxcs | default([]) }}"
-  when: proxmox_non_ha_vms_lxcs is defined
 
-- name: Create report using pre-reboot data
+- name: Debug - Pre-reboot non-HA list
+  debug:
+    var: pre_reboot_non_ha_list
+
+- name: Create host report
   set_fact:
     host_report_data:
       hostname: "{{ inventory_hostname }}"
-      ha_vms_text: "{{ current_ha_vms_list | join('\n') if current_ha_vms_list | length > 0 else 'None' }}"
+      ha_vms_text: "{{ current_ha_on_host | join('\n') if current_ha_on_host | length > 0 else 'None' }}"
       non_ha_vms_text: "{{ pre_reboot_non_ha_list | join('\n') if pre_reboot_non_ha_list | length > 0 else 'None' }}"
 
-- name: Debug - Show host report data
+- name: Debug - Host report data
   debug:
     var: host_report_data
 
-- name: Store report in a temporary file for collection
+- name: Store report in temporary file
   copy:
     content: "{{ host_report_data | to_json }}"
     dest: "/tmp/proxmox_report_{{ inventory_hostname }}.json"
   delegate_to: localhost
 
-- name: Wait for all hosts to complete their reporting
+- name: Wait for all hosts to complete reporting
   pause:
-    seconds: 5
+    seconds: 3
   run_once: true
 
-- name: Collect all host reports from temp files
+- name: Collect all host reports
   set_fact:
     all_collected_reports: []
   run_once: true
 
-- name: Read each host report file
+- name: Read each host report
   set_fact:
     all_collected_reports: "{{ all_collected_reports + [lookup('file', '/tmp/proxmox_report_' + item + '.json') | from_json] }}"
   loop: "{{ groups['pve_test_cluster_01'] }}"
   run_once: true
 
-- name: Debug - Show all collected reports
+- name: Debug - All collected reports
   debug:
     var: all_collected_reports
   run_once: true
@@ -78,19 +88,19 @@
     discord_embed_fields: []
   run_once: true
 
-- name: Build HA VM fields for all hosts
+- name: Build HA VM fields
   set_fact:
     discord_embed_fields: "{{ discord_embed_fields + [{'name': '🖥️ ' + item.hostname + ' - HA VMs/LXCs (Current State)', 'value': item.ha_vms_text, 'inline': false}] }}"
   loop: "{{ all_collected_reports }}"
   run_once: true
 
-- name: Build non-HA VM fields for all hosts
+- name: Build non-HA VM fields
   set_fact:
     discord_embed_fields: "{{ discord_embed_fields + [{'name': '📦 ' + item.hostname + ' - Non-HA VMs/LXCs (Pre-Reboot State)', 'value': item.non_ha_vms_text, 'inline': false}] }}"
   loop: "{{ all_collected_reports }}"
   run_once: true
 
-- name: Get current timestamp
+- name: Get timestamp
   command: date -u '+%Y-%m-%d %H:%M:%S UTC'
   register: current_timestamp
   run_once: true
@@ -114,10 +124,12 @@
             text: "Reported at {{ current_timestamp.stdout }}"
   run_once: true
 
-- name: Clean up temporary report files
+- name: Clean up temporary files
   file:
-    path: "/tmp/proxmox_report_{{ item }}.json"
+    path: "{{ item }}"
     state: absent
-  loop: "{{ groups['pve_test_cluster_01'] }}"
+  loop:
+    - "/tmp/proxmox_report_{{ inventory_hostname }}.json"
+    - "/tmp/proxmox_initial_data_{{ inventory_hostname }}.yml"
   delegate_to: localhost
   run_once: true

@@ -1,51 +1,35 @@
 - name: Get all VMs and LXCs with their states
   shell: |
-    echo "=== VMs ==="
-    qm list | awk 'NR>1 {print $1":"$2":"$3}'
-    echo "=== LXCs ==="
-    pct list | awk 'NR>1 {print $1":"$2":"$3}'
+    echo "VM_START"
+    qm list | awk 'NR>1 {print $1":"$2":"$3":vm"}'
+    echo "LXC_START"
+    pct list | awk 'NR>1 {print $1":"$2":"$3":lxc"}'
+    echo "END_DATA"
   register: all_vms_lxcs_raw
 
 - name: Debug - Show raw VM/LXC data
   debug:
     var: all_vms_lxcs_raw.stdout_lines
 
-- name: Initialize VM/LXC lists
+- name: Parse all VMs and LXCs
   set_fact:
     all_vms_lxcs_parsed: []
 
-- name: Parse VM data
+- name: Build VM/LXC list
   set_fact:
-    all_vms_lxcs_parsed: "{{ all_vms_lxcs_parsed + [{'type': 'vm', 'id': parts[0], 'name': parts[1], 'state': parts[2]}] }}"
+    all_vms_lxcs_parsed: "{{ all_vms_lxcs_parsed + [{'type': parts[3], 'id': parts[0], 'name': parts[1], 'state': parts[2]}] }}"
   vars:
     parts: "{{ item.split(':') }}"
   loop: "{{ all_vms_lxcs_raw.stdout_lines }}"
-  when: 
-    - item != "=== VMs ==="
-    - item != "=== LXCs ==="
-    - item != ""
-    - parts | length >= 3
-    - all_vms_lxcs_raw.stdout_lines.index(item) > all_vms_lxcs_raw.stdout_lines.index("=== VMs ===")
-    - all_vms_lxcs_raw.stdout_lines.index(item) < all_vms_lxcs_raw.stdout_lines.index("=== LXCs ===")
-
-- name: Parse LXC data
-  set_fact:
-    all_vms_lxcs_parsed: "{{ all_vms_lxcs_parsed + [{'type': 'lxc', 'id': parts[0], 'name': parts[1], 'state': parts[2]}] }}"
-  vars:
-    parts: "{{ item.split(':') }}"
-  loop: "{{ all_vms_lxcs_raw.stdout_lines }}"
-  when: 
-    - item != "=== VMs ==="
-    - item != "=== LXCs ==="
-    - item != ""
-    - parts | length >= 3
-    - all_vms_lxcs_raw.stdout_lines.index(item) > all_vms_lxcs_raw.stdout_lines.index("=== LXCs ===")
+  when:
+    - item not in ['VM_START', 'LXC_START', 'END_DATA']
+    - parts | length == 4
 
 - name: Debug - Show parsed VM/LXC data
   debug:
     var: all_vms_lxcs_parsed
 
-- name: Get HA-managed resources
+- name: Get HA-managed resource IDs
   shell: |
     ha-manager config | grep -E '^(vm|ct):' | awk -F: '{print $2}'
   register: ha_resources
@@ -67,7 +51,15 @@
       - "HA VMs/LXCs: {{ ha_vms_lxcs }}"
       - "Non-HA VMs/LXCs: {{ non_ha_vms_lxcs }}"
 
-- name: Set global facts for VM/LXC data (persisted across roles)
+- name: Create fact file to persist data between plays
+  copy:
+    content: |
+      proxmox_ha_vms_lxcs: {{ ha_vms_lxcs | to_json }}
+      proxmox_non_ha_vms_lxcs: {{ non_ha_vms_lxcs | to_json }}
+    dest: "/tmp/proxmox_initial_data_{{ inventory_hostname }}.yml"
+  delegate_to: localhost
+
+- name: Set global facts for VM/LXC data
   set_fact:
     proxmox_ha_vms_lxcs: "{{ ha_vms_lxcs }}"
     proxmox_non_ha_vms_lxcs: "{{ non_ha_vms_lxcs }}"
@@ -79,8 +71,7 @@
   register: vms_on_node_result
   changed_when: false
 
-- name: Set fact for initial HA-Managed VMs/LXCs on this node (persisted)
+- name: Set fact for initial HA-Managed VMs/LXCs on this node
   set_fact:
     vms_on_node: "{{ vms_on_node_result.stdout_lines }}"
-    initial_ha_vms_on_node: "{{ vms_on_node_result.stdout_lines }}"
     cacheable: yes

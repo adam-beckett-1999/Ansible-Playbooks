@@ -9,15 +9,7 @@
   changed_when: false
   failed_when: false
 
-- name: Debug - Show VMs initially on this node
-  debug:
-    var: vms_on_node_result.stdout_lines
-
 - name: Set fact for initial HA-Managed VMs/LXCs on this node
   set_fact:
     vms_on_node: "{{ vms_on_node_result.stdout_lines | select('regex', '^(vm|ct):') | list }}"
     cacheable: yes
-
-- name: Debug - Show final vms_on_node value
-  debug:
-    var: vms_on_node

@@ -1,0 +1,20 @@
+- name: Rolling reboot of Proxmox Cluster
+  hosts: pve_test_cluster_01
+  serial: 1
+  become: yes
+  vars:
+    vms_on_node: []
+    all_reports: []
+  gather_facts: yes
+  roles:
+    - proxmox-migration-check-vms-initial
+    - proxmox-node-reboot
+    - proxmox-migration-check-vms-returned
+
+- name: Report Proxmox Cluster reboot status to Discord Channel
+  hosts: pve_test_cluster_01
+  gather_facts: yes
+  roles:
+    - proxmox-cluster-reboot-report
+  vars:
+    reboot_report_discord_webhook_url: "{{ lookup('env', 'REBOOT_REPORT_DISCORD_WEBHOOK_URL') }}"

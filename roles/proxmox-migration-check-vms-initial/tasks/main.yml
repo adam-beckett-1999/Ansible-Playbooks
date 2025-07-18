@@ -1,0 +1,15 @@
+- name: Gather initial HA-Managed VMs/LXCs on this node
+  shell: |
+    ha-manager status | awk '/^service/ {
+      if ($2 ~ /^(vm|ct):/ && $0 ~ "{{ inventory_hostname }}") {
+        print $2
+      }
+    }'
+  register: vms_on_node_result
+  changed_when: false
+  failed_when: false
+
+- name: Set fact for initial HA-Managed VMs/LXCs on this node
+  set_fact:
+    vms_on_node: "{{ vms_on_node_result.stdout_lines | select('regex', '^(vm|ct):') | list }}"
+    cacheable: yes

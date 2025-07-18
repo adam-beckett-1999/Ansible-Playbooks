@@ -1,0 +1,9 @@
+- name: Reboot the Proxmox Node
+  reboot:
+    reboot_timeout: 900
+
+- name: Wait for Proxmox Node to be reachable after reboot
+  wait_for_connection:
+    timeout: 600
+
+

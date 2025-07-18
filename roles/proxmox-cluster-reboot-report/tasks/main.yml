@@ -1,0 +1,103 @@
+- name: Get all VMs and LXCs across the cluster
+  shell: |
+    ha-manager status | awk '/^service/ {
+      if ($2 ~ /^(vm|ct):/) {
+        # Extract service ID (vm:123 or ct:123)
+        service = $2
+        # Extract node name (remove parentheses and comma)
+        gsub(/[(),]/, "", $3)
+        node = $3
+        # Extract state (remove parentheses)
+        gsub(/[(),]/, "", $4)
+        state = $4
+        print service ":" node ":" state
+      }
+    }'
+  register: cluster_vms_raw
+  changed_when: false
+  failed_when: false
+  run_once: true
+
+- name: Debug cluster_vms_raw
+  debug:
+    var: cluster_vms_raw.stdout_lines
+  run_once: true
+  delegate_to: localhost
+
+- name: Debug raw ha-manager output
+  debug:
+    var: cluster_vms_raw.stdout
+  run_once: true
+  delegate_to: localhost
+
+- name: Filter valid VM/LXC lines
+  set_fact:
+    cluster_vms_lines: "{{ cluster_vms_raw.stdout_lines | select('match', '^(vm|ct):[0-9]+:') | list }}"
+  run_once: true
+  delegate_to: localhost
+
+- name: Parse cluster VM/LXC data
+  set_fact:
+    cluster_vms: []
+  run_once: true
+  delegate_to: localhost
+
+- name: Build cluster VM/LXC list
+  set_fact:
+    cluster_vms: "{{ cluster_vms + [{'service': parts[0] ~ ':' ~ parts[1], 'node': parts[2], 'state': parts[3]}] }}"
+  vars:
+    parts: "{{ item.split(':') }}"
+  loop: "{{ cluster_vms_lines }}"
+  when: parts | length == 4
+  run_once: true
+  delegate_to: localhost
+
+- name: Sort VMs by node and service ID
+  set_fact:
+    cluster_vms_sorted: "{{ cluster_vms | sort(attribute='node') | sort(attribute='service') }}"
+  run_once: true
+  delegate_to: localhost
+
+- name: Get unique nodes from cluster data
+  set_fact:
+    cluster_nodes: "{{ cluster_vms_sorted | map(attribute='node') | unique | list }}"
+  run_once: true
+  delegate_to: localhost
+
+- name: Create Discord message content
+  set_fact:
+    discord_message: |
+      ## ✅ Proxmox Cluster Reboot Complete
+
+      **Cluster:** {{ ansible_domain | default('Unknown') }}
+      **Date:** {{ ansible_date_time.iso8601 }}
+      **Nodes Rebooted:** {{ ansible_play_hosts | length }}
+      **Nodes in Cluster:** {{ cluster_nodes | length }}
+
+      ### 📊 Current VM/LXC Status:
+      ```
+      {% for vm in cluster_vms_sorted -%}
+      {{ "%-8s %-20s %s" | format(vm.service, vm.node, vm.state) }}
+      {% endfor -%}
+      ```
+
+      ### 📋 Summary:
+      - **Total VMs/LXCs:** {{ cluster_vms_sorted | length }}
+      - **Running:** {{ cluster_vms_sorted | selectattr('state', 'equalto', 'started') | list | length }}
+      - **Stopped:** {{ cluster_vms_sorted | selectattr('state', 'equalto', 'stopped') | list | length }}
+      - **Other States:** {{ cluster_vms_sorted | rejectattr('state', 'in', ['started', 'stopped']) | list | length }}
+
+      **✅ All nodes successfully rebooted and VMs/LXCs are accounted for.**
+  run_once: true
+  delegate_to: localhost
+
+- name: Send Discord notification
+  uri:
+    url: "{{ reboot_report_discord_webhook_url }}"
+    method: POST
+    body_format: json
+    body:
+      content: "{{ discord_message }}"
+    status_code: [200, 204]
+  run_once: true
+  delegate_to: localhost

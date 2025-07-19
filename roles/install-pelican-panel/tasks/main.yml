@@ -69,6 +69,7 @@
       - unzip
       - python3-pymysql
       - python3-mysqldb
+      - cron
     state: present
   become: yes
 
@@ -299,6 +300,41 @@
     sudo -u www-data php artisan config:cache
   become: yes
   ignore_errors: yes
+
+- name: Start and enable cron service
+  systemd:
+    name: cron
+    state: started
+    enabled: true
+  become: yes
+
+- name: Add Pelican scheduler cron job
+  cron:
+    name: "Pelican Panel Scheduler"
+    job: "php /var/www/pelican/artisan schedule:run >> /dev/null 2>&1"
+    minute: "*"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    user: www-data
+  become: yes
+
+- name: Setup Pelican queue worker service
+  shell: |
+    cd /var/www/pelican
+    sudo php artisan p:environment:queue-service
+  become: yes
+  args:
+    creates: /etc/systemd/system/pelican-queue.service
+
+- name: Start and enable Pelican queue worker service
+  systemd:
+    name: pelican-queue
+    state: started
+    enabled: true
+    daemon_reload: yes
+  become: yes
 
 - name: Remove default nginx site
   file:

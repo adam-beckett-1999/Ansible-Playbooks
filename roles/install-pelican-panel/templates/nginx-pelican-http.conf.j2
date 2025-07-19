@@ -1,18 +1,9 @@
 server {
     listen 80;
     server_name {{ pelican_domain }};
-    return 301 https://$host$request_uri;
-}
-
-server {
-    listen 443 ssl;
-    server_name {{ pelican_domain }};
 
     root /var/www/pelican/public;
     index index.php;
-
-    ssl_certificate /etc/letsencrypt/live/{{ pelican_domain }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ pelican_domain }}/privkey.pem;
 
     location / {
         try_files $uri $uri/ /index.php?$query_string;
@@ -25,5 +16,10 @@ server {
 
     location ~ /\.ht {
         deny all;
+    }
+
+    # Allow certbot challenges
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
     }
 }

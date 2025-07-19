@@ -320,13 +320,94 @@
     user: www-data
   become: yes
 
+- name: Install snapd
+  apt:
+    name: snapd
+    state: present
+  become: yes
+
+- name: Install snap core
+  snap:
+    name: core
+    state: present
+  become: yes
+
+- name: Refresh snap core
+  command: snap refresh core
+  become: yes
+  changed_when: false
+
+- name: Install certbot via snap
+  snap:
+    name: certbot
+    classic: yes
+    state: present
+  become: yes
+
+- name: Create symlink for certbot
+  file:
+    src: /snap/bin/certbot
+    dest: /usr/bin/certbot
+    state: link
+  become: yes
+
 - name: Remove default nginx site
   file:
     path: /etc/nginx/sites-enabled/default
     state: absent
   become: yes
 
-- name: Create Pelican nginx configuration
+- name: Create temporary HTTP-only Pelican nginx configuration
+  template:
+    src: nginx-pelican-http.conf.j2
+    dest: /etc/nginx/sites-available/pelican-temp.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+
+- name: Enable temporary Pelican site
+  file:
+    src: /etc/nginx/sites-available/pelican-temp.conf
+    dest: /etc/nginx/sites-enabled/pelican-temp.conf
+    state: link
+  become: yes
+
+- name: Reload nginx for temporary config
+  systemd:
+    name: nginx
+    state: reloaded
+  become: yes
+
+- name: Obtain SSL certificate with certbot
+  command: certbot --nginx -d {{ pelican_domain }} --non-interactive --agree-tos --email {{ letsencrypt_email }}
+  become: yes
+  register: certbot_result
+  ignore_errors: yes
+
+- name: Verify SSL certificate files exist
+  stat:
+    path: "{{ item }}"
+  loop:
+    - "/etc/letsencrypt/live/{{ pelican_domain }}/fullchain.pem"
+    - "/etc/letsencrypt/live/{{ pelican_domain }}/privkey.pem"
+  register: ssl_cert_check
+  become: yes
+
+- name: Display SSL certificate status
+  debug:
+    msg: |
+      SSL Certificate Status:
+      fullchain.pem: {{ ssl_cert_check.results[0].stat.exists | default(false) }}
+      privkey.pem: {{ ssl_cert_check.results[1].stat.exists | default(false) }}
+
+- name: Remove temporary nginx configuration
+  file:
+    path: /etc/nginx/sites-enabled/pelican-temp.conf
+    state: absent
+  become: yes
+
+- name: Create final Pelican nginx configuration with SSL
   template:
     src: nginx-pelican.conf.j2
     dest: /etc/nginx/sites-available/pelican.conf
@@ -352,6 +433,18 @@
   command: nginx -t
   become: yes
   changed_when: false
+
+- name: Enable certbot auto-renewal timer
+  systemd:
+    name: snap.certbot.renew.timer
+    enabled: true
+  become: yes
+
+- name: Test certbot renewal
+  command: certbot renew --dry-run
+  become: yes
+  changed_when: false
+  ignore_errors: yes
 
 - name: Start and enable nginx
   systemd:

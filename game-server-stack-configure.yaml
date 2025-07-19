@@ -1,4 +1,3 @@
-##### INITIAL CONFIGURATION
 - name: Install updates and standard packages, configure SNMP and network shares
   hosts: game_servers
   roles: 
@@ -9,3 +8,13 @@
     - snmp-configure
   vars:
     user: abeckett
+
+- name: Install Pelican Panel (Game Server Management Interface)
+  hosts: game_server_panel
+  become: yes
+  vars:
+    pelican_domain: "{{ lookup('env', 'PELICAN_PANEL_DOMAIN') }}"
+    pelican_db_password: "{{ lookup('env', 'PELICAN_DB_PASSWORD') }}"
+    mysql_root_password: "{{ lookup('env', 'PELICAN_DB_ROOT_PASSWORD') }}"
+  roles:
+    - install-pelican-panel

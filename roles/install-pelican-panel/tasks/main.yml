@@ -1,0 +1,235 @@
+---
+- name: Add ondrej/php PPA repository
+  apt_repository:
+    repo: "ppa:ondrej/php"
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Install required packages
+  apt:
+    name:
+      - nginx
+      - mysql-server
+      - sqlite3
+      - "php8.2"
+      - "php8.2-cli"
+      - "php8.2-common"
+      - "php8.2-mysql"
+      - "php8.2-sqlite3"
+      - "php8.2-fpm"
+      - "php8.2-mbstring"
+      - "php8.2-xml"
+      - "php8.2-bcmath"
+      - "php8.2-curl"
+      - "php8.2-zip"
+      - "php8.2-gd"
+      - "php8.2-intl"
+      - git
+      - unzip
+    state: present
+  become: yes
+
+- name: restart nginx
+  systemd:
+    name: nginx
+    state: restarted
+  become: yes
+
+- name: reload nginx
+  systemd:
+    name: nginx
+    state: reloaded
+  become: yes
+
+- name: Secure MySQL installation
+  mysql_user:
+    name: root
+    password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  become: yes
+
+- name: Create Pelican database
+  mysql_db:
+    name: pelican
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  become: yes
+
+- name: Create Pelican database user
+  mysql_user:
+    name: pelicanuser
+    password: "{{ pelican_db_password }}"
+    priv: "pelican.*:ALL"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  become: yes
+
+- name: Install Docker prerequisites
+  apt:
+    name:
+      - gnupg
+      - lsb-release
+    state: present
+  become: yes
+
+- name: Add Docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  become: yes
+
+- name: Add Docker repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Install Docker Engine
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+  become: yes
+
+- name: restart docker
+  systemd:
+    name: docker
+    state: restarted
+  become: yes
+
+- name: Start and enable Docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: true
+  become: yes
+
+- name: Add user to docker group
+  user:
+    name: "{{ docker_user }}"
+    groups: docker
+    append: yes
+  become: yes
+
+- name: Download and install Composer
+  shell: |
+    curl -sS https://getcomposer.org/installer | php
+    mv composer.phar /usr/local/bin/composer
+    chmod +x /usr/local/bin/composer
+  become: yes
+  args:
+    creates: /usr/local/bin/composer
+
+- name: Create Pelican installation directory
+  file:
+    path: /var/www/pelican
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: www-data
+    mode: '0775'
+  become: yes
+
+- name: Download Pelican Panel
+  unarchive:
+    src: https://github.com/pelican-dev/panel/releases/latest/download/panel.tar.gz
+    dest: /var/www/pelican
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: www-data
+    mode: '0775'
+  become: yes
+
+- name: Install PHP dependencies with Composer
+  composer:
+    command: install
+    arguments: "--no-dev --optimize-autoloader"
+    working_dir: /var/www/pelican
+  become: yes
+  become_user: "{{ ansible_user }}"
+
+- name: Set proper ownership for Pelican files
+  file:
+    path: /var/www/pelican
+    owner: www-data
+    group: www-data
+    recurse: yes
+  become: yes
+
+- name: Set permissions for storage and bootstrap cache
+  file:
+    path: "{{ item }}"
+    mode: '0755'
+    recurse: yes
+  loop:
+    - "/var/www/pelican/storage"
+    - "/var/www/pelican/bootstrap/cache"
+  become: yes
+
+- name: Set secure permissions for .env file
+  file:
+    path: /var/www/pelican/.env
+    mode: '0640'
+    owner: www-data
+    group: www-data
+  become: yes
+  ignore_errors: yes
+
+- name: Remove default nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  become: yes
+
+- name: Create Pelican nginx configuration
+  template:
+    src: nginx-pelican.conf.j2
+    dest: /etc/nginx/sites-available/pelican.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+
+- name: Enable Pelican site
+  file:
+    src: /etc/nginx/sites-available/pelican.conf
+    dest: /etc/nginx/sites-enabled/pelican.conf
+    state: link
+  become: yes
+ 
+- name: reload nginx
+  systemd:
+    name: nginx
+    state: reloaded
+  become: yes
+
+- name: Test nginx configuration
+  command: nginx -t
+  become: yes
+  changed_when: false
+
+- name: Start and enable nginx
+  systemd:
+    name: nginx
+    state: started
+    enabled: true
+  become: yes
+
+- name: Start and enable PHP-FPM
+  systemd:
+    name: "php8.2-fpm"
+    state: started
+    enabled: true
+  become: yes
+
+- name: Start and enable MySQL
+  systemd:
+    name: mysql
+    state: started
+    enabled: true
+  become: yes

@@ -103,10 +103,42 @@
     group: root
   become: yes
 
-- name: Display Wings installation completion message
-  debug:
-    msg: |
-      Wings installation completed!
-      
-      Next steps:
-      Use the Auto Deploy Command from the Panel for automatic setup
+- name: Create Wings systemd service file
+  copy:
+    content: |
+      [Unit]
+      Description=Wings Daemon
+      After=docker.service
+      Requires=docker.service
+      PartOf=docker.service
+
+      [Service]
+      User=root
+      WorkingDirectory=/etc/pelican
+      LimitNOFILE=4096
+      PIDFile=/var/run/wings/daemon.pid
+      ExecStart=/usr/local/bin/wings
+      Restart=on-failure
+      StartLimitInterval=180
+      StartLimitBurst=30
+      RestartSec=5s
+
+      [Install]
+      WantedBy=multi-user.target
+    dest: /etc/systemd/system/wings.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: yes
+
+- name: Start and enable Wings service
+  systemd:
+    name: wings
+    state: started
+    enabled: true
+  become: yes

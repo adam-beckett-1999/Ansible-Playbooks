@@ -18,6 +18,7 @@
     pelican_db_password: "{{ lookup('env', 'PELICAN_DB_PASSWORD') }}"
     mysql_root_password: "{{ lookup('env', 'PELICAN_DB_ROOT_PASSWORD') }}"
     letsencrypt_email: "{{ lookup('env', 'LETSENCRYPT_EMAIL') }}"
+    enable_ssl: false
   roles:
     - install-pelican-panel
 

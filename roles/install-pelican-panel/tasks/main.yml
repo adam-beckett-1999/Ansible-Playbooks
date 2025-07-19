@@ -239,6 +239,14 @@
     - "/var/www/pelican/bootstrap/cache"
   become: yes
 
+- name: Ensure proper ownership of all Pelican files
+  file:
+    path: /var/www/pelican
+    owner: www-data
+    group: www-data
+    recurse: yes
+  become: yes
+
 - name: Run Pelican environment setup
   shell: |
     cd /var/www/pelican
@@ -246,6 +254,13 @@
   become: yes
   args:
     creates: /var/www/pelican/.env
+
+- name: Generate application key if missing
+  shell: |
+    cd /var/www/pelican
+    sudo -u www-data php artisan key:generate --force
+  become: yes
+  when: ansible_check_mode == false
 
 - name: Set secure permissions for .env file
   file:
@@ -255,6 +270,18 @@
     group: www-data
   become: yes
 
+- name: Verify .env file contains APP_KEY
+  shell: |
+    cd /var/www/pelican
+    grep -q "APP_KEY=" .env && echo "APP_KEY found" || echo "APP_KEY missing"
+  become: yes
+  register: appkey_check
+  changed_when: false
+
+- name: Display APP_KEY status
+  debug:
+    var: appkey_check.stdout
+
 - name: Run database migrations
   shell: |
     cd /var/www/pelican
@@ -262,6 +289,16 @@
   become: yes
   environment:
     COMPOSER_ALLOW_SUPERUSER: "1"
+
+- name: Clear application cache and optimize
+  shell: |
+    cd /var/www/pelican
+    sudo -u www-data php artisan config:clear
+    sudo -u www-data php artisan cache:clear
+    sudo -u www-data php artisan view:clear
+    sudo -u www-data php artisan config:cache
+  become: yes
+  ignore_errors: yes
 
 - name: Remove default nginx site
   file:

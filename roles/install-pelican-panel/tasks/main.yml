@@ -72,13 +72,6 @@
     state: present
   become: yes
 
-- name: Install PyMySQL via pip as fallback
-  pip:
-    name: PyMySQL
-    executable: pip3
-  become: yes
-  ignore_errors: yes
-
 - name: restart nginx
   systemd:
     name: nginx

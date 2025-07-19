@@ -1,3 +1,60 @@
+- name: Ensure system time is synchronized
+  block:
+    - name: Check if systemd-timesyncd is available
+      ansible.builtin.stat:
+        path: /lib/systemd/system/systemd-timesyncd.service
+      register: timesyncd_available
+
+    - name: Use systemd-timesyncd for time synchronization (modern systems)
+      block:
+        - name: Start and enable systemd-timesyncd
+          ansible.builtin.systemd:
+            name: systemd-timesyncd
+            state: started
+            enabled: yes
+          become: yes
+
+        - name: Force time synchronization
+          ansible.builtin.command: timedatectl set-ntp true
+          become: yes
+      when: timesyncd_available.stat.exists
+
+    - name: Use NTP for time synchronization (fallback)
+      block:
+        - name: Install NTP packages
+          ansible.builtin.apt:
+            name:
+              - ntp
+              - ntpdate
+            state: present
+            update_cache: yes
+          become: yes
+
+        - name: Stop NTP service temporarily
+          ansible.builtin.systemd:
+            name: ntp
+            state: stopped
+          become: yes
+          ignore_errors: yes
+
+        - name: Synchronize time with NTP servers
+          ansible.builtin.command: ntpdate -s time.nist.gov
+          become: yes
+          ignore_errors: yes
+
+        - name: Start and enable NTP service
+          ansible.builtin.systemd:
+            name: ntp
+            state: started
+            enabled: yes
+          become: yes
+      when: not timesyncd_available.stat.exists
+
+    - name: Wait for time synchronization
+      ansible.builtin.pause:
+        seconds: 5
+  when: ansible_os_family == 'Debian'
+
 - name: Install required dependencies and base packages for every install
   ansible.builtin.apt:
     name:

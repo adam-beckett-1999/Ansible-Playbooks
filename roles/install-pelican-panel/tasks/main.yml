@@ -242,9 +242,8 @@
 - name: Run Pelican environment setup
   shell: |
     cd /var/www/pelican
-    php artisan p:environment:setup --new-salt --author={{ ansible_user }} --url=http://{{ ansible_default_ipv4.address }} --timezone=UTC --cache=database --session=database --queue=database --redis-host=127.0.0.1 --redis-pass= --redis-port=6379 --settings-ui=true
+    sudo -u www-data php artisan p:environment:setup --new-salt --author={{ ansible_user }} --url=http://{{ ansible_default_ipv4.address }} --timezone=UTC --cache=database --session=database --queue=database --redis-host=127.0.0.1 --redis-pass= --redis-port=6379 --settings-ui=true
   become: yes
-  become_user: www-data
   args:
     creates: /var/www/pelican/.env
 
@@ -259,18 +258,16 @@
 - name: Run database migrations
   shell: |
     cd /var/www/pelican
-    php artisan migrate --seed --force
+    sudo -u www-data php artisan migrate --seed --force
   become: yes
-  become_user: www-data
   environment:
     COMPOSER_ALLOW_SUPERUSER: "1"
 
 - name: Create Pelican admin user
   shell: |
     cd /var/www/pelican
-    php artisan p:user:make --email={{ pelican_admin_email }} --username={{ pelican_admin_username }} --name-first={{ pelican_admin_first_name }} --name-last={{ pelican_admin_last_name }} --password={{ pelican_admin_password }} --admin=1
+    sudo -u www-data php artisan p:user:make --email={{ pelican_admin_email | default('admin@example.com') }} --username={{ pelican_admin_username | default('admin') }} --name-first={{ pelican_admin_first_name | default('Admin') }} --name-last={{ pelican_admin_last_name | default('User') }} --password={{ pelican_admin_password | default('changeme123') }} --admin=1
   become: yes
-  become_user: www-data
   ignore_errors: yes
 
 - name: Remove default nginx site

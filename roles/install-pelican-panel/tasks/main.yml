@@ -277,8 +277,6 @@
     group: root
     mode: '0644'
   become: yes
-  vars:
-    pelican_domain: "{{ lookup('env', 'PELICAN_PANEL_DOMAIN') }}"
 
 - name: Enable Pelican site
   file:
@@ -326,8 +324,8 @@
       Pelican Panel Installation Complete!
       ========================================
       
-      Panel URL: http://{{ ansible_default_ipv4.address }}
-      Web Installer: http://{{ ansible_default_ipv4.address }}/installer
+      Panel URL: http://{{ PELICAN_PANEL_DOMAIN }}
+      Web Installer: http://{{ PELICAN_PANEL_DOMAIN }}/installer
 
       Database Details:
       Database: pelican

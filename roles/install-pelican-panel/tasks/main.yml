@@ -320,15 +320,6 @@
     user: www-data
   become: yes
 
-
-- name: Start and enable Pelican queue worker service
-  systemd:
-    name: pelican-queue
-    state: started
-    enabled: true
-    daemon_reload: yes
-  become: yes
-
 - name: Remove default nginx site
   file:
     path: /etc/nginx/sites-enabled/default

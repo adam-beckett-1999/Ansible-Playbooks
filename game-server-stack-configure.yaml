@@ -16,14 +16,11 @@
     pelican_domain: "{{ lookup('env', 'PELICAN_PANEL_DOMAIN') }}"
     pelican_db_password: "{{ lookup('env', 'PELICAN_DB_PASSWORD') }}"
     mysql_root_password: "{{ lookup('env', 'PELICAN_DB_ROOT_PASSWORD') }}"
-    docker_user: "{{ lookup('env', 'DOCKER_USER') | default('abeckett') }}"
   roles:
     - install-pelican-panel
 
 - name: Install Pelican Wings (Game Server Daemon)
   hosts: game_server_nodes
   become: yes
-  vars:
-    docker_user: "{{ lookup('env', 'DOCKER_USER') | default('abeckett') }}"
   roles:
     - install-pelican-wings

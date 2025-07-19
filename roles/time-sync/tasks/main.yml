@@ -17,6 +17,20 @@
         - name: Force time synchronization
           ansible.builtin.command: timedatectl set-ntp true
           become: yes
+
+        - name: Force immediate time sync
+          ansible.builtin.command: systemctl restart systemd-timesyncd
+          become: yes
+
+        - name: Wait for time synchronization to complete
+          ansible.builtin.pause:
+            seconds: 10
+
+        - name: Verify time sync status
+          ansible.builtin.command: timedatectl status
+          register: timedate_status
+          become: yes
+          changed_when: false
       when: timesyncd_available.stat.exists
 
     - name: Use NTP for time synchronization (fallback)
@@ -37,10 +51,14 @@
           become: yes
           ignore_errors: yes
 
-        - name: Synchronize time with NTP servers
-          ansible.builtin.command: ntpdate -s time.nist.gov
+        - name: Synchronize time with multiple NTP servers
+          ansible.builtin.command: "{{ item }}"
           become: yes
           ignore_errors: yes
+          loop:
+            - "ntpdate -s time.nist.gov"
+            - "ntpdate -s pool.ntp.org"
+            - "ntpdate -s time.google.com"
 
         - name: Start and enable NTP service
           ansible.builtin.systemd:
@@ -48,9 +66,17 @@
             state: started
             enabled: yes
           become: yes
+
+        - name: Wait for NTP synchronization
+          ansible.builtin.pause:
+            seconds: 10
       when: not timesyncd_available.stat.exists
 
-    - name: Wait for time synchronization
+    - name: Final time synchronization wait
       ansible.builtin.pause:
         seconds: 5
+
+    - name: Display current time status
+      ansible.builtin.debug:
+        msg: "Time synchronization completed. Current time: {{ ansible_date_time.iso8601 }}"
   when: ansible_os_family == 'Debian'

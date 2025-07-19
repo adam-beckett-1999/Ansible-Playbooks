@@ -4,9 +4,6 @@
     - time-sync
     - update
     - base-packages
-    - disable-motd-ubuntu
-    - webmin-install
-    - snmp-configure
   vars:
     user: abeckett
 

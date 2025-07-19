@@ -50,39 +50,49 @@
 - name: Install other required packages
   apt:
     name:
-      - nginx
       - sqlite3
-      - "php8.2"
-      - "php8.2-cli"
-      - "php8.2-common"
-      - "php8.2-mysql"
-      - "php8.2-sqlite3"
-      - "php8.2-fpm"
-      - "php8.2-mbstring"
-      - "php8.2-xml"
-      - "php8.2-bcmath"
-      - "php8.2-curl"
-      - "php8.2-zip"
-      - "php8.2-gd"
-      - "php8.2-intl"
+      - "php8.4"
+      - "php8.4-cli"
+      - "php8.4-common"
+      - "php8.4-mysql"
+      - "php8.4-sqlite3"
+      - "php8.4-fpm"
+      - "php8.4-mbstring"
+      - "php8.4-xml"
+      - "php8.4-bcmath"
+      - "php8.4-curl"
+      - "php8.4-zip"
+      - "php8.4-gd"
+      - "php8.4-intl"
       - git
       - unzip
       - python3-pymysql
       - python3-mysqldb
       - cron
+      - debian-keyring
+      - debian-archive-keyring
+      - apt-transport-https
     state: present
   become: yes
 
-- name: Restart nginx
-  systemd:
-    name: nginx
-    state: restarted
+- name: Add Caddy GPG key
+  get_url:
+    url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+    dest: /usr/share/keyrings/caddy-stable-archive-keyring.asc
+    mode: '0644'
   become: yes
 
-- name: Reload nginx
-  systemd:
-    name: nginx
-    state: reloaded
+- name: Add Caddy repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/caddy-stable-archive-keyring.asc] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main"
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Install Caddy
+  apt:
+    name: caddy
+    state: present
   become: yes
 
 - name: Start and enable MySQL/MariaDB service
@@ -320,100 +330,105 @@
     user: www-data
   become: yes
 
-- name: Install snapd
-  apt:
-    name: snapd
-    state: present
+- name: Setup Pelican queue worker service
+  shell: |
+    cd /var/www/pelican
+    sudo php artisan p:environment:queue-service
+  become: yes
+  args:
+    creates: /etc/systemd/system/pelican-queue.service
+
+- name: Start and enable Pelican queue worker service
+  systemd:
+    name: pelican-queue
+    state: started
+    enabled: true
+    daemon_reload: yes
   become: yes
 
-- name: Install snap core
-  snap:
-    name: core
-    state: present
-  become: yes
-
-- name: Refresh snap core
-  command: snap refresh core
-  become: yes
-  changed_when: false
-
-- name: Install certbot via snap
-  snap:
-    name: certbot
-    classic: yes
-    state: present
-  become: yes
-
-- name: Create symlink for certbot
+- name: Create Caddy log directory
   file:
-    src: /snap/bin/certbot
-    dest: /usr/bin/certbot
-    state: link
+    path: /var/log/caddy
+    state: directory
+    owner: caddy
+    group: caddy
+    mode: '0755'
   become: yes
 
-- name: Remove default nginx site
-  file:
-    path: /etc/nginx/sites-enabled/default
-    state: absent
-  become: yes
+- name: Create Caddyfile configuration
+  copy:
+    content: |
+      {
+          servers :80 {
+              timeouts {
+                  read_body 120s
+              }
+          }
+      }
 
-- name: Obtain SSL certificate with DNS challenge
-  command: certbot certonly --manual --preferred-challenges dns -d {{ pelican_domain }} --non-interactive --agree-tos --email {{ letsencrypt_email }}
-  become: yes
-  register: certbot_result
-  ignore_errors: yes
+      {{ pelican_domain }}:80 {
+          root * /var/www/pelican/public
 
-- name: Verify SSL certificate files exist
-  stat:
-    path: "{{ item }}"
-  loop:
-    - "/etc/letsencrypt/live/{{ pelican_domain }}/fullchain.pem"
-    - "/etc/letsencrypt/live/{{ pelican_domain }}/privkey.pem"
-  become: yes
+          trusted_proxies static {{ pelican_domain }}
 
-- name: Create Pelican nginx configuration with SSL
-  template:
-    src: nginx-pelican.conf.j2
-    dest: /etc/nginx/sites-available/pelican.conf
+          file_server
+
+          php_fastcgi unix//run/php/php8.4-fpm.sock {
+              root /var/www/pelican/public
+              index index.php
+
+              env PHP_VALUE "upload_max_filesize = 100M
+              post_max_size = 100M"
+              env HTTP_PROXY ""
+
+              read_timeout 300s
+              dial_timeout 300s
+              write_timeout 300s
+          }
+
+          header Strict-Transport-Security "max-age=16768000; preload;"
+          header X-Content-Type-Options "nosniff"
+          header X-XSS-Protection "1; mode=block;"
+          header X-Robots-Tag "none"
+          header Content-Security-Policy "frame-ancestors 'self'"
+          header X-Frame-Options "DENY"
+          header Referrer-Policy "same-origin"
+
+          request_body {
+              max_size 100m
+          }
+
+          respond /.ht* 403
+
+          log {
+              output file /var/log/caddy/pelican.log {
+                  roll_size 100MiB
+                  roll_keep_for 7d
+              }
+              level INFO
+          }
+      }
+    dest: /etc/caddy/Caddyfile
     owner: root
     group: root
     mode: '0644'
   become: yes
 
-- name: Enable Pelican site
-  file:
-    src: /etc/nginx/sites-available/pelican.conf
-    dest: /etc/nginx/sites-enabled/pelican.conf
-    state: link
-  become: yes
-
-- name: Test nginx configuration
-  command: nginx -t
+- name: Test Caddy configuration
+  command: caddy validate --config /etc/caddy/Caddyfile
   become: yes
   changed_when: false
 
-- name: Enable certbot auto-renewal timer
+- name: Start and enable Caddy
   systemd:
-    name: snap.certbot.renew.timer
-    enabled: true
-  become: yes
-
-- name: Test certbot renewal
-  command: certbot renew --dry-run
-  become: yes
-  changed_when: false
-  ignore_errors: yes
-
-- name: Start and enable nginx
-  systemd:
-    name: nginx
+    name: caddy
     state: started
     enabled: true
   become: yes
 
 - name: Start and enable PHP-FPM
   systemd:
-    name: "php8.2-fpm"
+    name: "php8.4-fpm"
     state: started
     enabled: true
   become: yes

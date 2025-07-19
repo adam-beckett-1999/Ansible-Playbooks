@@ -29,11 +29,28 @@
     cache_valid_time: 3600
   become: yes
 
-- name: Install required packages
+- name: Install MySQL/MariaDB server (distribution-specific)
+  block:
+    - name: Install MySQL server on Ubuntu
+      apt:
+        name: mysql-server
+        state: present
+      become: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Install MariaDB server on Debian
+      apt:
+        name: 
+          - mariadb-server
+          - mariadb-client
+        state: present
+      become: yes
+      when: ansible_distribution == "Debian"
+
+- name: Install other required packages
   apt:
     name:
       - nginx
-      - mysql-server
       - sqlite3
       - "php8.2"
       - "php8.2-cli"
@@ -65,7 +82,14 @@
     state: reloaded
   become: yes
 
-- name: Secure MySQL installation
+- name: Start and enable MySQL/MariaDB service
+  systemd:
+    name: "{{ 'mysql' if ansible_distribution == 'Ubuntu' else 'mariadb' }}"
+    state: started
+    enabled: true
+  become: yes
+
+- name: Secure MySQL/MariaDB installation
   mysql_user:
     name: root
     password: "{{ mysql_root_password }}"
@@ -262,9 +286,9 @@
     enabled: true
   become: yes
 
-- name: Start and enable MySQL
+- name: Start and enable MySQL/MariaDB
   systemd:
-    name: mysql
+    name: "{{ 'mysql' if ansible_distribution == 'Ubuntu' else 'mariadb' }}"
     state: started
     enabled: true
   become: yes

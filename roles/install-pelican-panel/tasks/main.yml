@@ -320,13 +320,6 @@
     user: www-data
   become: yes
 
-- name: Setup Pelican queue worker service
-  shell: |
-    cd /var/www/pelican
-    sudo php artisan p:environment:queue-service
-  become: yes
-  args:
-    creates: /etc/systemd/system/pelican-queue.service
 
 - name: Start and enable Pelican queue worker service
   systemd:

@@ -263,13 +263,6 @@
   environment:
     COMPOSER_ALLOW_SUPERUSER: "1"
 
-- name: Create Pelican admin user
-  shell: |
-    cd /var/www/pelican
-    sudo -u www-data php artisan p:user:make --email={{ pelican_admin_email | default('admin@example.com') }} --username={{ pelican_admin_username | default('admin') }} --name-first={{ pelican_admin_first_name | default('Admin') }} --name-last={{ pelican_admin_last_name | default('User') }} --password={{ pelican_admin_password | default('changeme123') }} --admin=1
-  become: yes
-  ignore_errors: yes
-
 - name: Remove default nginx site
   file:
     path: /etc/nginx/sites-enabled/default
@@ -333,13 +326,8 @@
       Pelican Panel Installation Complete!
       ========================================
       
-      Panel URL: http://{{ PELICAN_PANEL_DOMAIN }}
-      Web Installer: http://{{ PELICAN_PANEL_DOMAIN }}/installer
-
-      Default Admin Credentials:
-      Email: {{ pelican_admin_email }}
-      Username: {{ pelican_admin_username }}
-      Password: {{ pelican_admin_password }}
+      Panel URL: http://{{ ansible_default_ipv4.address }}
+      Web Installer: http://{{ ansible_default_ipv4.address }}/installer
 
       Database Details:
       Database: pelican

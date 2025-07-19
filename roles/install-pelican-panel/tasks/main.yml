@@ -239,6 +239,15 @@
     - "/var/www/pelican/bootstrap/cache"
   become: yes
 
+- name: Run Pelican environment setup
+  shell: |
+    cd /var/www/pelican
+    php artisan p:environment:setup --new-salt --author={{ ansible_user }} --url=http://{{ ansible_default_ipv4.address }} --timezone=UTC --cache=database --session=database --queue=database --redis-host=127.0.0.1 --redis-pass= --redis-port=6379 --settings-ui=true
+  become: yes
+  become_user: www-data
+  args:
+    creates: /var/www/pelican/.env
+
 - name: Set secure permissions for .env file
   file:
     path: /var/www/pelican/.env
@@ -246,6 +255,22 @@
     owner: www-data
     group: www-data
   become: yes
+
+- name: Run database migrations
+  shell: |
+    cd /var/www/pelican
+    php artisan migrate --seed --force
+  become: yes
+  become_user: www-data
+  environment:
+    COMPOSER_ALLOW_SUPERUSER: "1"
+
+- name: Create Pelican admin user
+  shell: |
+    cd /var/www/pelican
+    php artisan p:user:make --email={{ pelican_admin_email }} --username={{ pelican_admin_username }} --name-first={{ pelican_admin_first_name }} --name-last={{ pelican_admin_last_name }} --password={{ pelican_admin_password }} --admin=1
+  become: yes
+  become_user: www-data
   ignore_errors: yes
 
 - name: Remove default nginx site
@@ -303,3 +328,29 @@
     state: started
     enabled: true
   become: yes
+
+- name: Display Pelican Panel installation completion message
+  debug:
+    msg: |
+      ========================================
+      Pelican Panel Installation Complete!
+      ========================================
+      
+      Panel URL: http://{{ PELICAN_PANEL_DOMAIN }}
+      Web Installer: http://{{ PELICAN_PANEL_DOMAIN }}/installer
+
+      Default Admin Credentials:
+      Email: {{ pelican_admin_email }}
+      Username: {{ pelican_admin_username }}
+      Password: {{ pelican_admin_password }}
+
+      Database Details:
+      Database: pelican
+      DB User: pelicanuser
+      DB Password: {{ pelican_db_password }}
+      
+      IMPORTANT: 
+      1. Visit the web installer to complete setup
+      2. Change the default admin password immediately
+      3. Back up your APP_KEY from /var/www/pelican/.env
+      ========================================

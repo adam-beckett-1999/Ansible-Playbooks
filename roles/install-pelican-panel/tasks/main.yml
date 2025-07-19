@@ -325,20 +325,17 @@
     name: snapd
     state: present
   become: yes
-  when: enable_ssl | default(true) | bool
 
 - name: Install snap core
   snap:
     name: core
     state: present
   become: yes
-  when: enable_ssl | default(true) | bool
 
 - name: Refresh snap core
   command: snap refresh core
   become: yes
   changed_when: false
-  when: enable_ssl | default(true) | bool
 
 - name: Install certbot via snap
   snap:
@@ -346,7 +343,6 @@
     classic: yes
     state: present
   become: yes
-  when: enable_ssl | default(true) | bool
 
 - name: Create symlink for certbot
   file:
@@ -354,7 +350,6 @@
     dest: /usr/bin/certbot
     state: link
   become: yes
-  when: enable_ssl | default(true) | bool
 
 - name: Remove default nginx site
   file:
@@ -362,150 +357,11 @@
     state: absent
   become: yes
 
-- name: Create HTTP-only Pelican nginx configuration (for reverse proxy)
-  template:
-    src: nginx-pelican-http.conf.j2
-    dest: /etc/nginx/sites-available/pelican.conf
-    owner: root
-    group: root
-    mode: '0644'
-  become: yes
-  when: not (enable_ssl | default(true) | bool)
-
-- name: Create webroot directory for certbot challenges
-  file:
-    path: /var/www/html
-    state: directory
-    owner: www-data
-    group: www-data
-    mode: '0755'
-  become: yes
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
-
-- name: Create .well-known/acme-challenge directory
-  file:
-    path: /var/www/html/.well-known/acme-challenge
-    state: directory
-    owner: www-data
-    group: www-data
-    mode: '0755'
-    recurse: yes
-  become: yes
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
-
-- name: Create temporary HTTP-only Pelican nginx configuration
-  template:
-    src: nginx-pelican-http.conf.j2
-    dest: /etc/nginx/sites-available/pelican-temp.conf
-    owner: root
-    group: root
-    mode: '0644'
-  become: yes
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
-
-- name: Enable temporary Pelican site
-  file:
-    src: /etc/nginx/sites-available/pelican-temp.conf
-    dest: /etc/nginx/sites-enabled/pelican-temp.conf
-    state: link
-  become: yes
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
-
-- name: Test nginx configuration before SSL
-  command: nginx -t
-  become: yes
-  changed_when: false
-
-- name: Reload nginx for temporary config
-  systemd:
-    name: nginx
-    state: reloaded
-  become: yes
-
-- name: Display reverse proxy notice
-  debug:
-    msg: |
-      ========================================
-      REVERSE PROXY DETECTED
-      ========================================
-      
-      Since you're using a reverse proxy, SSL certificate installation 
-      has been skipped. You should:
-      
-      1. Install SSL certificates on your reverse proxy instead
-      2. Configure your reverse proxy to forward to: http://{{ ansible_default_ipv4.address }}
-      3. Set enable_ssl: false in your playbook variables
-      
-      Alternative: Use DNS challenge method by setting:
-      ssl_challenge_method: "dns"
-      ========================================
-  when: not (enable_ssl | default(true) | bool)
-
 - name: Obtain SSL certificate with DNS challenge
   command: certbot certonly --manual --preferred-challenges dns -d {{ pelican_domain }} --non-interactive --agree-tos --email {{ letsencrypt_email }}
   become: yes
   register: certbot_result
   ignore_errors: yes
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'dns'
-
-- name: Test domain accessibility
-  uri:
-    url: "http://{{ pelican_domain }}/.well-known/acme-challenge/test"
-    method: GET
-    status_code: [404, 200]
-  register: domain_test
-  ignore_errors: yes
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
-
-- name: Display domain test result
-  debug:
-    msg: |
-      Domain Test Result:
-      URL: http://{{ pelican_domain }}/.well-known/acme-challenge/test
-      Status: {{ domain_test.status | default('Failed to connect') }}
-      This should return 404 (not found) if nginx is serving correctly
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
-
-- name: Create test challenge file
-  copy:
-    content: "test-challenge-file"
-    dest: /var/www/html/.well-known/acme-challenge/test-file
-    owner: www-data
-    group: www-data
-    mode: '0644'
-  become: yes
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
-
-- name: Test challenge file serving
-  uri:
-    url: "http://{{ pelican_domain }}/.well-known/acme-challenge/test-file"
-    method: GET
-  register: challenge_test
-  ignore_errors: yes
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
-
-- name: Display challenge test result
-  debug:
-    msg: |
-      Challenge File Test:
-      URL: http://{{ pelican_domain }}/.well-known/acme-challenge/test-file
-      Status: {{ challenge_test.status | default('Failed') }}
-      Content: {{ challenge_test.content | default('No content') }}
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
-
-- name: Remove test challenge file
-  file:
-    path: /var/www/html/.well-known/acme-challenge/test-file
-    state: absent
-  become: yes
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
-
-- name: Obtain SSL certificate with certbot (webroot method)
-  command: certbot certonly --webroot -w /var/www/html -d {{ pelican_domain }} --non-interactive --agree-tos --email {{ letsencrypt_email }}
-  become: yes
-  register: certbot_result
-  ignore_errors: yes
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
 
 - name: Verify SSL certificate files exist
   stat:
@@ -513,26 +369,9 @@
   loop:
     - "/etc/letsencrypt/live/{{ pelican_domain }}/fullchain.pem"
     - "/etc/letsencrypt/live/{{ pelican_domain }}/privkey.pem"
-  register: ssl_cert_check
   become: yes
-  when: enable_ssl | default(true) | bool
 
-- name: Display SSL certificate status
-  debug:
-    msg: |
-      SSL Certificate Status:
-      fullchain.pem: {{ ssl_cert_check.results[0].stat.exists | default(false) }}
-      privkey.pem: {{ ssl_cert_check.results[1].stat.exists | default(false) }}
-  when: enable_ssl | default(true) | bool
-
-- name: Remove temporary nginx configuration
-  file:
-    path: /etc/nginx/sites-enabled/pelican-temp.conf
-    state: absent
-  become: yes
-  when: enable_ssl | default(true) | bool and ssl_challenge_method | default('http') == 'http'
-
-- name: Create final Pelican nginx configuration with SSL
+- name: Create Pelican nginx configuration with SSL
   template:
     src: nginx-pelican.conf.j2
     dest: /etc/nginx/sites-available/pelican.conf
@@ -540,29 +379,12 @@
     group: root
     mode: '0644'
   become: yes
-  when: enable_ssl | default(true) | bool and ssl_cert_check.results[0].stat.exists | default(false)
-
-- name: Create HTTP-only nginx configuration (SSL failed or disabled)
-  template:
-    src: nginx-pelican-http.conf.j2
-    dest: /etc/nginx/sites-available/pelican.conf
-    owner: root
-    group: root
-    mode: '0644'
-  become: yes
-  when: not (enable_ssl | default(true) | bool) or not (ssl_cert_check.results[0].stat.exists | default(false))
 
 - name: Enable Pelican site
   file:
     src: /etc/nginx/sites-available/pelican.conf
     dest: /etc/nginx/sites-enabled/pelican.conf
     state: link
-  become: yes
- 
-- name: Reload nginx
-  systemd:
-    name: nginx
-    state: reloaded
   become: yes
 
 - name: Test nginx configuration
@@ -575,14 +397,12 @@
     name: snap.certbot.renew.timer
     enabled: true
   become: yes
-  when: enable_ssl | default(true) | bool
 
 - name: Test certbot renewal
   command: certbot renew --dry-run
   become: yes
   changed_when: false
   ignore_errors: yes
-  when: enable_ssl | default(true) | bool
 
 - name: Start and enable nginx
   systemd:

@@ -17,11 +17,6 @@
     pelican_domain: "{{ lookup('env', 'PELICAN_PANEL_DOMAIN') }}"
     pelican_db_password: "{{ lookup('env', 'PELICAN_DB_PASSWORD') }}"
     mysql_root_password: "{{ lookup('env', 'PELICAN_DB_ROOT_PASSWORD') }}"
-    pelican_admin_email: "{{ lookup('env', 'PELICAN_ADMIN_EMAIL') }}"
-    pelican_admin_username: "{{ lookup('env', 'PELICAN_ADMIN_USERNAME') }}"
-    pelican_admin_first_name: "{{ lookup('env', 'PELICAN_ADMIN_FIRST_NAME') }}"
-    pelican_admin_last_name: "{{ lookup('env', 'PELICAN_ADMIN_LAST_NAME') }}"
-    pelican_admin_password: "{{ lookup('env', 'PELICAN_ADMIN_PASSWORD') }}"
   roles:
     - install-pelican-panel
 

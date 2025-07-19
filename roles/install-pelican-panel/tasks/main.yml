@@ -72,13 +72,13 @@
     state: present
   become: yes
 
-- name: restart nginx
+- name: Restart nginx
   systemd:
     name: nginx
     state: restarted
   become: yes
 
-- name: reload nginx
+- name: Reload nginx
   systemd:
     name: nginx
     state: reloaded
@@ -165,7 +165,7 @@
     state: present
   become: yes
 
-- name: restart docker
+- name: Restart docker
   systemd:
     name: docker
     state: restarted
@@ -285,7 +285,7 @@
     state: link
   become: yes
  
-- name: reload nginx
+- name: Reload nginx
   systemd:
     name: nginx
     state: reloaded

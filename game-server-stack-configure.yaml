@@ -1,6 +1,6 @@
 ##### INITIAL CONFIGURATION
 - name: Install updates and standard packages, configure SNMP and network shares
-  hosts: game_server_virtual_machines
+  hosts: game_servers
   roles: 
     - update
     - base-packages

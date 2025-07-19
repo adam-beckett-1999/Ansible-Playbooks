@@ -2,9 +2,6 @@
   ansible.builtin.apt:
     name:
       - software-properties-common
-      - apt-transport-https
-      - ca-certificates
-      - curl
       - python3-pip
       - virtualenv
       - python3

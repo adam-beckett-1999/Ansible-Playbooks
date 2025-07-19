@@ -5,6 +5,12 @@ server {
     root /var/www/pelican/public;
     index index.php;
 
+    # Allow certbot challenges - this must come first
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+        try_files $uri =404;
+    }
+
     location / {
         try_files $uri $uri/ /index.php?$query_string;
     }
@@ -16,10 +22,5 @@ server {
 
     location ~ /\.ht {
         deny all;
-    }
-
-    # Allow certbot challenges
-    location /.well-known/acme-challenge/ {
-        root /var/www/html;
     }
 }

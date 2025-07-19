@@ -357,6 +357,15 @@
     state: absent
   become: yes
 
+- name: Create webroot directory for certbot challenges
+  file:
+    path: /var/www/html
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  become: yes
+
 - name: Create temporary HTTP-only Pelican nginx configuration
   template:
     src: nginx-pelican-http.conf.j2
@@ -373,14 +382,19 @@
     state: link
   become: yes
 
+- name: Test nginx configuration before SSL
+  command: nginx -t
+  become: yes
+  changed_when: false
+
 - name: Reload nginx for temporary config
   systemd:
     name: nginx
     state: reloaded
   become: yes
 
-- name: Obtain SSL certificate with certbot
-  command: certbot --nginx -d {{ pelican_domain }} --non-interactive --agree-tos --email {{ letsencrypt_email }}
+- name: Obtain SSL certificate with certbot (webroot method)
+  command: certbot certonly --webroot -w /var/www/html -d {{ pelican_domain }} --non-interactive --agree-tos --email {{ letsencrypt_email }}
   become: yes
   register: certbot_result
   ignore_errors: yes

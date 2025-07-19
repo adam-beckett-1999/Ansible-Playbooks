@@ -1,9 +1,32 @@
 ---
-- name: Add ondrej/php PPA repository
+- name: Add ondrej/php PPA repository (Ubuntu only)
   apt_repository:
     repo: "ppa:ondrej/php"
     state: present
     update_cache: yes
+  become: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: Add Sury PHP repository for Debian
+  block:
+    - name: Add Sury PHP repository GPG key
+      apt_key:
+        url: https://packages.sury.org/php/apt.gpg
+        state: present
+      become: yes
+
+    - name: Add Sury PHP repository
+      apt_repository:
+        repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
+        state: present
+        update_cache: yes
+      become: yes
+  when: ansible_distribution == "Debian"
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
   become: yes
 
 - name: Install required packages
@@ -73,15 +96,23 @@
     state: present
   become: yes
 
+- name: Create Docker GPG keyring directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  become: yes
+
 - name: Add Docker GPG key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
+  get_url:
+    url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+    dest: /etc/apt/keyrings/docker.gpg
+    mode: '0644'
   become: yes
 
 - name: Add Docker repository
   apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
     state: present
     update_cache: yes
   become: yes

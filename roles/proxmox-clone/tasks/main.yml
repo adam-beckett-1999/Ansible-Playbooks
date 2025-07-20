@@ -14,6 +14,7 @@
     timeout: 120
   async: 120
   poll: 10
+
 - name: Edit cloned virtual-machine with new cloud-init parameters
   community.general.proxmox_kvm:
     node: "{{ proxmox_node }}"
@@ -33,6 +34,7 @@
     ipconfig:
       ipconfig0: "{{ ip_address }}"
     update: true
+
 - name: Re-size cloned virtual-machine disk
   community.general.proxmox_disk:
     api_user: "{{ proxmox_user }}"
@@ -43,6 +45,7 @@
     disk: scsi0
     size: "{{ disk_size }}"
     state: resized
+
 - name: Start cloned virtual-machine
   community.general.proxmox_kvm:
     node: "{{ proxmox_node }}"

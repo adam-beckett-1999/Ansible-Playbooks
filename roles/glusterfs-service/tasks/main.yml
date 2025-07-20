@@ -4,11 +4,13 @@
       - glusterfs-server
       - glusterfs-client
     state: present
+
 - name: Start glusterd service
   ansible.builtin.systemd:
     name: glusterd
     enabled: true
     state: started
+
 - name: Create GlusterFS brick-1 directory
   ansible.builtin.file:
     path: /glusterfs/bricks/gv0

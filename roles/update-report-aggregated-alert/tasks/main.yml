@@ -1,17 +1,17 @@
 - name: Update apt cache [Linux - Debian]
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Get list of upgradable packages [Debian]
-  ansible.builtin.shell: apt list --upgradable 2>/dev/null | tail -n +2
+  ansible.builtin.shell: set -o pipefail; apt list --upgradable 2>/dev/null | tail -n +2
   register: apt_upgradable_raw
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Get list of security updates [Debian]
   ansible.builtin.shell: |
-    unattended-upgrade --dry-run -d | grep "Checking: " | cut -d' ' -f2
+    set -o pipefail; unattended-upgrade --dry-run -d | grep "Checking: " | cut -d' ' -f2
   register: security_updates_raw
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
@@ -46,7 +46,7 @@
   when: ansible_facts['os_family'] == "Windows"
 
 - name: Parse and collect report data [Debian]
-  set_fact:
+  ansible.builtin.set_fact:
     report_data:
       hostname: "{{ inventory_hostname }}"
       os_family: Debian
@@ -55,7 +55,7 @@
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Parse and collect report data [RedHat]
-  set_fact:
+  ansible.builtin.set_fact:
     report_data:
       hostname: "{{ inventory_hostname }}"
       os_family: RedHat
@@ -64,20 +64,27 @@
   when: ansible_facts['os_family'] == "RedHat"
 
 - name: Parse and collect report data [Windows]
-  set_fact:
+  ansible.builtin.set_fact:
     report_data:
       hostname: "{{ inventory_hostname }}"
       os_family: Windows
       upgradable: "{{ win_update_result.updates.values() | map(attribute='title') | list if win_update_result.updates is defined else [] }}"
-      security: "{{ win_update_result.updates.values() | selectattr('categories', 'search', '(Security Updates|Critical Updates|Definition Updates)') | map(attribute='title') | list if win_update_result.updates is defined else [] }}"
+      security: >-
+        {{
+          win_update_result.updates.values()
+          | selectattr('categories', 'search', '(Security Updates|Critical Updates|Definition Updates)')
+          | map(attribute='title')
+          | list
+          if win_update_result.updates is defined else []
+        }}
   when: ansible_facts['os_family'] == "Windows"
 
 - name: Convert UTC time to UK local time (BST/GMT)
-  set_fact:
+  ansible.builtin.set_fact:
     local_time_uk: "{{ lookup('pipe', 'date \"+%Y-%m-%d %H:%M:%S %Z\"') }}"
 
 - name: Collect report data from hosts that defined it
-  set_fact:
+  ansible.builtin.set_fact:
     all_reports: >-
       {{
         ansible_play_hosts
@@ -89,15 +96,18 @@
   run_once: true
 
 - name: Initialise embed_fields list
-  set_fact:
+  ansible.builtin.set_fact:
     embed_fields: []
 
 - name: Append embed field for each report with internal spacing
-  set_fact:
+  ansible.builtin.set_fact:
     embed_fields: "{{ embed_fields + [item_field] }}"
   vars:
     item_field:
-      name: "{{ (item.hostname | default('Unknown Host'))[:100] }} (📦 {{ item.upgradable | default([]) | length }}, ⚠️ {{ item.security | default([]) | length }})"
+      name: >-
+        {{ (item.hostname | default('Unknown Host'))[:100] }}
+        (📦 {{ item.upgradable | default([]) | length }},
+        ⚠️ {{ item.security | default([]) | length }})
       value: |
         **🔐 Security Updates:**
         {% if item.security | default([]) | length > 0 %}
@@ -111,7 +121,7 @@
         {% else %}
         ✅ No security updates
         {% endif %}
-        
+
         **📦 All Upgradable Packages:**
         {% if item.upgradable | default([]) | length > 0 %}
         {% set upgradable_list = item.upgradable | map('regex_replace', '^', '• ') | list %}
@@ -124,14 +134,13 @@
         {% else %}
         ✅ System is fully up-to-date
         {% endif %}
-
-        ​ 
+         ​
       inline: false
   loop: "{{ all_reports }}"
   run_once: true
 
 - name: Send single aggregated Discord alert
-  uri:
+  ansible.builtin.uri:
     url: "{{ update_report_discord_webhook_url }}"
     method: POST
     headers:
@@ -150,12 +159,12 @@
   delegate_to: localhost
 
 - name: Wait to avoid Discord rate limits
-  pause:
+  ansible.builtin.pause:
     seconds: 2
   run_once: true
 
 - name: Send Discord prompt with styled embed and interactive button via bot API
-  uri:
+  ansible.builtin.uri:
     url: "{{ discord_channel_url }}"
     method: POST
     headers:

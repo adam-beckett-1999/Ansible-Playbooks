@@ -1,7 +1,16 @@
+- name: Check if node is already in Swarm
+  ansible.builtin.command: docker info --format '{{ "{{" }}.Swarm.LocalNodeState{{ "}}" }}'
+  register: swarm_status
+  ignore_errors: true
+  changed_when: false
+  tags: swarm
+
 - name: Add Workers to the Swarm
-  docker_swarm:
+  community.docker.docker_swarm:
     state: join
-    advertise_addr: "{{ ansible_host }}"
+    advertise_addr: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
     join_token: "{{ hostvars['swarm_01']['worker_token']['stdout'] }}"
-    remote_addrs: [ "{{ hostvars['swarm_01']['ansible_default_ipv4']['address'] }}:2377" ]
+    remote_addrs: |
+      - "{{ hostvars['swarm_01']['ansible_default_ipv4']['address'] }}:2377"
+  when: swarm_status.stdout != "active"
   tags: swarm

@@ -4,6 +4,7 @@
     test_command: uptime
   when:
     - ansible_facts.os_family == "Debian"
+
 - name: Reboot systems [Windows]
   ansible.windows.win_reboot:
     post_reboot_delay: 60

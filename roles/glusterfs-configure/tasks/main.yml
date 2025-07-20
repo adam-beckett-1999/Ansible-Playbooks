@@ -2,6 +2,7 @@
   gluster.gluster.gluster_peer:
     state: present
     nodes: "{{ nodes }}"
+
 - name: Create GlusterFS volume
   gluster.gluster.gluster_volume:
     state: present
@@ -11,6 +12,7 @@
     cluster: "{{ cluster }}"
     force: true
   run_once: true
+
 - name: Start GlusterFS volume
   gluster.gluster.gluster_volume:
     state: started

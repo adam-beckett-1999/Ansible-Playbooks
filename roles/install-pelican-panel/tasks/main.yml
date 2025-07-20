@@ -77,7 +77,9 @@
     path: /opt/pelican
     state: directory
     owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
     mode: '0775'
+    recurse: yes
   become: yes
 
 - name: Create Pelican logs directory
@@ -85,7 +87,9 @@
     path: /var/www/pelican/storage/logs
     state: directory
     owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
     mode: '0775'
+    recurse: yes
   become: yes
 
 - name: Create Caddy directory
@@ -93,7 +97,9 @@
     path: /etc/caddy/
     state: directory
     owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
     mode: '0775'
+    recurse: yes
   become: yes
 
 - name: Create Caddyfile configuration

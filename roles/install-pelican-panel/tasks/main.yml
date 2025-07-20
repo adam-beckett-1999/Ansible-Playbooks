@@ -113,13 +113,13 @@
       }
 
       :80 {
-        root * /var/www/pelican/public
+        root * /var/www/html/public
         encode gzip
 
         file_server
 
         php_fastcgi unix//run/php/php8.4-fpm.sock {
-          root /var/www/pelican/public
+          root /var/www/html/public
           index index.php
 
           env PHP_VALUE "upload_max_filesize = 100M

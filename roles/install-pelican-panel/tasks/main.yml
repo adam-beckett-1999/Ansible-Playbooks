@@ -92,6 +92,16 @@
     recurse: yes
   become: yes
 
+- name: Create Pelican public directory
+  file:
+    path: /var/www/pelican/public
+    state: directory
+    owner: root
+    group: root
+    mode: '0777'
+    recurse: yes
+  become: yes
+
 - name: Create Caddy directory
   file:
     path: /etc/caddy/

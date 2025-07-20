@@ -78,7 +78,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0775'
+    mode: '0777'
     recurse: yes
   become: yes
 
@@ -88,7 +88,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0775'
+    mode: '0777'
     recurse: yes
   become: yes
 
@@ -98,7 +98,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0775'
+    mode: '0777'
     recurse: yes
   become: yes
 
@@ -108,7 +108,7 @@
       {
         admin off
         servers {
-          trusted_proxies static {{ reverse_proxy_ip }}
+            trusted_proxies static {{ reverse_proxy_ip }}
         }
       }
 
@@ -116,20 +116,8 @@
         root * /var/www/html/public
         encode gzip
 
+        php_fastcgi 127.0.0.1:9000
         file_server
-
-        php_fastcgi unix//run/php/php8.4-fpm.sock {
-          root /var/www/html/public
-          index index.php
-
-          env PHP_VALUE "upload_max_filesize = 100M
-          post_max_size = 100M"
-          env HTTP_PROXY ""
-
-          read_timeout 300s
-          dial_timeout 300s
-          write_timeout 300s
-        }
       }
     dest: /etc/caddy/Caddyfile
     owner: root

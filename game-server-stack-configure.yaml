@@ -1,6 +1,7 @@
 - name: Install updates and standard packages, configure SNMP and network shares
   hosts: game_servers
   roles:
+    - time-sync
     - update
     - base-packages
   vars:

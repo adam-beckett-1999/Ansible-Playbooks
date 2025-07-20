@@ -76,8 +76,8 @@
   file:
     path: /opt/pelican
     state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: root
+    group: root
     mode: '0775'
     recurse: yes
   become: yes
@@ -86,8 +86,8 @@
   file:
     path: /var/www/pelican/storage/logs
     state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: root
+    group: root
     mode: '0775'
     recurse: yes
   become: yes
@@ -96,8 +96,8 @@
   file:
     path: /etc/caddy/
     state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: root
+    group: root
     mode: '0775'
     recurse: yes
   become: yes
@@ -116,10 +116,22 @@
         root * /var/www/pelican/public
         encode gzip
 
-        php_fastcgi 127.0.0.1:9000
         file_server
+
+        php_fastcgi unix//run/php/php8.4-fpm.sock {
+          root /var/www/pelican/public
+          index index.php
+
+          env PHP_VALUE "upload_max_filesize = 100M
+          post_max_size = 100M"
+          env HTTP_PROXY ""
+
+          read_timeout 300s
+          dial_timeout 300s
+          write_timeout 300s
+        }
       }
     dest: /etc/caddy/Caddyfile
-    owner: "{{ ansible_user }}"
+    owner: root
     mode: '0644'
   become: yes

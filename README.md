@@ -14,16 +14,19 @@ This repository contains a collection of Ansible playbooks and roles for deployi
 
 ### Playbooks
 
+- `cluster-reboot-pve-core.yaml` — Runs a rolling reboot of Proxmox nodes in the Core cluster after an update or as part of scheduled restart operations
+- `cluster-reboot-pve-mini.yaml` — Runs a rolling reboot of Proxmox nodes in the Mini cluster after an update or as part of scheduled restart operations
+- `cluster-reboot-pve-test.yaml` — Runs a rolling reboot of Proxmox nodes in the Test cluster after an update or as part of scheduled restart operations
 - `docker-prune.yaml` — Prune unused Docker images and containers
 - `docker-server-stack-configure.yaml` — Configure Docker server stack
 - `docker-swarm-server-stack-configure.yaml` — Configure Docker Swarm server stack
-- `game-server-stack-configure.yaml` — Configure game server stack
 - `kubernetes-cluster-stack-configure.yaml` — Configure Kubernetes cluster stack
-- `lxc-containers-configure.yaml` — Configure LXC containers
 - `patchman-install.yaml` — Install Patchman client
+- `physical-hosts-update.yaml` — Update physical hosts & machines on the network
 - `proxmox-update.yaml` — Update Proxmox servers
 - `reboot.yaml` — Reboot target machines
 - `shutdown.yaml` — Shutdown target machines
+- `update-report-physical-hosts.yaml` — Generate update reports for physical hosts and machines on the network
 - `update-report-pve-clusters.yaml` — Generate update reports for Proxmox clusters
 - `update-report-vms-lxcs.yaml` — Generate update reports for VMs and LXCs
 - `vms-lxcs-update.yaml` — Update VMs and LXCs
@@ -39,6 +42,9 @@ This repository contains a collection of Ansible playbooks and roles for deployi
 - `proxmox-destroy` — Destroy Proxmox VMs
 - `proxmox-snapshot` — Manage Proxmox VM snapshots
 - `proxmox-vm-start` / `proxmox-vm-stop` — Start/stop VMs
+- `proxmox-migration-check-vms-initial` / `proxmox-migration-check-vms-returned` — Check that VMs/LXCs have migrated off proxmox node successfully during rolling reboot
+- `proxmox-node-reboot` — Reboots Proxmox nodes
+- `proxmox-cluster-reboot-report`  — Summarises Reboot Process and running VMs/LXCs and sends a Discord Webhook alert
 
 #### Docker & Container Management
 
@@ -67,12 +73,9 @@ This repository contains a collection of Ansible playbooks and roles for deployi
 #### System Management & Utilities
 
 - `base-packages` — Install essential base packages
-- `cc-amp-install` — Install AMP (Application Management Panel)
-- `cockpit-install` — Install Cockpit web-based management
 - `disable-motd-ubuntu` — Disable Ubuntu MOTD messages
 - `patchman-client-install` — Install Patchman patch management client
 - `pause` — Pause playbook execution
-- `pufferpanel-install` — Install PufferPanel game server management
 - `qemu-guest-agent-install` — Install QEMU guest agent for VMs
 - `reboot` — Reboot target systems
 - `shutdown` — Shutdown target systems

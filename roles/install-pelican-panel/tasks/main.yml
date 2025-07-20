@@ -1,137 +1,3 @@
----
-- name: Add ondrej/php PPA repository (Ubuntu only)
-  apt_repository:
-    repo: "ppa:ondrej/php"
-    state: present
-    update_cache: yes
-  become: yes
-  when: ansible_distribution == "Ubuntu"
-
-- name: Add Sury PHP repository for Debian
-  block:
-    - name: Add Sury PHP repository GPG key
-      apt_key:
-        url: https://packages.sury.org/php/apt.gpg
-        state: present
-      become: yes
-
-    - name: Add Sury PHP repository
-      apt_repository:
-        repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
-        state: present
-        update_cache: yes
-      become: yes
-  when: ansible_distribution == "Debian"
-
-- name: Update apt cache
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600
-  become: yes
-
-- name: Install MySQL/MariaDB server (distribution-specific)
-  block:
-    - name: Install MySQL server on Ubuntu
-      apt:
-        name: mysql-server
-        state: present
-      become: yes
-      when: ansible_distribution == "Ubuntu"
-
-    - name: Install MariaDB server on Debian
-      apt:
-        name: 
-          - mariadb-server
-          - mariadb-client
-        state: present
-      become: yes
-      when: ansible_distribution == "Debian"
-
-- name: Install other required packages
-  apt:
-    name:
-      - sqlite3
-      - "php8.4"
-      - "php8.4-cli"
-      - "php8.4-common"
-      - "php8.4-mysql"
-      - "php8.4-sqlite3"
-      - "php8.4-fpm"
-      - "php8.4-mbstring"
-      - "php8.4-xml"
-      - "php8.4-bcmath"
-      - "php8.4-curl"
-      - "php8.4-zip"
-      - "php8.4-gd"
-      - "php8.4-intl"
-      - git
-      - unzip
-      - python3-pymysql
-      - python3-mysqldb
-      - cron
-      - debian-keyring
-      - debian-archive-keyring
-      - apt-transport-https
-    state: present
-  become: yes
-
-- name: Add Caddy GPG key
-  get_url:
-    url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
-    dest: /usr/share/keyrings/caddy-stable-archive-keyring.asc
-    mode: '0644'
-  become: yes
-
-- name: Add Caddy repository
-  apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/caddy-stable-archive-keyring.asc] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main"
-    state: present
-    update_cache: yes
-  become: yes
-
-- name: Install Caddy
-  apt:
-    name: caddy
-    state: present
-  become: yes
-
-- name: Start and enable MySQL/MariaDB service
-  systemd:
-    name: "{{ 'mysql' if ansible_distribution == 'Ubuntu' else 'mariadb' }}"
-    state: started
-    enabled: true
-  become: yes
-
-- name: Secure MySQL/MariaDB installation
-  mysql_user:
-    name: root
-    password: "{{ mysql_root_password }}"
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    login_user: root
-    login_password: ""
-  become: yes
-  ignore_errors: yes
-
-- name: Create Pelican database
-  mysql_db:
-    name: pelican
-    state: present
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    login_user: root
-    login_password: "{{ mysql_root_password | default('') }}"
-  become: yes
-
-- name: Create Pelican database user
-  mysql_user:
-    name: pelicanuser
-    password: "{{ pelican_db_password }}"
-    priv: "pelican.*:ALL"
-    state: present
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    login_user: root
-    login_password: "{{ mysql_root_password | default('') }}"
-  become: yes
-
 - name: Install Docker prerequisites
   apt:
     name:
@@ -196,246 +62,50 @@
     append: yes
   become: yes
 
-- name: Download and install Composer
-  shell: |
-    curl -sS https://getcomposer.org/installer | php
-    mv composer.phar /usr/local/bin/composer
-    chmod +x /usr/local/bin/composer
-  become: yes
-  args:
-    creates: /usr/local/bin/composer
+- name: Start Portainer-Agent service
+  community.docker.docker_container:
+    name: Portainer-Agent
+    image: portainer/agent:2.27.9
+    ports:
+      - 9001:9001
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
 
-- name: Create Pelican installation directory
+- name: Create Pelican directory
   file:
-    path: /var/www/pelican
+    path: /opt/pelican
     state: directory
     owner: "{{ ansible_user }}"
-    group: www-data
     mode: '0775'
   become: yes
 
-- name: Download Pelican Panel
-  unarchive:
-    src: https://github.com/pelican-dev/panel/releases/latest/download/panel.tar.gz
-    dest: /var/www/pelican
-    remote_src: yes
-    owner: "{{ ansible_user }}"
-    group: www-data
-    mode: '0775'
-  become: yes
-
-- name: Install PHP dependencies with Composer
-  composer:
-    command: install
-    arguments: "--no-dev --optimize-autoloader"
-    working_dir: /var/www/pelican
-  become: yes
-  become_user: "{{ ansible_user }}"
-
-- name: Set proper ownership for Pelican files
+- name: Create Pelican logs directory
   file:
-    path: /var/www/pelican
-    owner: www-data
-    group: www-data
-    recurse: yes
-  become: yes
-
-- name: Set permissions for storage and bootstrap cache
-  file:
-    path: "{{ item }}"
-    mode: '0755'
-    recurse: yes
-  loop:
-    - "/var/www/pelican/storage"
-    - "/var/www/pelican/bootstrap/cache"
-  become: yes
-
-- name: Ensure proper ownership of all Pelican files
-  file:
-    path: /var/www/pelican
-    owner: www-data
-    group: www-data
-    recurse: yes
-  become: yes
-
-- name: Run Pelican environment setup
-  shell: |
-    cd /var/www/pelican
-    sudo -u www-data php artisan p:environment:setup --new-salt --author={{ ansible_user }} --url=http://{{ ansible_default_ipv4.address }} --timezone=UTC --cache=database --session=database --queue=database --redis-host=127.0.0.1 --redis-pass= --redis-port=6379 --settings-ui=true
-  become: yes
-  args:
-    creates: /var/www/pelican/.env
-
-- name: Generate application key if missing
-  shell: |
-    cd /var/www/pelican
-    sudo -u www-data php artisan key:generate --force
-  become: yes
-  when: ansible_check_mode == false
-
-- name: Set secure permissions for .env file
-  file:
-    path: /var/www/pelican/.env
-    mode: '0640'
-    owner: www-data
-    group: www-data
-  become: yes
-
-- name: Verify .env file contains APP_KEY
-  shell: |
-    cd /var/www/pelican
-    grep -q "APP_KEY=" .env && echo "APP_KEY found" || echo "APP_KEY missing"
-  become: yes
-  register: appkey_check
-  changed_when: false
-
-- name: Display APP_KEY status
-  debug:
-    var: appkey_check.stdout
-
-- name: Run database migrations
-  shell: |
-    cd /var/www/pelican
-    sudo -u www-data php artisan migrate --seed --force
-  become: yes
-  environment:
-    COMPOSER_ALLOW_SUPERUSER: "1"
-
-- name: Clear application cache and optimize
-  shell: |
-    cd /var/www/pelican
-    sudo -u www-data php artisan config:clear
-    sudo -u www-data php artisan cache:clear
-    sudo -u www-data php artisan view:clear
-    sudo -u www-data php artisan config:cache
-  become: yes
-  ignore_errors: yes
-
-- name: Start and enable cron service
-  systemd:
-    name: cron
-    state: started
-    enabled: true
-  become: yes
-
-- name: Add Pelican scheduler cron job
-  cron:
-    name: "Pelican Panel Scheduler"
-    job: "php /var/www/pelican/artisan schedule:run >> /dev/null 2>&1"
-    minute: "*"
-    hour: "*"
-    day: "*"
-    month: "*"
-    weekday: "*"
-    user: www-data
-  become: yes
-
-- name: Setup Pelican queue worker service
-  shell: |
-    cd /var/www/pelican
-    sudo php artisan p:environment:queue-service
-  become: yes
-  args:
-    creates: /etc/systemd/system/pelican-queue.service
-
-- name: Start and enable Pelican queue worker service
-  systemd:
-    name: pelican-queue
-    state: started
-    enabled: true
-    daemon_reload: yes
-  become: yes
-
-- name: Create Caddy log directory
-  file:
-    path: /var/log/caddy
+    path: /var/www/pelican/storage/logs
     state: directory
-    owner: caddy
-    group: caddy
-    mode: '0755'
+    owner: "{{ ansible_user }}"
+    mode: '0775'
   become: yes
 
 - name: Create Caddyfile configuration
   copy:
     content: |
       {
-          servers :80 {
-              timeouts {
-                  read_body 120s
-              }
-          }
+        admin off
+        servers {
+          trusted_proxies static {{ reverse_proxy_ip }}
+        }
       }
 
-      {{ pelican_domain }}:80 {
-          root * /var/www/pelican/public
+      :80 {
+        root * /var/www/pelican/public
+        encode gzip
 
-          trusted_proxies static {{ pelican_domain }}
-
-          file_server
-
-          php_fastcgi unix//run/php/php8.4-fpm.sock {
-              root /var/www/pelican/public
-              index index.php
-
-              env PHP_VALUE "upload_max_filesize = 100M
-              post_max_size = 100M"
-              env HTTP_PROXY ""
-
-              read_timeout 300s
-              dial_timeout 300s
-              write_timeout 300s
-          }
-
-          header Strict-Transport-Security "max-age=16768000; preload;"
-          header X-Content-Type-Options "nosniff"
-          header X-XSS-Protection "1; mode=block;"
-          header X-Robots-Tag "none"
-          header Content-Security-Policy "frame-ancestors 'self'"
-          header X-Frame-Options "DENY"
-          header Referrer-Policy "same-origin"
-
-          request_body {
-              max_size 100m
-          }
-
-          respond /.ht* 403
-
-          log {
-              output file /var/log/caddy/pelican.log {
-                  roll_size 100MiB
-                  roll_keep_for 7d
-              }
-              level INFO
-          }
+        php_fastcgi 127.0.0.1:9000
+        file_server
       }
     dest: /etc/caddy/Caddyfile
-    owner: root
-    group: root
+    owner: "{{ ansible_user }}"
     mode: '0644'
-  become: yes
-
-- name: Test Caddy configuration
-  command: caddy validate --config /etc/caddy/Caddyfile
-  become: yes
-  changed_when: false
-
-- name: Start and enable Caddy
-  systemd:
-    name: caddy
-    state: started
-    enabled: true
-  become: yes
-
-- name: Start and enable PHP-FPM
-  systemd:
-    name: "php8.4-fpm"
-    state: started
-    enabled: true
-  become: yes
-
-- name: Start and enable MySQL/MariaDB
-  systemd:
-    name: "{{ 'mysql' if ansible_distribution == 'Ubuntu' else 'mariadb' }}"
-    state: started
-    enabled: true
   become: yes

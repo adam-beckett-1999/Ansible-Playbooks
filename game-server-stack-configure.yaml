@@ -11,10 +11,7 @@
   hosts: game_server_panel
   become: yes
   vars:
-    pelican_domain: "{{ lookup('env', 'PELICAN_PANEL_DOMAIN') }}"
-    pelican_db_password: "{{ lookup('env', 'PELICAN_DB_PASSWORD') }}"
-    mysql_root_password: "{{ lookup('env', 'PELICAN_DB_ROOT_PASSWORD') }}"
-    letsencrypt_email: "{{ lookup('env', 'LETSENCRYPT_EMAIL') }}"
+    reverse_proxy_ip: "{{ lookup('env', 'REVERSE_PROXY_IP') }}"
   roles:
     - install-pelican-panel
 

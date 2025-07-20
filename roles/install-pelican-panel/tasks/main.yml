@@ -102,6 +102,15 @@
     recurse: yes
   become: yes
 
+- name: Download HyveCloud logo
+  get_url:
+    url: https://auth.hyvecloud.dev/media/public/icons/HyveCloudClearBlackCropped.png
+    dest: /var/www/pelican/public/HyveCloudClearBlackCropped.png
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+
 - name: Create Caddy directory
   file:
     path: /etc/caddy/

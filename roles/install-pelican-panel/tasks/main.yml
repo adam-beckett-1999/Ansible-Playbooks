@@ -88,6 +88,14 @@
     mode: '0775'
   become: yes
 
+- name: Create Caddy directory
+  file:
+    path: /etc/caddy/
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: '0775'
+  become: yes
+
 - name: Create Caddyfile configuration
   copy:
     content: |

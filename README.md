@@ -1,10 +1,12 @@
+# Ansible Playbooks
+
 ![image info](ansible-playbooks.png)
 
 ---
 
 ## Ansible Playbooks for Home Network Management
 
-This repository contains a collection of Ansible playbooks and roles for deploying and managing a home network environment. The playbooks cover a wide range of tasks, including virtualization, containerization, storage, monitoring, and general Linux system management.
+This repository contains a collection of Ansible playbooks and roles for deploying and managing my homelab network environment. The playbooks cover a wide range of tasks, including virtualization, containerization, storage, monitoring, and general Linux/Windows system management.
 
 > **Note:** This is a work-in-progress repository. Some playbooks/roles may be unfinished or have issues. Use at your own risk and adapt as needed for your environment.
 
@@ -31,6 +33,7 @@ This repository contains a collection of Ansible playbooks and roles for deployi
 ### Roles
 
 #### Proxmox Management
+
 - `proxmox-create` — Create new Proxmox VMs
 - `proxmox-clone` — Clone existing Proxmox VMs
 - `proxmox-destroy` — Destroy Proxmox VMs
@@ -38,45 +41,52 @@ This repository contains a collection of Ansible playbooks and roles for deployi
 - `proxmox-vm-start` / `proxmox-vm-stop` — Start/stop VMs
 
 #### Docker & Container Management
-- `docker-install` — Install Docker
-- `docker-image-prune` — Prune Docker images
-- `docker-portainer-deploy` — Deploy Portainer
+
+- `docker-install` — Install Docker Engine
+- `docker-image-prune` — Prune unused Docker images
+- `docker-portainer-deploy` — Deploy Portainer management interface
 - `docker-portainer-agent-deploy` — Deploy Portainer Agent
-- `docker-swarm-create` — Create Docker Swarm
-- `docker-swarm-manager-join` / `docker-swarm-worker-join` — Join Swarm as manager/worker
+- `docker-swarm-create` — Initialize Docker Swarm cluster
+- `docker-swarm-manager-join` — Join nodes to Swarm as managers
+- `docker-swarm-worker-join` — Join nodes to Swarm as workers
 
 #### Kubernetes & K3s
-- `k3s-master-deploy` — Deploy K3s master
-- `k3s-node-deploy` — Deploy K3s node
-- `k3s-prerequisites` — Prepare system for K3s
+
+- `k3s-master-deploy` — Deploy K3s master node
+- `k3s-node-deploy` — Deploy K3s worker node
+- `k3s-prerequisites` — Prepare system for K3s installation
 - `kubernetes-portainer-agent-deploy` — Deploy Portainer Agent on Kubernetes
 
 #### Storage & Network
-- `glusterfs-configure` — Configure GlusterFS
+
+- `glusterfs-configure` — Configure GlusterFS distributed storage
 - `glusterfs-mount` — Mount GlusterFS volumes
 - `glusterfs-service` — Manage GlusterFS service
-- `network-share-mount` — Mount network shares
+- `network-share-mount` — Mount network shares (SMB/NFS)
 
 #### System Management & Utilities
-- `base-packages` — Install base packages
+
+- `base-packages` — Install essential base packages
 - `cc-amp-install` — Install AMP (Application Management Panel)
-- `cockpit-install` — Install Cockpit web management
-- `disable-motd-ubuntu` — Disable Ubuntu MOTD
-- `patchman-client-install` — Install Patchman client
-- `pause` — Pause execution
-- `pufferpanel-install` — Install PufferPanel
-- `qemu-guest-agent-install` — Install QEMU guest agent
-- `reboot` / `shutdown` — Reboot or shutdown systems
-- `reboot-required-check` — Check if reboot is required
-- `snmp-configure` — Configure SNMP
-- `update` — General update tasks
-- `update-report-aggregated-alert` / `update-report-single-alert` — Update reporting
-- `webmin-install` — Install Webmin
+- `cockpit-install` — Install Cockpit web-based management
+- `disable-motd-ubuntu` — Disable Ubuntu MOTD messages
+- `patchman-client-install` — Install Patchman patch management client
+- `pause` — Pause playbook execution
+- `pufferpanel-install` — Install PufferPanel game server management
+- `qemu-guest-agent-install` — Install QEMU guest agent for VMs
+- `reboot` — Reboot target systems
+- `shutdown` — Shutdown target systems
+- `reboot-required-check` — Check if system reboot is required (Linux/Windows)
+- `snmp-configure` — Configure SNMP monitoring
+- `update` — Perform system updates (Linux/Windows)
+- `update-report-aggregated-alert` — Send aggregated update reports
+- `update-report-single-alert` — Send individual update reports
+- `webmin-install` — Install Webmin web administration
 
 ---
 
-## Usage
+## License
 
-Refer to individual playbooks and roles for usage details/required environment variables.
+This project is provided as-is for educational and personal use. Adapt and modify as needed for your environment.
 
 ---

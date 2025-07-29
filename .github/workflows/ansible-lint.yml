@@ -1,0 +1,17 @@
+name: ansible-lint
+
+on:
+  push:
+    branches: ["dev"]
+
+jobs:
+  build:
+    name: Ansible Lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run ansible-lint on playbooks and roles
+        uses: ansible/ansible-lint@main
+        with:
+          args: >-
+            *.yaml roles/*/tasks/*.yml

@@ -24,20 +24,38 @@ jobs:
           ANSIBLE_COLLECTIONS_PATH: ~/.ansible/collections:/usr/share/ansible/collections
         run: |
           ansible-lint *.yaml roles/*/tasks/*.yml
-
-      - name: Discord webhook alert
-        if: always()
+      - name: Discord Notification (Success)
+        if: success()
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          if [ "$GITHUB_JOB" = "build" ]; then
-            if [ "$GITHUB_RUN_ATTEMPT" -eq 1 ]; then
-              STATUS="${{ job.status }}"
-              if [ "$STATUS" = "success" ]; then
-                MESSAGE="✅ Ansible-lint workflow succeeded on $GITHUB_REPOSITORY@$GITHUB_REF."
-              else
-                MESSAGE="❌ Ansible-lint workflow failed on $GITHUB_REPOSITORY@$GITHUB_REF."
-              fi
-              curl -H "Content-Type: application/json" -X POST -d '{"content": "'$MESSAGE'"}' "$DISCORD_WEBHOOK"
-            fi
-          fi
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d '{
+              "embeds": [{
+                "title": "✅ Ansible-lint Workflow Succeeded",
+                "description": "Ansible-lint workflow succeeded on **DEV** branch for repo **Ansible-Playbooks**.",
+                "color": 3066993,
+                "timestamp": "'"$(date --utc +%Y-%m-%dT%H:%M:%SZ)"'",
+                "footer": { "text": "GitHub Actions • Ansible Lint Success" }
+              }]
+            }' \
+            $DISCORD_WEBHOOK
+
+      - name: Discord Notification (Failure)
+        if: failure()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d '{
+              "embeds": [{
+                "title": "❌ Ansible-lint Workflow Failed",
+                "description": "Ansible-lint workflow failed on **DEV** branch for repo **Ansible-Playbooks**.",
+                "color": 15158332,
+                "timestamp": "'"$(date --utc +%Y-%m-%dT%H:%M:%SZ)"'",
+                "footer": { "text": "GitHub Actions • Ansible Lint Failure" }
+              }]
+            }' \
+            $DISCORD_WEBHOOK

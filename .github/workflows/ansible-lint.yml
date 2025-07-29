@@ -14,13 +14,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Install Ansible and required collections
+      - name: Install Ansible, ansible-lint, and required collections
         run: |
           python -m pip install --upgrade pip
-          pip install ansible
+          pip install ansible ansible-lint
           ansible-galaxy collection install community.general ansible.posix community.docker gluster.gluster ansible.windows
       - name: Run ansible-lint on playbooks and roles
-        uses: ansible/ansible-lint@main
-        with:
-          args: >-
-            *.yaml roles/*/tasks/*.yml
+        env:
+          ANSIBLE_COLLECTIONS_PATHS: ~/.ansible/collections:/usr/share/ansible/collections
+        run: |
+          ansible-lint *.yaml roles/*/tasks/*.yml

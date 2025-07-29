@@ -21,6 +21,6 @@ jobs:
           ansible-galaxy collection install community.general ansible.posix community.docker gluster.gluster ansible.windows
       - name: Run ansible-lint on playbooks and roles
         env:
-          ANSIBLE_COLLECTIONS_PATHS: ~/.ansible/collections:/usr/share/ansible/collections
+          ANSIBLE_COLLECTIONS_PATH: ~/.ansible/collections:/usr/share/ansible/collections
         run: |
           ansible-lint *.yaml roles/*/tasks/*.yml

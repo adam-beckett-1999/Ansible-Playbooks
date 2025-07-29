@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Install distutils dependency
+        run: sudo apt-get update && sudo apt-get install -y python3-distutils
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

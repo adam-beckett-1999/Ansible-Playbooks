@@ -24,3 +24,20 @@ jobs:
           ANSIBLE_COLLECTIONS_PATH: ~/.ansible/collections:/usr/share/ansible/collections
         run: |
           ansible-lint *.yaml roles/*/tasks/*.yml
+
+      - name: Discord webhook alert
+        if: always()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ "$GITHUB_JOB" = "build" ]; then
+            if [ "$GITHUB_RUN_ATTEMPT" -eq 1 ]; then
+              STATUS="${{ job.status }}"
+              if [ "$STATUS" = "success" ]; then
+                MESSAGE="✅ Ansible-lint workflow succeeded on $GITHUB_REPOSITORY@$GITHUB_REF."
+              else
+                MESSAGE="❌ Ansible-lint workflow failed on $GITHUB_REPOSITORY@$GITHUB_REF."
+              fi
+              curl -H "Content-Type: application/json" -X POST -d '{"content": "'$MESSAGE'"}' "$DISCORD_WEBHOOK"
+            fi
+          fi

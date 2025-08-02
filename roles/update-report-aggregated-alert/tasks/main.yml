@@ -95,48 +95,60 @@
       }}
   run_once: true
 
-- name: Initialise embed_fields list
+- name: Create summary statistics
   ansible.builtin.set_fact:
-    embed_fields: []
+    summary_stats:
+      total_hosts: "{{ all_reports | length }}"
+      hosts_with_updates: "{{ all_reports | selectattr('upgradable', 'defined') | selectattr('upgradable', 'length', '>', 0) | list | length }}"
+      hosts_with_security: "{{ all_reports | selectattr('security', 'defined') | selectattr('security', 'length', '>', 0) | list | length }}"
+      total_upgradable: "{{ all_reports | map(attribute='upgradable') | map('default', []) | map('length') | sum }}"
+      total_security: "{{ all_reports | map(attribute='security') | map('default', []) | map('length') | sum }}"
+  run_once: true
 
-- name: Append embed field for each report with internal spacing
+- name: Create compact host status list
   ansible.builtin.set_fact:
-    embed_fields: "{{ embed_fields + [item_field] }}"
+    host_status_lines: >-
+      {{
+        all_reports | map('extract', host_line_template) | list
+      }}
   vars:
-    item_field:
-      name: >-
-        {{ (item.hostname | default('Unknown Host'))[:100] }}
-        (📦 {{ item.upgradable | default([]) | length }},
-        ⚠️ {{ item.security | default([]) | length }})
-      value: |
-        **🔐 Security Updates:**
-        {% if item.security | default([]) | length > 0 %}
-        {% set security_list = item.security | map('regex_replace', '^', '• ') | list %}
-        {% if security_list | join('  ') | length > 800 %}
-        {{ security_list[:5] | join('  ') }}
-        ... and {{ (item.security | length) - 5 }} more
-        {% else %}
-        {{ security_list | join('  ') }}
-        {% endif %}
-        {% else %}
-        ✅ No security updates
-        {% endif %}
+    host_line_template: >-
+      {%- set upgradable_count = item.upgradable | default([]) | length -%}
+      {%- set security_count = item.security | default([]) | length -%}
+      {%- if upgradable_count == 0 -%}
+      ✅ {{ item.hostname | default('Unknown') }} - Up to date
+      {%- else -%}
+      {%- if security_count > 0 -%}
+      🔴 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)
+      {%- else -%}
+      🟡 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates
+      {%- endif -%}
+      {%- endif -%}
+  run_once: true
 
-        **📦 All Upgradable Packages:**
-        {% if item.upgradable | default([]) | length > 0 %}
-        {% set upgradable_list = item.upgradable | map('regex_replace', '^', '• ') | list %}
-        {% if upgradable_list | join('  ') | length > 800 %}
-        {{ upgradable_list[:5] | join('  ') }}
-        ... and {{ (item.upgradable | length) - 5 }} more
-        {% else %}
-        {{ upgradable_list | join('  ') }}
-        {% endif %}
-        {% else %}
-        ✅ System is fully up-to-date
-        {% endif %}
-         ​
-      inline: false
-  loop: "{{ all_reports }}"
+- name: Split host status into chunks to avoid embed limits
+  ansible.builtin.set_fact:
+    host_chunks: >-
+      {{
+        host_status_lines | batch(15) | list
+      }}
+  run_once: true
+
+- name: Create embed fields from host chunks
+  ansible.builtin.set_fact:
+    embed_fields: >-
+      {{
+        host_chunks | map('join', '\n') | list |
+        map('regex_replace', '^', '') |
+        enumerate |
+        map('extract', chunk_field_template) |
+        list
+      }}
+  vars:
+    chunk_field_template:
+      name: "Hosts {{ item.0 * 15 + 1 }}-{{ [item.0 * 15 + 15, host_status_lines | length] | min }}"
+      value: "{{ item.1 }}"
+      inline: true
   run_once: true
 
 - name: Send single aggregated Discord alert
@@ -150,8 +162,21 @@
     body:
       embeds:
         - title: "🔐 Update Report for VMs & LXCs"
-          description: "Summary across {{ all_reports | length }} hosts"
-          color: 16753920
+          description: |
+            **Summary:** {{ summary_stats.total_hosts }} hosts checked
+            📊 **{{ summary_stats.hosts_with_updates }}** hosts need updates ({{ summary_stats.total_upgradable }} total packages)
+            ⚠️ **{{ summary_stats.hosts_with_security }}** hosts have security updates ({{ summary_stats.total_security }} packages)
+
+            **Legend:**
+            ✅ Up to date | 🟡 General updates | 🔴 Security updates available
+          color: >-
+            {%- if summary_stats.hosts_with_security > 0 -%}
+            15158332
+            {%- elif summary_stats.hosts_with_updates > 0 -%}
+            16776960
+            {%- else -%}
+            3066993
+            {%- endif -%}
           fields: "{{ embed_fields }}"
           footer:
             text: "Reported at {{ local_time_uk }}"

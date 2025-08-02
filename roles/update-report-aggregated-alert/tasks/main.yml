@@ -99,8 +99,26 @@
   ansible.builtin.set_fact:
     summary_stats:
       total_hosts: "{{ all_reports | length }}"
-      hosts_with_updates: "{{ all_reports | selectattr('upgradable', 'defined') | selectattr('upgradable', 'length', '>', 0) | list | length }}"
-      hosts_with_security: "{{ all_reports | selectattr('security', 'defined') | selectattr('security', 'length', '>', 0) | list | length }}"
+      hosts_with_updates: >-
+        {{
+          all_reports
+          | selectattr('upgradable', 'defined')
+          | map(attribute='upgradable')
+          | map('default', [])
+          | select('length')
+          | list
+          | length
+        }}
+      hosts_with_security: >-
+        {{
+          all_reports
+          | selectattr('security', 'defined')
+          | map(attribute='security')
+          | map('default', [])
+          | select('length')
+          | list
+          | length
+        }}
       total_upgradable: "{{ all_reports | map(attribute='upgradable') | map('default', []) | map('length') | sum }}"
       total_security: "{{ all_reports | map(attribute='security') | map('default', []) | map('length') | sum }}"
   run_once: true

@@ -4,19 +4,15 @@
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Get list of upgradable packages [Debian]
-  ansible.builtin.shell: set -o pipefail; apt list --upgradable 2>/dev/null | tail -n +2
+  ansible.builtin.shell: apt list --upgradable 2>/dev/null | tail -n +2
   register: apt_upgradable_raw
-  args:
-    executable: /bin/bash
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Get list of security updates [Debian]
   ansible.builtin.shell: |
-    set -o pipefail; unattended-upgrade --dry-run -d | grep "Checking: " | cut -d' ' -f2
+    unattended-upgrade --dry-run -d | grep "Checking: " | cut -d' ' -f2
   register: security_updates_raw
-  args:
-    executable: /bin/bash
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
 
@@ -119,15 +115,7 @@
     host_line_template: >-
       {%- set upgradable_count = item.upgradable | default([]) | length -%}
       {%- set security_count = item.security | default([]) | length -%}
-      {%- if upgradable_count == 0 -%}
-      ✅ {{ item.hostname | default('Unknown') }} - Up to date
-      {%- else -%}
-      {%- if security_count > 0 -%}
-      🔴 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)
-      {%- else -%}
-      🟡 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates
-      {%- endif -%}
-      {%- endif -%}
+      {%- if upgradable_count == 0 -%}✅ {{ item.hostname | default('Unknown') }} - Up to date{%- else -%}{%- if security_count > 0 -%}🔴 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security){%- else -%}🟡 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates{%- endif -%}{%- endif -%}
   run_once: true
 
 - name: Split host status into chunks to avoid embed limits
@@ -174,12 +162,9 @@
             **Legend:**
             ✅ Up to date | 🟡 General updates | 🔴 Security updates available
           color: >-
-            {%- if summary_stats.hosts_with_security > 0 -%}
-            15158332
-            {%- elif summary_stats.hosts_with_updates > 0 -%}
-            16776960
-            {%- else -%}
-            3066993
+            {%- if summary_stats.hosts_with_security > 0 -%}15158332
+            {%- elif summary_stats.hosts_with_updates > 0 -%}16776960
+            {%- else -%}3066993
             {%- endif -%}
           fields: "{{ embed_fields }}"
           footer:

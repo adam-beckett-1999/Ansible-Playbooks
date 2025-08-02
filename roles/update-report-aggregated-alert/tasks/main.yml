@@ -115,7 +115,15 @@
     host_line_template: >-
       {%- set upgradable_count = item.upgradable | default([]) | length -%}
       {%- set security_count = item.security | default([]) | length -%}
-      {%- if upgradable_count == 0 -%}✅ {{ item.hostname | default('Unknown') }} - Up to date{%- else -%}{%- if security_count > 0 -%}🔴 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security){%- else -%}🟡 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates{%- endif -%}{%- endif -%}
+      {%- if upgradable_count == 0 -%}
+        ✅ {{ item.hostname | default('Unknown') }} - Up to date
+      {%- else -%}
+        {%- if security_count > 0 -%}
+          🔴 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)
+        {%- else -%}
+          🟡 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates
+        {%- endif -%}
+      {%- endif -%}
   run_once: true
 
 - name: Split host status into chunks to avoid embed limits

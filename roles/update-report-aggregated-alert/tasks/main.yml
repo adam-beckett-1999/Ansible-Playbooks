@@ -102,20 +102,20 @@
       hosts_with_updates: >-
         {{
           all_reports
-          | selectattr('upgradable', 'defined')
           | map(attribute='upgradable')
           | map('default', [])
-          | select('length')
+          | map('length')
+          | select('>', 0)
           | list
           | length
         }}
       hosts_with_security: >-
         {{
           all_reports
-          | selectattr('security', 'defined')
           | map(attribute='security')
           | map('default', [])
-          | select('length')
+          | map('length')
+          | select('>', 0)
           | list
           | length
         }}

@@ -6,6 +6,8 @@
 - name: Get list of upgradable packages [Debian]
   ansible.builtin.shell: set -o pipefail; apt list --upgradable 2>/dev/null | tail -n +2
   register: apt_upgradable_raw
+  args:
+    executable: /bin/bash
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
 
@@ -13,6 +15,8 @@
   ansible.builtin.shell: |
     set -o pipefail; unattended-upgrade --dry-run -d | grep "Checking: " | cut -d' ' -f2
   register: security_updates_raw
+  args:
+    executable: /bin/bash
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
 

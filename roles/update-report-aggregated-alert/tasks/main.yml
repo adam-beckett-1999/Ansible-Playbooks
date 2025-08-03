@@ -4,14 +4,21 @@
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Get list of upgradable packages [Debian]
-  ansible.builtin.shell: apt list --upgradable 2>/dev/null | tail -n +2
+  ansible.builtin.shell: |
+    set -o pipefail
+    apt list --upgradable 2>/dev/null | tail -n +2
+  args:
+    executable: /usr/bin/bash
   register: apt_upgradable_raw
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Get list of security updates [Debian]
   ansible.builtin.shell: |
+    set -o pipefail
     unattended-upgrade --dry-run -d | grep "Checking: " | cut -d' ' -f2
+  args:
+    executable: /usr/bin/bash
   register: security_updates_raw
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"

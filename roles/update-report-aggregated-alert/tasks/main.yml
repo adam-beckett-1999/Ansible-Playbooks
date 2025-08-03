@@ -126,22 +126,22 @@
 - name: Create compact host status list
   ansible.builtin.set_fact:
     host_status_lines: >-
-      {{
-        all_reports | map('extract', host_line_template) | list
-      }}
-  vars:
-    host_line_template: >-
-      {%- set upgradable_count = item.upgradable | default([]) | length -%}
-      {%- set security_count = item.security | default([]) | length -%}
+      [
+      {% for report in all_reports -%}
+      {%- set upgradable_count = report.upgradable | default([]) | length -%}
+      {%- set security_count = report.security | default([]) | length -%}
       {%- if upgradable_count == 0 -%}
-        ✅ {{ item.hostname | default('Unknown') }} - Up to date
+      "✅ {{ report.hostname | default('Unknown') }} - Up to date"
       {%- else -%}
-        {%- if security_count > 0 -%}
-          🔴 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)
-        {%- else -%}
-          🟡 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates
-        {%- endif -%}
+      {%- if security_count > 0 -%}
+      "🔴 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)"
+      {%- else -%}
+      "🟡 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates"
       {%- endif -%}
+      {%- endif -%}
+      {%- if not loop.last %},{% endif -%}
+      {%- endfor %}
+      ]
   run_once: true
 
 - name: Split host status into chunks to avoid embed limits
@@ -188,10 +188,7 @@
             **Legend:**
             ✅ Up to date | 🟡 General updates | 🔴 Security updates available
           color: >-
-            {%- if summary_stats.hosts_with_security > 0 -%}15158332
-            {%- elif summary_stats.hosts_with_updates > 0 -%}16776960
-            {%- else -%}3066993
-            {%- endif -%}
+            {%- if summary_stats.hosts_with_security > 0 -%}15158332{%- elif summary_stats.hosts_with_updates > 0 -%}16776960{%- else -%}3066993{%- endif -%}
           fields: "{{ embed_fields }}"
           footer:
             text: "Reported at {{ local_time_uk }}"

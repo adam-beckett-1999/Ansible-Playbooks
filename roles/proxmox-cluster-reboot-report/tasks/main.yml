@@ -1,5 +1,6 @@
 - name: Get all VMs and LXCs across the cluster
-  shell: |
+  ansible.builtin.shell: |
+    set -o pipefail
     ha-manager status | awk '/^service/ {
       if ($2 ~ /^(vm|ct):/) {
         # Extract service ID (vm:123 or ct:123)
@@ -13,37 +14,39 @@
         print service ":" node ":" state
       }
     }'
+  args:
+    executable: /bin/bash
   register: cluster_vms_raw
   changed_when: false
   failed_when: false
   run_once: true
 
 - name: Debug cluster_vms_raw
-  debug:
+  ansible.builtin.debug:
     var: cluster_vms_raw.stdout_lines
   run_once: true
   delegate_to: localhost
 
 - name: Debug raw ha-manager output
-  debug:
+  ansible.builtin.debug:
     var: cluster_vms_raw.stdout
   run_once: true
   delegate_to: localhost
 
 - name: Filter valid VM/LXC lines
-  set_fact:
+  ansible.builtin.set_fact:
     cluster_vms_lines: "{{ cluster_vms_raw.stdout_lines | select('match', '^(vm|ct):[0-9]+:') | list }}"
   run_once: true
   delegate_to: localhost
 
 - name: Parse cluster VM/LXC data
-  set_fact:
+  ansible.builtin.set_fact:
     cluster_vms: []
   run_once: true
   delegate_to: localhost
 
 - name: Build cluster VM/LXC list
-  set_fact:
+  ansible.builtin.set_fact:
     cluster_vms: "{{ cluster_vms + [{'service': parts[0] ~ ':' ~ parts[1], 'node': parts[2], 'state': parts[3]}] }}"
   vars:
     parts: "{{ item.split(':') }}"
@@ -53,19 +56,19 @@
   delegate_to: localhost
 
 - name: Sort VMs by node and service ID
-  set_fact:
+  ansible.builtin.set_fact:
     cluster_vms_sorted: "{{ cluster_vms | sort(attribute='node') | sort(attribute='service') }}"
   run_once: true
   delegate_to: localhost
 
 - name: Get unique nodes from cluster data
-  set_fact:
+  ansible.builtin.set_fact:
     cluster_nodes: "{{ cluster_vms_sorted | map(attribute='node') | unique | list }}"
   run_once: true
   delegate_to: localhost
 
 - name: Create Discord message content
-  set_fact:
+  ansible.builtin.set_fact:
     discord_message: |
       ## ✅ Proxmox Cluster Reboot Complete
 
@@ -92,7 +95,7 @@
   delegate_to: localhost
 
 - name: Send Discord notification
-  uri:
+  ansible.builtin.uri:
     url: "{{ reboot_report_discord_webhook_url }}"
     method: POST
     body_format: json

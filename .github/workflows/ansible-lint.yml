@@ -1,0 +1,61 @@
+name: ansible-lint
+
+on:
+  push:
+    branches: ["dev"]
+
+jobs:
+  build:
+    name: Ansible Lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install Ansible, ansible-lint, and required collections
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible ansible-lint
+          ansible-galaxy collection install community.general ansible.posix community.docker gluster.gluster ansible.windows
+      - name: Run ansible-lint on playbooks and roles
+        env:
+          ANSIBLE_COLLECTIONS_PATH: ~/.ansible/collections:/usr/share/ansible/collections
+        run: |
+          ansible-lint *.yaml roles/*/tasks/*.yml
+      - name: Discord Notification (Success)
+        if: success()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d '{
+              "embeds": [{
+                "title": "✅ Ansible-lint Workflow Succeeded",
+                "description": "Ansible-lint workflow succeeded on **DEV** branch for repo **Ansible-Playbooks**.",
+                "color": 3066993,
+                "timestamp": "'"$(date --utc +%Y-%m-%dT%H:%M:%SZ)"'",
+                "footer": { "text": "GitHub Actions • Ansible Lint Success" }
+              }]
+            }' \
+            $DISCORD_WEBHOOK
+
+      - name: Discord Notification (Failure)
+        if: failure()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d '{
+              "embeds": [{
+                "title": "❌ Ansible-lint Workflow Failed",
+                "description": "Ansible-lint workflow failed on **DEV** branch for repo **Ansible-Playbooks**.",
+                "color": 15158332,
+                "timestamp": "'"$(date --utc +%Y-%m-%dT%H:%M:%SZ)"'",
+                "footer": { "text": "GitHub Actions • Ansible Lint Failure" }
+              }]
+            }' \
+            $DISCORD_WEBHOOK

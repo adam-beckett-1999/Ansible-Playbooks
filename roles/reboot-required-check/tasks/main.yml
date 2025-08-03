@@ -1,32 +1,33 @@
 - name: Check if reboot is required [Linux]
-  stat:
+  ansible.builtin.stat:
     path: /var/run/reboot-required
   register: reboot_check
-  when: 
-  - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat"
-  - "'lxc' not in inventory_hostname | lower"
+  when:
+    - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat"
+    - "'lxc' not in inventory_hostname | lower"
 
 - name: Check Windows reboot requirements [Windows]
   ansible.windows.win_shell: |
     # Check multiple registry keys and conditions that indicate a reboot is required
     $rebootRequired = $false
-    
+
     # Check Windows Update reboot flag
     if (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired" -ErrorAction SilentlyContinue) {
         $rebootRequired = $true
     }
-    
+
     # Check Component Based Servicing reboot flag
     if (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending" -ErrorAction SilentlyContinue) {
         $rebootRequired = $true
     }
-    
+
     # Check Session Manager pending file operations
-    $sessionManager = Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" -Name "PendingFileRenameOperations" -ErrorAction SilentlyContinue
+    $sessionManager = Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" `
+        -Name "PendingFileRenameOperations" -ErrorAction SilentlyContinue
     if ($sessionManager) {
         $rebootRequired = $true
     }
-    
+
     # Check SCCM Client reboot flag
     try {
         $sccmClient = Invoke-WmiMethod -Class CCM_ClientSDK -Name DetermineIfRebootPending -Namespace root\ccm\clientsdk -ErrorAction SilentlyContinue
@@ -34,34 +35,34 @@
             $rebootRequired = $true
         }
     } catch {}
-    
+
     # Output result
     Write-Output $rebootRequired
   register: win_reboot_check
   when: ansible_facts['os_family'] == "Windows"
 
 - name: Set reboot_required fact [Linux]
-  set_fact:
+  ansible.builtin.set_fact:
     reboot_required: "{{ reboot_check.stat.exists | default(false) }}"
-  when: 
-  - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat"
-  - "'lxc' not in inventory_hostname | lower"
+  when:
+    - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat"
+    - "'lxc' not in inventory_hostname | lower"
 
 - name: Set reboot_required fact [Windows]
-  set_fact:
+  ansible.builtin.set_fact:
     reboot_required: "{{ win_reboot_check.stdout | trim | bool }}"
   when: ansible_facts['os_family'] == "Windows"
 
 - name: Debug reboot status
-  debug:
+  ansible.builtin.debug:
     msg: >
       Reboot is {{ 'REQUIRED' if reboot_required else 'not required' }}
-  when: 
-  - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Windows"
-  - "'lxc' not in inventory_hostname | lower or ansible_facts['os_family'] == 'Windows'"
+  when:
+    - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Windows"
+    - "'lxc' not in inventory_hostname | lower or ansible_facts['os_family'] == 'Windows'"
 
 - name: Send Discord alert about reboot requirement
-  uri:
+  ansible.builtin.uri:
     url: "{{ reboot_status_discord_webhook_url }}"
     method: POST
     headers:
@@ -81,6 +82,6 @@
   retries: 5
   delay: 2
   delegate_to: localhost
-  when: 
-  - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Windows"
-  - "'lxc' not in inventory_hostname | lower or ansible_facts['os_family'] == 'Windows'"
+  when:
+    - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Windows"
+    - "'lxc' not in inventory_hostname | lower or ansible_facts['os_family'] == 'Windows'"

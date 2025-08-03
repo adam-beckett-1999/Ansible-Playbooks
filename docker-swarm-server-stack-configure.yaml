@@ -1,12 +1,11 @@
 ##### INITIAL CONFIGURATION
 - name: Reboot machines, install updates and standard packages, configure SNMP and network shares
   hosts: docker_swarm_virtual_machines
-  roles: 
+  roles:
     - reboot
     - base-packages
     - disable-motd-ubuntu
     - qemu-guest-agent-install
-    - cockpit-install
     - snmp-configure
     - network-share-mount
   vars:
@@ -56,7 +55,7 @@
 ##### SERVICE INSTALL
 - name: Install GlusterFS and Docker
   hosts: docker_swarm_virtual_machines
-  roles: 
+  roles:
     - glusterfs-service
     - docker-install
   vars:
@@ -83,28 +82,28 @@
 
 - name: Mount GlusterFS share to VMs
   hosts: docker_swarm_virtual_machines
-  roles: 
+  roles:
     - glusterfs-mount
 
 - name: Initiate swarm on first node
   hosts: swarm_01
-  roles: 
+  roles:
     - docker-swarm-create
 
 - name: Connect second manager to swarm
   hosts: swarm_05
-  roles: 
+  roles:
     - docker-swarm-manager-join
 
 - name: Connect worker nodes to swarm
   hosts: swarm_02,swarm_03,swarm_04
-  roles: 
+  roles:
     - docker-swarm-worker-join
 
 ##### REBOOT AND POST-CONFIGURATION SNAPSHOTS
 - name: Reboot Virtual Machines
   hosts: docker_swarm_virtual_machines
-  roles: 
+  roles:
     - reboot
 
 - name: Take post-configuration snapshot of SWARM-01

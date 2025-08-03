@@ -1,7 +1,7 @@
 ##### INITIAL CONFIGURATION
 - name: Reboot machines, install updates and base packages, configure SNMP and network shares
   hosts: kubernetes_virtual_machines
-  roles: 
+  roles:
     - reboot
     - base-packages
     - disable-motd-ubuntu
@@ -73,7 +73,7 @@
 
 - name: Reboot Virtual Machines
   hosts: kubernetes_virtual_machines
-  roles: 
+  roles:
     - reboot
 
 - name: Deploy Portainer Agent to cluster

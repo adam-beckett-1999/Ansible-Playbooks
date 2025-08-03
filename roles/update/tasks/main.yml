@@ -24,7 +24,7 @@
 - name: Install all updates [Linux - RedHat/CentOS/Alma/Rocky]
   ansible.builtin.dnf:
     name: '*'
-    state: latest
+    state: present
     update_cache: true
   when: ansible_facts.os_family == "RedHat"
 
@@ -34,43 +34,49 @@
   ansible.windows.win_shell: |
     # Check multiple registry keys and conditions that indicate a reboot is required
     $rebootRequired = $false
-    
+
     # Check Windows Update reboot flag
-    if (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired" -ErrorAction SilentlyContinue) {
+    if (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired" `
+        -ErrorAction SilentlyContinue) {
         $rebootRequired = $true
     }
-    
+
     # Check Component Based Servicing reboot flag
-    if (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending" -ErrorAction SilentlyContinue) {
+    if (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending" `
+        -ErrorAction SilentlyContinue) {
         $rebootRequired = $true
     }
-    
+
     # Check Session Manager pending file operations
-    $sessionManager = Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" -Name "PendingFileRenameOperations" -ErrorAction SilentlyContinue
+    $sessionManager = Get-ItemProperty `
+        "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" `
+        -Name "PendingFileRenameOperations" `
+        -ErrorAction SilentlyContinue
     if ($sessionManager) {
         $rebootRequired = $true
     }
-    
+
     # Check SCCM Client reboot flag
     try {
-        $sccmClient = Invoke-WmiMethod -Class CCM_ClientSDK -Name DetermineIfRebootPending -Namespace root\ccm\clientsdk -ErrorAction SilentlyContinue
+        $sccmClient = Invoke-WmiMethod -Class CCM_ClientSDK -Name DetermineIfRebootPending `
+            -Namespace root\ccm\clientsdk -ErrorAction SilentlyContinue
         if ($sccmClient -and ($sccmClient.RebootPending -or $sccmClient.IsHardRebootPending)) {
             $rebootRequired = $true
         }
     } catch {}
-    
+
     # Output result
     Write-Output $rebootRequired
-  register: win_reboot_required
+  register: update_win_reboot_required
   when: ansible_facts['os_family'] == "Windows"
 
 - name: Set reboot_required fact [Windows]
-  set_fact:
-    reboot_required: "{{ win_reboot_required.stdout | trim | bool }}"
+  ansible.builtin.set_fact:
+    update_reboot_required: "{{ update_win_reboot_required.stdout | trim | bool }}"
   when: ansible_facts['os_family'] == "Windows"
 
 - name: Send Discord alert about reboot requirement before updates [Windows]
-  uri:
+  ansible.builtin.uri:
     url: "{{ reboot_status_discord_webhook_url }}"
     method: POST
     headers:
@@ -81,18 +87,18 @@
       embeds:
         - title: "🔁 Reboot required before updates can be installed"
           description: >-
-            Host `{{ inventory_hostname }}` has {{ '🔴 a pending reboot' if reboot_required else '✅ no reboot required' }}.
-          color: "{{ 16711680 if reboot_required else 65280 }}"  # Red or Green
+            Host `{{ inventory_hostname }}` has {{ '🔴 a pending reboot' if update_reboot_required else '✅ no reboot required' }}.
+          color: "{{ 16711680 if update_reboot_required else 65280 }}"  # Red or Green
           footer:
             text: "Checked at {{ ansible_date_time.iso8601 }}"
-  register: discord_response
-  until: discord_response.status == 204
+  register: update_discord_response
+  until: update_discord_response.status == 204
   retries: 5
   delay: 2
   delegate_to: localhost
-  when: 
-  - ansible_facts['os_family'] == "Windows"
-  - reboot_required | default(false)
+  when:
+    - ansible_facts['os_family'] == "Windows"
+    - update_reboot_required | default(false)
 
 - name: Reboot if a previous update or change is pending [Windows]
   ansible.windows.win_reboot:
@@ -101,7 +107,7 @@
     post_reboot_delay: 60
   when:
     - ansible_facts.os_family == "Windows"
-    - reboot_required | default(false)
+    - update_reboot_required | default(false)
 
 - name: Install all critical and security updates [Windows]
   ansible.windows.win_updates:
@@ -111,5 +117,5 @@
       - Updates
       - Definition Updates
     state: installed
-  register: win_update_result
+  register: update_win_update_result
   when: ansible_facts.os_family == "Windows"

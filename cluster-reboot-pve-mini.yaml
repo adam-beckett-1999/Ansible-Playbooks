@@ -1,11 +1,11 @@
 - name: Rolling reboot of Proxmox Cluster
   hosts: pve_mini_cluster_01
   serial: 1
-  become: yes
+  become: true
   vars:
     vms_on_node: []
     all_reports: []
-  gather_facts: yes
+  gather_facts: true
   roles:
     - proxmox-migration-check-vms-initial
     - proxmox-node-reboot
@@ -13,7 +13,7 @@
 
 - name: Report Proxmox Cluster reboot status to Discord Channel
   hosts: pve_mini_cluster_01
-  gather_facts: yes
+  gather_facts: true
   roles:
     - proxmox-cluster-reboot-report
   vars:

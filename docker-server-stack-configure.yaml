@@ -1,7 +1,7 @@
 ##### INITIAL CONFIGURATION
 - name: Reboot machines, install updates and standard packages, configure SNMP and network shares
   hosts: docker_virtual_machines
-  roles: 
+  roles:
     - reboot
     - base-packages
     - disable-motd-ubuntu
@@ -48,7 +48,7 @@
 ##### SERVICE INSTALL
 - name: Install GlusterFS and Docker
   hosts: docker_virtual_machines
-  roles: 
+  roles:
     - glusterfs-service
     - docker-install
   vars:
@@ -73,27 +73,27 @@
 
 - name: Mount GlusterFS shared storage
   hosts: docker_virtual_machines
-  roles: 
+  roles:
     - glusterfs-mount
   vars:
     user: abeckett
 
 - name: Deploy Portainer to Management node
   hosts: docker_management
-  roles: 
+  roles:
     - docker-portainer-deploy
   vars:
     user: abeckett
 
 - name: Deploy Portainer-agent to other Docker servers
   hosts: docker_proxy,docker_media,docker_services
-  roles: 
+  roles:
     - docker-portainer-agent-deploy
 
 ##### REBOOT AND POST-CONFIGURATION SNAPSHOTS
 - name: Reboot Virtual Machines
   hosts: docker_virtual_machines
-  roles: 
+  roles:
     - reboot
 
 - name: Take post-configuration snapshot of VM-DOCKER-PROXY

@@ -1,4 +1,0 @@
-- name: Prune dangling and un-used docker images to free space
-  hosts: docker_virtual_machines
-  roles:
-    - docker-image-prune

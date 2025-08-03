@@ -1,17 +1,27 @@
 - name: Update apt cache [Linux - Debian]
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Get list of upgradable packages [Debian]
-  ansible.builtin.shell: apt list --upgradable 2>/dev/null | tail -n +2
+  ansible.builtin.shell: |
+    set -o pipefail
+    apt list --upgradable 2>/dev/null | tail -n +2
+  args:
+    executable: /usr/bin/bash
   register: apt_upgradable_raw
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Get list of security updates [Debian]
   ansible.builtin.shell: |
-    unattended-upgrade --dry-run -d | grep "Checking: " | cut -d' ' -f2
+    set -o pipefail
+    # Check for security updates using apt-get upgrade simulation
+    apt-get upgrade -s 2>/dev/null | \
+    grep -E "^Inst.*security" | \
+    awk '{print $2}' || true
+  args:
+    executable: /usr/bin/bash
   register: security_updates_raw
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
@@ -46,7 +56,7 @@
   when: ansible_facts['os_family'] == "Windows"
 
 - name: Parse and collect report data [Debian]
-  set_fact:
+  ansible.builtin.set_fact:
     report_data:
       hostname: "{{ inventory_hostname }}"
       os_family: Debian
@@ -55,7 +65,7 @@
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Parse and collect report data [RedHat]
-  set_fact:
+  ansible.builtin.set_fact:
     report_data:
       hostname: "{{ inventory_hostname }}"
       os_family: RedHat
@@ -64,20 +74,27 @@
   when: ansible_facts['os_family'] == "RedHat"
 
 - name: Parse and collect report data [Windows]
-  set_fact:
+  ansible.builtin.set_fact:
     report_data:
       hostname: "{{ inventory_hostname }}"
       os_family: Windows
       upgradable: "{{ win_update_result.updates.values() | map(attribute='title') | list if win_update_result.updates is defined else [] }}"
-      security: "{{ win_update_result.updates.values() | selectattr('categories', 'search', '(Security Updates|Critical Updates|Definition Updates)') | map(attribute='title') | list if win_update_result.updates is defined else [] }}"
+      security: >-
+        {{
+          win_update_result.updates.values()
+          | selectattr('categories', 'search', '(Security Updates|Critical Updates|Definition Updates)')
+          | map(attribute='title')
+          | list
+          if win_update_result.updates is defined else []
+        }}
   when: ansible_facts['os_family'] == "Windows"
 
 - name: Convert UTC time to UK local time (BST/GMT)
-  set_fact:
+  ansible.builtin.set_fact:
     local_time_uk: "{{ lookup('pipe', 'date \"+%Y-%m-%d %H:%M:%S %Z\"') }}"
 
 - name: Collect report data from hosts that defined it
-  set_fact:
+  ansible.builtin.set_fact:
     all_reports: >-
       {{
         ansible_play_hosts
@@ -88,50 +105,83 @@
       }}
   run_once: true
 
-- name: Initialise embed_fields list
-  set_fact:
+- name: Create summary statistics
+  ansible.builtin.set_fact:
+    summary_stats:
+      total_hosts: "{{ all_reports | length }}"
+      hosts_with_updates: >-
+        {{
+          all_reports
+          | map(attribute='upgradable')
+          | map('default', [])
+          | map('length')
+          | select('>', 0)
+          | list
+          | length
+        }}
+      hosts_with_security: >-
+        {{
+          all_reports
+          | map(attribute='security')
+          | map('default', [])
+          | map('length')
+          | select('>', 0)
+          | list
+          | length
+        }}
+      total_upgradable: "{{ all_reports | map(attribute='upgradable') | map('default', []) | map('length') | sum }}"
+      total_security: "{{ all_reports | map(attribute='security') | map('default', []) | map('length') | sum }}"
+  run_once: true
+
+- name: Create compact host status list
+  ansible.builtin.set_fact:
+    host_status_lines: >-
+      [
+      {% for report in all_reports -%}
+      {%- set upgradable_count = report.upgradable | default([]) | length -%}
+      {%- set security_count = report.security | default([]) | length -%}
+      {%- if upgradable_count == 0 -%}
+      "✅ {{ report.hostname | default('Unknown') }} - Up to date"{%- else -%}
+      {%- if security_count > 0 -%}
+      "🔴 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)"{%- else -%}
+      "🟡 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates"{%- endif -%}
+      {%- endif -%}
+      {%- if not loop.last %},{% endif -%}
+      {%- endfor %}
+      ]
+  run_once: true
+
+- name: Split host status into chunks to avoid embed limits
+  ansible.builtin.set_fact:
+    host_chunks: >-
+      {{
+        host_status_lines | batch(15) | list
+      }}
+  run_once: true
+
+- name: Create embed fields from host chunks
+  ansible.builtin.set_fact:
     embed_fields: []
+  run_once: true
 
-- name: Append embed field for each report with internal spacing
-  set_fact:
-    embed_fields: "{{ embed_fields + [item_field] }}"
+- name: Build embed fields for each chunk
+  ansible.builtin.set_fact:
+    embed_fields: "{{ embed_fields + [chunk_field] }}"
   vars:
-    item_field:
-      name: "{{ (item.hostname | default('Unknown Host'))[:100] }} (📦 {{ item.upgradable | default([]) | length }}, ⚠️ {{ item.security | default([]) | length }})"
-      value: |
-        **🔐 Security Updates:**
-        {% if item.security | default([]) | length > 0 %}
-        {% set security_list = item.security | map('regex_replace', '^', '• ') | list %}
-        {% if security_list | join('  ') | length > 800 %}
-        {{ security_list[:5] | join('  ') }}
-        ... and {{ (item.security | length) - 5 }} more
-        {% else %}
-        {{ security_list | join('  ') }}
-        {% endif %}
-        {% else %}
-        ✅ No security updates
-        {% endif %}
-        
-        **📦 All Upgradable Packages:**
-        {% if item.upgradable | default([]) | length > 0 %}
-        {% set upgradable_list = item.upgradable | map('regex_replace', '^', '• ') | list %}
-        {% if upgradable_list | join('  ') | length > 800 %}
-        {{ upgradable_list[:5] | join('  ') }}
-        ... and {{ (item.upgradable | length) - 5 }} more
-        {% else %}
-        {{ upgradable_list | join('  ') }}
-        {% endif %}
-        {% else %}
-        ✅ System is fully up-to-date
-        {% endif %}
-
-        ​ 
-      inline: false
-  loop: "{{ all_reports }}"
+    chunk_field:
+      name: >-
+        Hosts {{ (ansible_loop.index0 * 15) + 1 }}-{{
+        [(ansible_loop.index0 * 15) + 15, host_status_lines | length] | min
+        }}
+      value: "{{ item | join('\n') }}"
+      inline: true
+  loop: "{{ host_chunks }}"
+  loop_control:
+    extended: true
   run_once: true
 
 - name: Send single aggregated Discord alert
-  uri:
+  ansible.builtin.uri:
     url: "{{ update_report_discord_webhook_url }}"
     method: POST
     headers:
@@ -141,8 +191,20 @@
     body:
       embeds:
         - title: "🔐 Update Report for VMs & LXCs"
-          description: "Summary across {{ all_reports | length }} hosts"
-          color: 16753920
+          description: |
+            **Summary:** {{ summary_stats.total_hosts }} hosts checked
+            📊 **{{ summary_stats.hosts_with_updates }}** hosts need updates
+            ({{ summary_stats.total_upgradable }} total packages)
+            ⚠️ **{{ summary_stats.hosts_with_security }}** hosts have security updates
+            ({{ summary_stats.total_security }} packages)
+
+            **Legend:**
+            ✅ Up to date | 🟡 General updates | 🔴 Security updates available
+          color: >-
+            {%- if (summary_stats.hosts_with_security | int) > 0 -%}
+            15158332{%- elif (summary_stats.hosts_with_updates | int) > 0 -%}
+            16776960{%- else -%}
+            3066993{%- endif -%}
           fields: "{{ embed_fields }}"
           footer:
             text: "Reported at {{ local_time_uk }}"
@@ -150,12 +212,12 @@
   delegate_to: localhost
 
 - name: Wait to avoid Discord rate limits
-  pause:
+  ansible.builtin.pause:
     seconds: 2
   run_once: true
 
 - name: Send Discord prompt with styled embed and interactive button via bot API
-  uri:
+  ansible.builtin.uri:
     url: "{{ discord_channel_url }}"
     method: POST
     headers:

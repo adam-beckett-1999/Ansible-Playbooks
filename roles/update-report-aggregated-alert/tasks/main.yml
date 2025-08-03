@@ -189,7 +189,13 @@
             **Legend:**
             ✅ Up to date | 🟡 General updates | 🔴 Security updates available
           color: >-
-            {%- if summary_stats.hosts_with_security > 0 -%}15158332{%- elif summary_stats.hosts_with_updates > 0 -%}16776960{%- else -%}3066993{%- endif -%}
+            {%- if (summary_stats.hosts_with_security | int) > 0 -%}
+              15158332
+            {%- elif (summary_stats.hosts_with_updates | int) > 0 -%}
+              16776960
+            {%- else -%}
+              3066993
+            {%- endif -%}
           fields: "{{ embed_fields }}"
           footer:
             text: "Reported at {{ local_time_uk }}"

@@ -17,7 +17,9 @@
   ansible.builtin.shell: |
     set -o pipefail
     # Check for security updates using apt-get upgrade simulation
-    apt-get upgrade -s 2>/dev/null | grep -E "^Inst.*security" | awk '{print $2}' || true
+    apt-get upgrade -s 2>/dev/null | \
+    grep -E "^Inst.*security" | \
+    awk '{print $2}' || true
   args:
     executable: /usr/bin/bash
   register: security_updates_raw
@@ -139,13 +141,10 @@
       {%- set upgradable_count = report.upgradable | default([]) | length -%}
       {%- set security_count = report.security | default([]) | length -%}
       {%- if upgradable_count == 0 -%}
-      "✅ {{ report.hostname | default('Unknown') }} - Up to date"
-      {%- else -%}
+      "✅ {{ report.hostname | default('Unknown') }} - Up to date"{%- else -%}
       {%- if security_count > 0 -%}
-      "🔴 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)"
-      {%- else -%}
-      "🟡 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates"
-      {%- endif -%}
+      "🔴 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)"{%- else -%}
+      "🟡 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates"{%- endif -%}
       {%- endif -%}
       {%- if not loop.last %},{% endif -%}
       {%- endfor %}
@@ -170,7 +169,10 @@
     embed_fields: "{{ embed_fields + [chunk_field] }}"
   vars:
     chunk_field:
-      name: "Hosts {{ (ansible_loop.index0 * 15) + 1 }}-{{ [(ansible_loop.index0 * 15) + 15, host_status_lines | length] | min }}"
+      name: >-
+        Hosts {{ (ansible_loop.index0 * 15) + 1 }}-{{
+        [(ansible_loop.index0 * 15) + 15, host_status_lines | length] | min
+        }}
       value: "{{ item | join('\n') }}"
       inline: true
   loop: "{{ host_chunks }}"
@@ -191,19 +193,18 @@
         - title: "🔐 Update Report for VMs & LXCs"
           description: |
             **Summary:** {{ summary_stats.total_hosts }} hosts checked
-            📊 **{{ summary_stats.hosts_with_updates }}** hosts need updates ({{ summary_stats.total_upgradable }} total packages)
-            ⚠️ **{{ summary_stats.hosts_with_security }}** hosts have security updates ({{ summary_stats.total_security }} packages)
+            📊 **{{ summary_stats.hosts_with_updates }}** hosts need updates
+            ({{ summary_stats.total_upgradable }} total packages)
+            ⚠️ **{{ summary_stats.hosts_with_security }}** hosts have security updates
+            ({{ summary_stats.total_security }} packages)
 
             **Legend:**
             ✅ Up to date | 🟡 General updates | 🔴 Security updates available
           color: >-
             {%- if (summary_stats.hosts_with_security | int) > 0 -%}
-              15158332
-            {%- elif (summary_stats.hosts_with_updates | int) > 0 -%}
-              16776960
-            {%- else -%}
-              3066993
-            {%- endif -%}
+            15158332{%- elif (summary_stats.hosts_with_updates | int) > 0 -%}
+            16776960{%- else -%}
+            3066993{%- endif -%}
           fields: "{{ embed_fields }}"
           footer:
             text: "Reported at {{ local_time_uk }}"

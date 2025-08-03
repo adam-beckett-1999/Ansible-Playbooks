@@ -154,19 +154,20 @@
 
 - name: Create embed fields from host chunks
   ansible.builtin.set_fact:
-    embed_fields: >-
-      {{
-        host_chunks | map('join', '\n') | list |
-        map('regex_replace', '^', '') |
-        enumerate |
-        map('extract', chunk_field_template) |
-        list
-      }}
+    embed_fields: []
+  run_once: true
+
+- name: Build embed fields for each chunk
+  ansible.builtin.set_fact:
+    embed_fields: "{{ embed_fields + [chunk_field] }}"
   vars:
-    chunk_field_template:
-      name: "Hosts {{ item.0 * 15 + 1 }}-{{ [item.0 * 15 + 15, host_status_lines | length] | min }}"
-      value: "{{ item.1 }}"
+    chunk_field:
+      name: "Hosts {{ (ansible_loop.index0 * 15) + 1 }}-{{ [(ansible_loop.index0 * 15) + 15, host_status_lines | length] | min }}"
+      value: "{{ item | join('\n') }}"
       inline: true
+  loop: "{{ host_chunks }}"
+  loop_control:
+    extended: true
   run_once: true
 
 - name: Send single aggregated Discord alert

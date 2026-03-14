@@ -145,7 +145,7 @@
             - name: "🔸 Affected Packages"
               value: >-
                 {% if report_data.security | length > 0 %}
-                  {{ report_data.security | map('regex_replace', '^', '• ') | join('\n') }}
+                  {{ report_data.security | map('regex_replace', '^', '• ') | join('\n') | truncate(1024) }}
                 {% else %}
                   No security updates found.
                 {% endif %}

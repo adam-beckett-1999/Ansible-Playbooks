@@ -135,20 +135,26 @@
 
 - name: Create compact host status list
   ansible.builtin.set_fact:
-    host_status_lines: >-
-      [
-      {% for report in all_reports -%}
+    host_status_lines: []
+  run_once: true
+
+- name: Build host status lines
+  ansible.builtin.set_fact:
+    host_status_lines: "{{ host_status_lines + [host_status] }}"
+  vars:
+    host_status: >-
       {%- set upgradable_count = report.upgradable | default([]) | length -%}
       {%- set security_count = report.security | default([]) | length -%}
       {%- if upgradable_count == 0 -%}
-      "✅ {{ report.hostname | default('Unknown') }} - Up to date"{%- else -%}
+      ✅ {{ report.hostname | default('Unknown') }} - Up to date
+      {%- else -%}
       {%- if security_count > 0 -%}
-      "🔴 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)"{%- else -%}
-      "🟡 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates"{%- endif -%}
+      🔴 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)
+      {%- else -%}
+      🟡 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates
       {%- endif -%}
-      {%- if not loop.last %},{% endif -%}
-      {%- endfor %}
-      ]
+      {%- endif -%}
+  loop: "{{ all_reports }}"
   run_once: true
 
 - name: Split host status into chunks to avoid embed limits

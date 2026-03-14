@@ -35,7 +35,7 @@
 - name: Get list of security updates using apt [Debian - fallback]
   ansible.builtin.shell: |
     set -o pipefail
-    apt-cache policy $(apt list --upgradable 2>/dev/null | tail -n +2 | cut -d'/' -f1) 2>/dev/null | grep -E "security|updates" | wc -l || echo "0"
+    apt-get upgrade -s 2>/dev/null | grep -E "^Inst.*security" | awk '{print $2}' || true
   args:
     executable: /usr/bin/bash
   register: security_updates_apt

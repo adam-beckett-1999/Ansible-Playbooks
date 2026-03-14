@@ -180,6 +180,18 @@
     extended: true
   run_once: true
 
+- name: Set embed color for report summary
+  ansible.builtin.set_fact:
+    embed_color: >-
+      {%- if (summary_stats.hosts_with_security | int) > 0 -%}
+      15158332
+      {%- elif (summary_stats.hosts_with_updates | int) > 0 -%}
+      16776960
+      {%- else -%}
+      3066993
+      {%- endif -%}
+  run_once: true
+
 - name: Send single aggregated Discord alert
   ansible.builtin.uri:
     url: "{{ update_report_discord_webhook_url }}"
@@ -200,11 +212,7 @@
 
             **Legend:**
             ✅ Up to date | 🟡 General updates | 🔴 Security updates available
-          color: >-
-            {%- if (summary_stats.hosts_with_security | int) > 0 -%}
-            15158332{%- elif (summary_stats.hosts_with_updates | int) > 0 -%}
-            16776960{%- else -%}
-            3066993{%- endif -%}
+          color: "{{ embed_color | int }}"
           fields: "{{ embed_fields }}"
           footer:
             text: "Reported at {{ local_time_uk }}"

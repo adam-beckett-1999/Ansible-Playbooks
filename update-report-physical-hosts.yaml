@@ -4,6 +4,3 @@
     - update-report-single-alert
   vars:
     update_report_discord_webhook_url: "{{ lookup('env', 'PHYSICAL_HOSTS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"
-    custom_id: "run_physical_hosts_update"
-    discord_bot_token: "{{ lookup('env', 'DISCORD_BOT_TOKEN') }}"
-    discord_channel_url: "{{ lookup('env', 'PHYSICAL_HOSTS_DISCORD_CHANNEL_URL') }}"

@@ -1,4 +1,0 @@
-- name: Install the patchman client on servers
-  hosts: lxc_containers,virtual_machines
-  roles:
-    - patchman-client-install

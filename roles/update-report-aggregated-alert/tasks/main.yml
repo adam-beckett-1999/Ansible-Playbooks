@@ -143,16 +143,13 @@
     host_status_lines: "{{ host_status_lines + [host_status] }}"
   vars:
     host_status: >-
-      {%- set upgradable_count = report.upgradable | default([]) | length -%}
-      {%- set security_count = report.security | default([]) | length -%}
+      {%- set upgradable_count = item.upgradable | default([]) | length -%}
+      {%- set security_count = item.security | default([]) | length -%}
       {%- if upgradable_count == 0 -%}
-      ✅ {{ report.hostname | default('Unknown') }} - Up to date
-      {%- else -%}
+      ✅ {{ item.hostname | default('Unknown') }} - Up to date{%- else -%}
       {%- if security_count > 0 -%}
-      🔴 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)
-      {%- else -%}
-      🟡 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates
-      {%- endif -%}
+      🔴 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security){%- else -%}
+      🟡 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates{%- endif -%}
       {%- endif -%}
   loop: "{{ all_reports }}"
   run_once: true

@@ -13,46 +13,14 @@
   changed_when: false
   when: ansible_facts['os_family'] == "Debian"
 
-- name: Check if unattended-upgrades is available [Debian]
-  ansible.builtin.command: which unattended-upgrade
-  register: unattended_upgrade_check
-  failed_when: false
-  changed_when: false
-  when: ansible_facts['os_family'] == "Debian"
-
-- name: Get list of security updates using unattended-upgrades [Debian]
+- name: Get list of security updates [Debian]
   ansible.builtin.shell: |
     set -o pipefail
-    unattended-upgrade --dry-run -d 2>/dev/null | grep "Checking: " | cut -d' ' -f2 || true
+    apt-get upgrade -s 2>/dev/null | grep -E "^Inst.*security" | awk '{print $2}' || true
   args:
     executable: /usr/bin/bash
-  register: security_updates_unattended
+  register: security_updates_raw
   changed_when: false
-  when:
-    - ansible_facts['os_family'] == "Debian"
-    - unattended_upgrade_check.rc == 0
-
-- name: Get list of security updates using apt [Debian - fallback]
-  ansible.builtin.shell: |
-    set -o pipefail
-    apt-cache policy $(apt list --upgradable 2>/dev/null | tail -n +2 | cut -d'/' -f1) 2>/dev/null | grep -E "security|updates" | wc -l || echo "0"
-  args:
-    executable: /usr/bin/bash
-  register: security_updates_apt
-  changed_when: false
-  when:
-    - ansible_facts['os_family'] == "Debian"
-    - unattended_upgrade_check.rc != 0
-
-- name: Set security updates fact [Debian]
-  ansible.builtin.set_fact:
-    security_updates_raw:
-      stdout_lines: >-
-        {{
-          security_updates_unattended.stdout_lines | default([])
-          if unattended_upgrade_check.rc == 0
-          else ['Security updates: ' + (security_updates_apt.stdout | default('0'))]
-        }}
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Ensure dnf plugins are installed [RedHat]
@@ -145,7 +113,7 @@
             - name: "🔸 Affected Packages"
               value: >-
                 {% if report_data.security | length > 0 %}
-                  {{ report_data.security | map('regex_replace', '^', '• ') | join('\n') }}
+                  {{ report_data.security | map('regex_replace', '^', '• ') | join('\n') | truncate(1024) }}
                 {% else %}
                   No security updates found.
                 {% endif %}

@@ -135,20 +135,23 @@
 
 - name: Create compact host status list
   ansible.builtin.set_fact:
-    host_status_lines: >-
-      [
-      {% for report in all_reports -%}
-      {%- set upgradable_count = report.upgradable | default([]) | length -%}
-      {%- set security_count = report.security | default([]) | length -%}
+    host_status_lines: []
+  run_once: true
+
+- name: Build host status lines
+  ansible.builtin.set_fact:
+    host_status_lines: "{{ host_status_lines + [host_status] }}"
+  vars:
+    host_status: >-
+      {%- set upgradable_count = item.upgradable | default([]) | length -%}
+      {%- set security_count = item.security | default([]) | length -%}
       {%- if upgradable_count == 0 -%}
-      "✅ {{ report.hostname | default('Unknown') }} - Up to date"{%- else -%}
+      ✅ {{ item.hostname | default('Unknown') }} - Up to date{%- else -%}
       {%- if security_count > 0 -%}
-      "🔴 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security)"{%- else -%}
-      "🟡 {{ report.hostname | default('Unknown') }} - {{ upgradable_count }} updates"{%- endif -%}
+      🔴 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security){%- else -%}
+      🟡 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates{%- endif -%}
       {%- endif -%}
-      {%- if not loop.last %},{% endif -%}
-      {%- endfor %}
-      ]
+  loop: "{{ all_reports }}"
   run_once: true
 
 - name: Split host status into chunks to avoid embed limits
@@ -173,11 +176,18 @@
         Hosts {{ (ansible_loop.index0 * 15) + 1 }}-{{
         [(ansible_loop.index0 * 15) + 15, host_status_lines | length] | min
         }}
-      value: "{{ item | join('\n') }}"
+      value: "{{ item | join('\n') | truncate(1024) }}"
       inline: true
-  loop: "{{ host_chunks }}"
+  loop: "{{ host_chunks[0:25] }}"
   loop_control:
     extended: true
+  run_once: true
+
+- name: Set embed color for report summary
+  ansible.builtin.set_fact:
+    embed_color: >-
+      {{ (summary_stats.hosts_with_security | int > 0) | ternary(15158332, (summary_stats.hosts_with_updates
+      | int > 0) | ternary(16776960, 3066993)) }}
   run_once: true
 
 - name: Send single aggregated Discord alert
@@ -200,11 +210,7 @@
 
             **Legend:**
             ✅ Up to date | 🟡 General updates | 🔴 Security updates available
-          color: >-
-            {%- if (summary_stats.hosts_with_security | int) > 0 -%}
-            15158332{%- elif (summary_stats.hosts_with_updates | int) > 0 -%}
-            16776960{%- else -%}
-            3066993{%- endif -%}
+          color: "{{ embed_color }}"
           fields: "{{ embed_fields }}"
           footer:
             text: "Reported at {{ local_time_uk }}"

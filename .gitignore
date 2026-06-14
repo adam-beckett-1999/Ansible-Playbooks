@@ -1,3 +1,4 @@
 .vscode
 .ansible
 .venv
+*.code-workspace

@@ -1,6 +1,6 @@
 ##### INITIAL CONFIGURATION
 - name: Reboot machines, install updates and standard packages, configure SNMP and network shares
-  hosts: docker_virtual_machines
+  hosts: docker_vms
   roles:
     - reboot
     - base-packages
@@ -47,7 +47,7 @@
 
 ##### SERVICE INSTALL
 - name: Install GlusterFS and Docker
-  hosts: docker_virtual_machines
+  hosts: docker_vms
   roles:
     - glusterfs-service
     - docker-install
@@ -72,7 +72,7 @@
       - VM-DOCKER-SERVICES.hyvecloud.internal
 
 - name: Mount GlusterFS shared storage
-  hosts: docker_virtual_machines
+  hosts: docker_vms
   roles:
     - glusterfs-mount
   vars:
@@ -80,7 +80,7 @@
 
 ##### REBOOT AND POST-CONFIGURATION SNAPSHOTS
 - name: Reboot Virtual Machines
-  hosts: docker_virtual_machines
+  hosts: docker_vms
   roles:
     - reboot
 

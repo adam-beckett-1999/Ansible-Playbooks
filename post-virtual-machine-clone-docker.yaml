@@ -1,5 +1,5 @@
 - name: Reboot machines, install updates and standard packages, configure SNMP and network shares
-  hosts: docker_virtual_machines
+  hosts: docker_vms
   roles:
     - reboot
     - base-packages

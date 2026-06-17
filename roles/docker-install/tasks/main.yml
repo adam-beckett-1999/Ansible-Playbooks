@@ -1,10 +1,49 @@
-- name: Add Docker GPG Key
-  ansible.builtin.apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
+- name: Validate supported distro
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution in ["Ubuntu", "Debian"]
+    fail_msg: "docker-install role supports Ubuntu and Debian only"
+
+- name: Set Docker repo distro and architecture
+  ansible.builtin.set_fact:
+    docker_repo_distro: "{{ ansible_distribution | lower }}"
+    docker_repo_arch: >-
+      {{
+        {
+          'x86_64': 'amd64',
+          'aarch64': 'arm64',
+          'armv7l': 'armhf',
+          'ppc64le': 'ppc64el',
+          's390x': 's390x'
+        }.get(ansible_architecture, ansible_architecture)
+      }}
+
+- name: Install apt prerequisites for Docker repository
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
     state: present
-- name: Add Docker Repository
+    update_cache: true
+
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Add Docker GPG key to keyring
+  ansible.builtin.get_url:
+    url: "https://download.docker.com/linux/{{ docker_repo_distro }}/gpg"
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+
+- name: Add Docker apt repository
   ansible.builtin.apt_repository:
-    repo: deb https://download.docker.com/linux/ubuntu focal stable
+    repo: >-
+      deb [arch={{ docker_repo_arch }} signed-by=/etc/apt/keyrings/docker.asc]
+      https://download.docker.com/linux/{{ docker_repo_distro }} {{ ansible_distribution_release | lower }} stable
     state: present
 - name: Install the latest version of Docker Engine and containerd
   ansible.builtin.apt:
@@ -12,7 +51,8 @@
       - docker-ce
       - docker-ce-cli
       - containerd.io
-      - docker-compose
+      - docker-buildx-plugin
+      - docker-compose-plugin
     update_cache: true
 - name: Add the admin user to the docker group
   ansible.builtin.user:
@@ -25,7 +65,6 @@
       - docker
       - jsondiff
       - pyyaml
-      - docker-compose
 - name: Start and enable Docker systemd service.
   ansible.builtin.systemd:
     name: docker

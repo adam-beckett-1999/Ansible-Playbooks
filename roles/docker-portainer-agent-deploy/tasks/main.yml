@@ -1,9 +1,0 @@
-- name: Start portainer_agent service
-  community.docker.docker_container:
-    name: Portainer_Agent
-    image: portainer/agent:2.19.0
-    ports:
-      - 9001:9001
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/volumes:/var/lib/docker/volumes

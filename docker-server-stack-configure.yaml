@@ -78,18 +78,6 @@
   vars:
     user: abeckett
 
-- name: Deploy Portainer to Management node
-  hosts: docker_management
-  roles:
-    - docker-portainer-deploy
-  vars:
-    user: abeckett
-
-- name: Deploy Portainer-agent to other Docker servers
-  hosts: docker_proxy,docker_media,docker_services
-  roles:
-    - docker-portainer-agent-deploy
-
 ##### REBOOT AND POST-CONFIGURATION SNAPSHOTS
 - name: Reboot Virtual Machines
   hosts: docker_virtual_machines

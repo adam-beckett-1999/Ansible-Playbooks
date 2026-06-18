@@ -1,0 +1,88 @@
+- name: Map system architecture to Hawser release architecture
+  ansible.builtin.set_fact:
+    hawser_arch: >-
+      {{
+        {
+          'x86_64': 'amd64',
+          'aarch64': 'arm64'
+        }.get(ansible_architecture, '')
+      }}
+
+- name: Validate supported architecture
+  ansible.builtin.assert:
+    that:
+      - hawser_arch | length > 0
+    fail_msg: "Unsupported architecture for Hawser binary: {{ ansible_architecture }}"
+
+- name: Download Hawser binary archive
+  ansible.builtin.get_url:
+    url: "https://github.com/Finsys/hawser/releases/latest/download/hawser_linux_{{ hawser_arch }}.tar.gz"
+    dest: "/tmp/hawser_linux_{{ hawser_arch }}.tar.gz"
+    mode: "0644"
+
+- name: Extract Hawser binary
+  ansible.builtin.unarchive:
+    src: "/tmp/hawser_linux_{{ hawser_arch }}.tar.gz"
+    dest: /tmp
+    remote_src: true
+
+- name: Install Hawser binary
+  ansible.builtin.copy:
+    src: /tmp/hawser
+    dest: /usr/local/bin/hawser
+    mode: "0755"
+    owner: root
+    group: root
+    remote_src: true
+
+- name: Ensure Hawser config directory exists
+  ansible.builtin.file:
+    path: /etc/hawser
+    state: directory
+    mode: "0755"
+
+- name: Create Hawser config file
+  ansible.builtin.copy:
+    dest: /etc/hawser/config
+    mode: "0644"
+    owner: root
+    group: root
+    content: |
+      PORT=2376
+      DOCKER_SOCKET=/var/run/docker.sock
+
+- name: Create Hawser systemd service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/hawser.service
+    mode: "0644"
+    owner: root
+    group: root
+    content: |
+      [Unit]
+      Description=Hawser - Remote Docker Agent for Dockhand
+      Documentation=https://github.com/Finsys/hawser
+      After=network-online.target docker.service
+      Wants=network-online.target
+      Requires=docker.service
+
+      [Service]
+      Type=simple
+      ExecStart=/usr/local/bin/hawser
+      Restart=always
+      RestartSec=10
+      EnvironmentFile=/etc/hawser/config
+
+      NoNewPrivileges=false
+      ProtectSystem=strict
+      ProtectHome=true
+      ReadWritePaths=/var/run/docker.sock /data/stacks
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Enable and start Hawser service
+  ansible.builtin.systemd:
+    name: hawser
+    daemon_reload: true
+    enabled: true
+    state: started

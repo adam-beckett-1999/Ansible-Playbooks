@@ -60,11 +60,13 @@
     groups: docker
     append: true
 - name: Install Docker Module for Python and JSONdiff
-  ansible.builtin.pip:
+  ansible.builtin.apt:
     name:
-      - docker
-      - jsondiff
-      - pyyaml
+      - python3-docker
+      - python3-jsondiff
+      - python3-yaml
+    state: present
+    update_cache: false
 - name: Start and enable Docker systemd service.
   ansible.builtin.systemd:
     name: docker

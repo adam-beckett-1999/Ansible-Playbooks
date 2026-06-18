@@ -27,16 +27,15 @@
 
 - name: Select matching Hawser Linux archive asset
   ansible.builtin.set_fact:
-    hawser_asset_url: >-
-      {{
-        (
-          (hawser_latest_release.json.assets | default([]))
-          | selectattr('name', 'match', '^hawser_.*_linux_' ~ hawser_arch ~ '\\.tar\\.gz$')
-          | map(attribute='browser_download_url')
-          | first
-        )
-        | default('')
-      }}
+    hawser_asset_url: ""
+
+- name: Select matching Hawser Linux archive asset
+  ansible.builtin.set_fact:
+    hawser_asset_url: "{{ item.browser_download_url }}"
+  loop: "{{ hawser_latest_release.json.assets | default([]) }}"
+  when:
+    - item.name.startswith('hawser_')
+    - item.name.endswith('_linux_' ~ hawser_arch ~ '.tar.gz')
 
 - name: Ensure a matching Hawser release asset exists
   ansible.builtin.assert:

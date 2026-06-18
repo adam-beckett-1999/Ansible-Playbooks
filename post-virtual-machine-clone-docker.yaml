@@ -1,8 +1,8 @@
-- name: Reboot machines, install updates and standard packages, configure SNMP and network shares
+- name: Install base packages, disable MOTD, install Docker and Hawser agent
   hosts: docker_vms
   roles:
-    - reboot
     - base-packages
+    - linux-disable-motd
     - docker-install
     - dockhand-hawser-agent-install
   vars:

@@ -1,0 +1,89 @@
+- name: Check if dynamic MOTD scripts directory exists
+  ansible.builtin.stat:
+    path: /etc/update-motd.d
+  register: motd_scripts_dir
+  when:
+    - ansible_os_family == 'Debian'
+
+- name: Find dynamic MOTD scripts
+  ansible.builtin.find:
+    paths: /etc/update-motd.d
+    file_type: file
+    recurse: false
+  register: motd_scripts
+  when:
+    - ansible_os_family == 'Debian'
+    - motd_scripts_dir.stat.exists
+
+- name: Disable execution of dynamic MOTD scripts
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: 'a-x'
+  loop: "{{ motd_scripts.files | default([]) }}"
+  when:
+    - ansible_os_family == 'Debian'
+    - motd_scripts_dir.stat.exists
+
+- name: Check PAM files that may display MOTD
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop:
+    - /etc/pam.d/login
+    - /etc/pam.d/sshd
+  register: pam_motd_files
+  when:
+    - ansible_os_family == 'Debian'
+
+- name: Disable pam_motd in PAM stack
+  ansible.builtin.replace:
+    path: "{{ item.stat.path }}"
+    regexp: '^(session\s+optional\s+pam_motd\.so.*)$'
+    replace: '# \1'
+  loop: "{{ pam_motd_files.results | default([]) }}"
+  when:
+    - ansible_os_family == 'Debian'
+    - item.stat.exists
+
+- name: Clear static MOTD file
+  ansible.builtin.copy:
+    dest: /etc/motd
+    content: ''
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - ansible_os_family == 'Debian'
+
+- name: Check for Ubuntu motd-news configuration file
+  ansible.builtin.stat:
+    path: /etc/default/motd-news
+  register: motd_news_config
+  when:
+    - ansible_distribution == 'Ubuntu'
+
+- name: Disable motd-news in Ubuntu configuration
+  ansible.builtin.lineinfile:
+    path: /etc/default/motd-news
+    regexp: '^ENABLED='
+    line: ENABLED=0
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - motd_news_config.stat.exists
+
+- name: Gather service facts on Ubuntu
+  ansible.builtin.service_facts:
+  when:
+    - ansible_distribution == 'Ubuntu'
+
+- name: Stop and mask Ubuntu motd-news units when present
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    enabled: false
+    state: stopped
+    masked: true
+  loop:
+    - motd-news.service
+    - motd-news.timer
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - item in ansible_facts.services

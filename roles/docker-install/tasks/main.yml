@@ -45,6 +45,7 @@
       deb [arch={{ docker_repo_arch }} signed-by=/etc/apt/keyrings/docker.asc]
       https://download.docker.com/linux/{{ docker_repo_distro }} {{ ansible_distribution_release | lower }} stable
     state: present
+
 - name: Install the latest version of Docker Engine and containerd
   ansible.builtin.apt:
     name:
@@ -54,11 +55,13 @@
       - docker-buildx-plugin
       - docker-compose-plugin
     update_cache: true
+
 - name: Add the admin user to the docker group
   ansible.builtin.user:
     name: "{{ user }}"
     groups: docker
     append: true
+
 - name: Install Docker Module for Python and JSONdiff
   ansible.builtin.apt:
     name:
@@ -67,6 +70,7 @@
       - python3-yaml
     state: present
     update_cache: false
+
 - name: Start and enable Docker systemd service.
   ansible.builtin.systemd:
     name: docker

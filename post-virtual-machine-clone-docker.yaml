@@ -4,5 +4,6 @@
     - reboot
     - base-packages
     - docker-install
+    - dockhand-hawser-agent-install
   vars:
     user: abeckett

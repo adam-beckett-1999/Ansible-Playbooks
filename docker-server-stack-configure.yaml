@@ -4,11 +4,6 @@
   roles:
     - reboot
     - base-packages
-    - disable-motd-ubuntu
-    - qemu-guest-agent-install
-    - webmin-install
-    - snmp-configure
-    - network-share-mount
   vars:
     user: abeckett
 
@@ -46,35 +41,11 @@
     snapshot_name: Pre-service-configuration
 
 ##### SERVICE INSTALL
-- name: Install GlusterFS and Docker
+- name: Install Docker
   hosts: docker_vms
   roles:
-    - glusterfs-service
     - docker-install
-  vars:
-    user: abeckett
-
-##### SERVICE-SPECIFIC CONFIGURATIONS
-- name: Configure GlusterFS and start the service
-  hosts: docker_proxy
-  roles:
-    - glusterfs-configure
-  vars:
-    nodes:
-      - VM-DOCKER-MANAGEMENT.hyvecloud.internal
-      - VM-DOCKER-MEDIA.hyvecloud.internal
-      - VM-DOCKER-SERVICES.hyvecloud.internal
-    replicas: 4
-    cluster:
-      - VM-DOCKER-PROXY.hyvecloud.internal
-      - VM-DOCKER-MANAGEMENT.hyvecloud.internal
-      - VM-DOCKER-MEDIA.hyvecloud.internal
-      - VM-DOCKER-SERVICES.hyvecloud.internal
-
-- name: Mount GlusterFS shared storage
-  hosts: docker_vms
-  roles:
-    - glusterfs-mount
+    - dockhand-hawser-agent-install
   vars:
     user: abeckett
 

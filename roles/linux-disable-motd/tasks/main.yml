@@ -87,3 +87,15 @@
   when:
     - ansible_distribution == 'Ubuntu'
     - item in ansible_facts.services
+
+- name: Create .hushlogin for user to suppress login messages
+  ansible.builtin.file:
+    path: "/home/{{ user }}/.hushlogin"
+    state: touch
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0644'
+    modification_time: preserve
+    access_time: preserve
+  when:
+    - ansible_os_family == 'Debian'

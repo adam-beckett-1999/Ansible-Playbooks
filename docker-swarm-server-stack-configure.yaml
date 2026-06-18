@@ -1,13 +1,9 @@
 ##### INITIAL CONFIGURATION
 - name: Reboot machines, install updates and standard packages, configure SNMP and network shares
-  hosts: docker_swarm_virtual_machines
+  hosts: docker_swarm_vms
   roles:
     - reboot
     - base-packages
-    - disable-motd-ubuntu
-    - qemu-guest-agent-install
-    - snmp-configure
-    - network-share-mount
   vars:
     user: abeckett
 
@@ -53,37 +49,13 @@
     snapshot_name: Pre-service-configuration
 
 ##### SERVICE INSTALL
-- name: Install GlusterFS and Docker
-  hosts: docker_swarm_virtual_machines
+- name: Install Docker & Hawser Agent
+  hosts: docker_swarm_vms
   roles:
-    - glusterfs-service
     - docker-install
+    - dockhand-hawser-agent-install
   vars:
     user: abeckett
-
-##### SERVICE-SPECIFIC CONFIGURATIONS
-- name: Configure GlusterFS and start the service
-  hosts: swarm_01
-  roles:
-    - glusterfs-configure
-  vars:
-    nodes:
-      - SWARM-02.hyvecloud.local
-      - SWARM-03.hyvecloud.local
-      - SWARM-04.hyvecloud.local
-      - SWARM-05.hyvecloud.local
-    replicas: 3
-    cluster:
-      - SWARM-01.hyvecloud.local
-      - SWARM-02.hyvecloud.local
-      - SWARM-03.hyvecloud.local
-      - SWARM-04.hyvecloud.local
-      - SWARM-05.hyvecloud.local
-
-- name: Mount GlusterFS share to VMs
-  hosts: docker_swarm_virtual_machines
-  roles:
-    - glusterfs-mount
 
 - name: Initiate swarm on first node
   hosts: swarm_01
@@ -102,7 +74,7 @@
 
 ##### REBOOT AND POST-CONFIGURATION SNAPSHOTS
 - name: Reboot Virtual Machines
-  hosts: docker_swarm_virtual_machines
+  hosts: docker_swarm_vms
   roles:
     - reboot
 

@@ -4,7 +4,8 @@
       {{
         {
           'x86_64': 'amd64',
-          'aarch64': 'arm64'
+          'aarch64': 'arm64',
+          'armv7l': 'arm'
         }.get(ansible_architecture, '')
       }}
 
@@ -14,15 +15,46 @@
       - hawser_arch | length > 0
     fail_msg: "Unsupported architecture for Hawser binary: {{ ansible_architecture }}"
 
+- name: Get latest Hawser release metadata
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/Finsys/hawser/releases/latest
+    method: GET
+    return_content: true
+    status_code: 200
+    headers:
+      Accept: application/vnd.github+json
+  register: hawser_latest_release
+
+- name: Select matching Hawser Linux archive asset
+  ansible.builtin.set_fact:
+    hawser_asset_url: >-
+      {{
+        (
+          (hawser_latest_release.json.assets | default([]))
+          | selectattr('name', 'match', '^hawser_.*_linux_' ~ hawser_arch ~ '\\.tar\\.gz$')
+          | map(attribute='browser_download_url')
+          | first
+        )
+        | default('')
+      }}
+
+- name: Ensure a matching Hawser release asset exists
+  ansible.builtin.assert:
+    that:
+      - hawser_asset_url | length > 0
+    fail_msg: >-
+      Could not find a Linux {{ hawser_arch }} Hawser archive in the latest release assets.
+      Available assets: {{ (hawser_latest_release.json.assets | default([]) | map(attribute='name') | list) | join(', ') }}
+
 - name: Download Hawser binary archive
   ansible.builtin.get_url:
-    url: "https://github.com/Finsys/hawser/releases/latest/download/hawser_linux_{{ hawser_arch }}.tar.gz"
-    dest: "/tmp/hawser_linux_{{ hawser_arch }}.tar.gz"
+    url: "{{ hawser_asset_url }}"
+    dest: "/tmp/{{ hawser_asset_url | basename }}"
     mode: "0644"
 
 - name: Extract Hawser binary
   ansible.builtin.unarchive:
-    src: "/tmp/hawser_linux_{{ hawser_arch }}.tar.gz"
+    src: "/tmp/{{ hawser_asset_url | basename }}"
     dest: /tmp
     remote_src: true
 

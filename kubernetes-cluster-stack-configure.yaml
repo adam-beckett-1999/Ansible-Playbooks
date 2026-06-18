@@ -4,11 +4,6 @@
   roles:
     - reboot
     - base-packages
-    - disable-motd-ubuntu
-    - qemu-guest-agent-install
-    - webmin-install
-    - snmp-configure
-    - network-share-mount
     - k3s-prerequisites
   vars:
     k3s_version: v1.31.2+k3s1
@@ -75,11 +70,6 @@
   hosts: kubernetes_virtual_machines
   roles:
     - reboot
-
-- name: Deploy Portainer Agent to cluster
-  hosts: vm_k3s_server_01
-  roles:
-    - kubernetes-portainer-agent-deploy
 
 ##### PRE-SERVICE-CONFIGURATION SNAPSHOTS
 - name: Take post-service-configuration snapshot of VM-K3S-SERVER-01

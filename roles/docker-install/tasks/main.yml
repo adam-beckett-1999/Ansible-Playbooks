@@ -1,12 +1,12 @@
 - name: Validate supported distro
   ansible.builtin.assert:
     that:
-      - ansible_distribution in ["Ubuntu", "Debian"]
+      - ansible_facts.distribution in ["Ubuntu", "Debian"]
     fail_msg: "docker-install role supports Ubuntu and Debian only"
 
 - name: Set Docker repo distro and architecture
   ansible.builtin.set_fact:
-    docker_repo_distro: "{{ ansible_distribution | lower }}"
+    docker_repo_distro: "{{ ansible_facts.distribution | lower }}"
     docker_repo_arch: >-
       {{
         {
@@ -15,7 +15,7 @@
           'armv7l': 'armhf',
           'ppc64le': 'ppc64el',
           's390x': 's390x'
-        }.get(ansible_architecture, ansible_architecture)
+        }.get(ansible_facts.architecture, ansible_facts.architecture)
       }}
 
 - name: Install apt prerequisites for Docker repository
@@ -43,7 +43,7 @@
   ansible.builtin.apt_repository:
     repo: >-
       deb [arch={{ docker_repo_arch }} signed-by=/etc/apt/keyrings/docker.asc]
-      https://download.docker.com/linux/{{ docker_repo_distro }} {{ ansible_distribution_release | lower }} stable
+      https://download.docker.com/linux/{{ docker_repo_distro }} {{ ansible_facts.distribution_release | lower }} stable
     state: present
 
 - name: Install the latest version of Docker Engine and containerd

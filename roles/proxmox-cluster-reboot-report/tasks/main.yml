@@ -72,8 +72,8 @@
     discord_message: |
       ## ✅ Proxmox Cluster Reboot Complete
 
-      **Cluster:** {{ ansible_domain | default('Unknown') }}
-      **Date:** {{ ansible_date_time.iso8601 }}
+      **Cluster:** {{ ansible_facts.domain | default('Unknown') }}
+      **Date:** {{ ansible_facts.date_time.iso8601 }}
       **Nodes Rebooted:** {{ ansible_play_hosts | length }}
       **Nodes in Cluster:** {{ cluster_nodes | length }}
 

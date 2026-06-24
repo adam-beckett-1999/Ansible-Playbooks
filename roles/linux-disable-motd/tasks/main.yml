@@ -3,7 +3,7 @@
     path: /etc/update-motd.d
   register: motd_scripts_dir
   when:
-    - ansible_os_family == 'Debian'
+    - ansible_facts.os_family == 'Debian'
 
 - name: Find dynamic MOTD scripts
   ansible.builtin.find:
@@ -12,7 +12,7 @@
     recurse: false
   register: motd_scripts
   when:
-    - ansible_os_family == 'Debian'
+    - ansible_facts.os_family == 'Debian'
     - motd_scripts_dir.stat.exists
 
 - name: Disable execution of dynamic MOTD scripts
@@ -21,7 +21,7 @@
     mode: 'a-x'
   loop: "{{ motd_scripts.files | default([]) }}"
   when:
-    - ansible_os_family == 'Debian'
+    - ansible_facts.os_family == 'Debian'
     - motd_scripts_dir.stat.exists
 
 - name: Check PAM files that may display MOTD
@@ -32,7 +32,7 @@
     - /etc/pam.d/sshd
   register: pam_motd_files
   when:
-    - ansible_os_family == 'Debian'
+    - ansible_facts.os_family == 'Debian'
 
 - name: Disable pam_motd in PAM stack
   ansible.builtin.replace:
@@ -41,7 +41,7 @@
     replace: '# \1'
   loop: "{{ pam_motd_files.results | default([]) }}"
   when:
-    - ansible_os_family == 'Debian'
+    - ansible_facts.os_family == 'Debian'
     - item.stat.exists
 
 - name: Clear static MOTD file
@@ -52,14 +52,14 @@
     group: root
     mode: '0644'
   when:
-    - ansible_os_family == 'Debian'
+    - ansible_facts.os_family == 'Debian'
 
 - name: Check for Ubuntu motd-news configuration file
   ansible.builtin.stat:
     path: /etc/default/motd-news
   register: motd_news_config
   when:
-    - ansible_distribution == 'Ubuntu'
+    - ansible_facts.distribution == 'Ubuntu'
 
 - name: Disable motd-news in Ubuntu configuration
   ansible.builtin.lineinfile:
@@ -67,13 +67,13 @@
     regexp: '^ENABLED='
     line: ENABLED=0
   when:
-    - ansible_distribution == 'Ubuntu'
+    - ansible_facts.distribution == 'Ubuntu'
     - motd_news_config.stat.exists
 
 - name: Gather service facts on Ubuntu
   ansible.builtin.service_facts:
   when:
-    - ansible_distribution == 'Ubuntu'
+    - ansible_facts.distribution == 'Ubuntu'
 
 - name: Stop and mask Ubuntu motd-news units when present
   ansible.builtin.systemd_service:
@@ -85,7 +85,7 @@
     - motd-news.service
     - motd-news.timer
   when:
-    - ansible_distribution == 'Ubuntu'
+    - ansible_facts.distribution == 'Ubuntu'
     - item in ansible_facts.services
 
 - name: Create .hushlogin for user to suppress login messages
@@ -98,4 +98,4 @@
     modification_time: preserve
     access_time: preserve
   when:
-    - ansible_os_family == 'Debian'
+    - ansible_facts.os_family == 'Debian'

@@ -6,14 +6,14 @@
           'x86_64': 'amd64',
           'aarch64': 'arm64',
           'armv7l': 'arm'
-        }.get(ansible_architecture, '')
+        }.get(ansible_facts.architecture, '')
       }}
 
 - name: Validate supported architecture
   ansible.builtin.assert:
     that:
       - hawser_arch | length > 0
-    fail_msg: "Unsupported architecture for Hawser binary: {{ ansible_architecture }}"
+    fail_msg: "Unsupported architecture for Hawser binary: {{ ansible_facts.architecture }}"
 
 - name: Get latest Hawser release metadata
   ansible.builtin.uri:

@@ -5,14 +5,6 @@
     mode: "0755"
   when: ansible_facts.os_family == "Debian"
 
-- name: Enable Backports repository on Ubuntu Jammy Machines [Linux]
-  ansible.builtin.apt_repository:
-    repo: deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
-    state: present
-  when:
-    - ansible_distribution == 'Ubuntu'
-    - ansible_distribution_version == '22.04'
-
 - name: Install all updates [Linux - Debian]
   ansible.builtin.apt:
     update_cache: true
@@ -27,7 +19,6 @@
     state: present
     update_cache: true
   when: ansible_facts.os_family == "RedHat"
-
 
 # Windows: Check and perform reboot if required before updates, then run update+reboot loop
 - name: Check whether a Windows reboot is required before installing pending updates [Windows]
@@ -95,7 +86,7 @@
       report_type: "reboot_check"
       scope: "{{ report_scope }}"
       title: "Reboot required before updates can be installed"
-      generated_at: "{{ ansible_date_time.iso8601 }}"
+      generated_at: "{{ ansible_facts.date_time.iso8601 }}"
       hosts:
         - hostname: "{{ inventory_hostname }}"
           reboot_required: "{{ update_reboot_required | default(false) }}"

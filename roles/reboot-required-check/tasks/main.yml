@@ -119,7 +119,7 @@
       report_type: reboot_check
       scope: "{{ report_scope }}"
       title: "{{ report_title }}"
-      generated_at: "{{ ansible_date_time.iso8601 }}"
+      generated_at: "{{ ansible_facts.date_time.iso8601 }}"
       hosts: "{{ reboot_report_hosts }}"
   run_once: true
   delegate_to: localhost

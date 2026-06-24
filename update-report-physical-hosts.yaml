@@ -3,4 +3,7 @@
   roles:
     - update-report-single-alert
   vars:
-    update_report_discord_webhook_url: "{{ lookup('env', 'PHYSICAL_HOSTS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"
+    update_report_bot_reports_url: "{{ lookup('env', 'BOT_URL') }}"
+    update_report_bot_reports_token: "{{ lookup('env', 'BOT_TOKEN') }}"
+    update_report_scope: "physical_hosts"
+    update_report_title: "Physical Hosts Update Report"

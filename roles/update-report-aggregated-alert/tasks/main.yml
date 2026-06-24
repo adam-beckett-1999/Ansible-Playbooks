@@ -128,6 +128,23 @@
       total_security: "{{ all_reports | map(attribute='security') | map('default', []) | map('length') | sum }}"
   run_once: true
 
+- name: Debug effective report URL
+  ansible.builtin.debug:
+    msg:
+      - "env_url={{ lookup('env', 'BOT_REPORTS_URL') | default('', true) | trim }}"
+      - "var_url={{ update_report_bot_reports_url | default('', true) | trim }}"
+  run_once: true
+  delegate_to: localhost
+
+- name: Assert report URL present
+  ansible.builtin.assert:
+    that:
+      - update_report_bot_reports_url | default('', true) | trim | length > 0
+      - update_report_bot_reports_url | trim is match('^https?://')
+    fail_msg: "Missing or invalid bot report URL in runtime context."
+  run_once: true
+  delegate_to: localhost
+
 - name: Send aggregated report payload to Semaphore Discord Bot
   ansible.builtin.uri:
     url: "{{ update_report_bot_reports_url }}"

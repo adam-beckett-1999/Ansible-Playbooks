@@ -1,0 +1,10 @@
+- name: Update packages on proxmox hypervisors
+  hosts: proxmox_clusters
+  roles:
+    - update
+    - reboot-required-check
+  vars:
+    report_bot_url: "{{ lookup('env', 'BOT_URL') }}"
+    report_bot_token: "{{ lookup('env', 'BOT_TOKEN') }}"
+    report_scope: "proxmox_clusters"
+    report_title: "Proxmox Clusters Reboot Check"

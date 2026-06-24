@@ -61,24 +61,39 @@
     - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Windows"
     - "'lxc' not in inventory_hostname | lower or ansible_facts['os_family'] == 'Windows'"
 
-- name: Send Discord alert about reboot requirement
+- name: Validate bot reports URL is configured
+  ansible.builtin.assert:
+    that:
+      - report_bot_url | default('', true) | trim | length > 0
+      - report_bot_url | default('', true) | trim is match('^https?://')
+    fail_msg: "Missing or invalid report_bot_url"
+  run_once: true
+  delegate_to: localhost
+
+- name: Send reboot-check payload to Semaphore Discord Bot
   ansible.builtin.uri:
-    url: "{{ reboot_status_discord_webhook_url }}"
+    url: "{{ report_bot_url | default('', true) | trim }}"
     method: POST
-    headers:
-      Content-Type: "application/json"
-    status_code: 204
+    headers: >-
+      {%- set token = report_bot_token | default('', true) | trim -%}
+      {{
+        {'Content-Type': 'application/json'}
+        | combine((token | length > 0) | ternary({'Authorization': 'Bearer ' ~ token}, {}))
+      }}
+    status_code:
+      - 200
+      - 202
     body_format: json
     body:
-      embeds:
-        - title: "🔁 Reboot Check"
-          description: >-
-            Host `{{ inventory_hostname }}` has {{ '🔴 a pending reboot' if reboot_required else '✅ no reboot required' }}.
-          color: "{{ 16711680 if reboot_required else 65280 }}"  # Red or Green
-          footer:
-            text: "Checked at {{ ansible_date_time.iso8601 }}"
-  register: discord_response
-  until: discord_response.status == 204
+      report_type: "reboot_check"
+      scope: "{{ report_scope }}"
+      title: "{{ report_title }}"
+      generated_at: "{{ ansible_date_time.iso8601 }}"
+      hostname: "{{ inventory_hostname }}"
+      os_family: "{{ ansible_facts['os_family'] }}"
+      reboot_required: "{{ reboot_required | default(false) }}"
+  register: bot_report_response
+  until: bot_report_response.status in [200, 202]
   retries: 5
   delay: 2
   delegate_to: localhost

@@ -1,7 +1,0 @@
-- name: Update packages on proxmox hypervisors
-  hosts: proxmox_clusters
-  roles:
-    - update
-    - reboot-required-check
-  vars:
-    reboot_status_discord_webhook_url: "{{ lookup('env', 'PVE_CLUSTERS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"

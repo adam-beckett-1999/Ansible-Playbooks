@@ -1,7 +1,0 @@
-- name: Update packages and OS on physical hosts
-  hosts: physical_hosts
-  roles:
-    - update
-    - reboot-required-check
-  vars:
-    reboot_status_discord_webhook_url: "{{ lookup('env', 'PHYSICAL_HOSTS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"

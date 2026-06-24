@@ -1,7 +1,0 @@
-- name: Update packages on VMs and Linux containers
-  hosts: virtual_infrastructure
-  roles:
-    - update
-    - reboot-required-check
-  vars:
-    reboot_status_discord_webhook_url: "{{ lookup('env', 'VMS_LXCS_UPDATE_REPORT_DISCORD_WEBHOOK_URL') }}"

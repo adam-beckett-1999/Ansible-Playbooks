@@ -1,0 +1,10 @@
+- name: Update packages and OS on physical hosts
+  hosts: physical_hosts
+  roles:
+    - update
+    - reboot-required-check
+  vars:
+    report_bot_url: "{{ lookup('env', 'BOT_URL') }}"
+    report_bot_token: "{{ lookup('env', 'BOT_TOKEN') }}"
+    report_scope: "physical_hosts"
+    report_title: "Physical Hosts Reboot Check"

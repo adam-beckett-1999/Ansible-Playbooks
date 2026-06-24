@@ -3,7 +3,7 @@
   roles:
     - update-report-aggregated-alert
   vars:
-    update_report_bot_reports_url: "{{ lookup('env', 'BOT_URL') }}"
-    update_report_bot_reports_token: "{{ lookup('env', 'BOT_TOKEN') }}"
-    update_report_scope: "vms_lxcs"
-    update_report_title: "VMS/LXCS Update Report"
+    report_bot_url: "{{ lookup('env', 'BOT_URL') }}"
+    report_bot_token: "{{ lookup('env', 'BOT_TOKEN') }}"
+    report_scope: "vms_lxcs"
+    report_title: "VMS/LXCS Update Report"

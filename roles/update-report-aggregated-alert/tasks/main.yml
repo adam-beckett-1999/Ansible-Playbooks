@@ -102,10 +102,10 @@
 
 - name: Normalize role inputs
   ansible.builtin.set_fact:
-    report_bot_url: "{{ update_report_bot_reports_url | default('', true) | trim }}"
-    report_bot_token: "{{ update_report_bot_reports_token | default('', true) | trim }}"
-    report_scope: "{{ update_report_scope | default('vms_lxcs') }}"
-    report_title: "{{ update_report_title | default('Update Report') }}"
+    report_bot_url: "{{ report_bot_url | default('', true) | trim }}"
+    report_bot_token: "{{ report_bot_token | default('', true) | trim }}"
+    report_scope: "{{ report_scope | default('vms_lxcs') }}"
+    report_title: "{{ report_title | default('Update Report') }}"
   delegate_to: localhost
 
 - name: Validate report endpoint input

@@ -1,7 +1,7 @@
 - name: Security update report and Discord notification
   hosts: proxmox_clusters
   roles:
-    - update-report-single-alert
+    - update-report
   vars:
     report_bot_url: "{{ lookup('env', 'BOT_URL') }}"
     report_bot_token: "{{ lookup('env', 'BOT_TOKEN') }}"

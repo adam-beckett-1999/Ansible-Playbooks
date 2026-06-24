@@ -1,7 +1,7 @@
 - name: Security update report and Discord notification
   hosts: virtual_infrastructure
   roles:
-    - update-report-aggregated-alert
+    - update-report
   vars:
     report_bot_url: "{{ lookup('env', 'BOT_URL') }}"
     report_bot_token: "{{ lookup('env', 'BOT_TOKEN') }}"

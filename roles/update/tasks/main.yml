@@ -75,24 +75,33 @@
     update_reboot_required: "{{ update_win_reboot_required.stdout | trim | bool }}"
   when: ansible_facts['os_family'] == "Windows"
 
-- name: Send Discord alert about reboot requirement before updates [Windows]
+- name: Send reboot-required alert to Semaphore Discord Bot [Windows]
   ansible.builtin.uri:
-    url: "{{ reboot_status_discord_webhook_url }}"
+    url: "{{ report_bot_url }}"
     method: POST
-    headers:
-      Content-Type: "application/json"
-    status_code: 204
+    headers: >-
+      {{
+        {'Content-Type': 'application/json'}
+        | combine(
+            (report_bot_token | default('', true) | trim | length > 0)
+            | ternary({'Authorization': 'Bearer ' ~ (report_bot_token | trim)}, {})
+          )
+      }}
+    status_code:
+      - 200
+      - 202
     body_format: json
     body:
-      embeds:
-        - title: "🔁 Reboot required before updates can be installed"
-          description: >-
-            Host `{{ inventory_hostname }}` has {{ '🔴 a pending reboot' if update_reboot_required else '✅ no reboot required' }}.
-          color: "{{ 16711680 if update_reboot_required else 65280 }}"  # Red or Green
-          footer:
-            text: "Checked at {{ ansible_date_time.iso8601 }}"
+      report_type: "reboot_check"
+      scope: "{{ report_scope }}"
+      title: "Reboot required before updates can be installed"
+      generated_at: "{{ ansible_date_time.iso8601 }}"
+      hosts:
+        - hostname: "{{ inventory_hostname }}"
+          reboot_required: "{{ update_reboot_required | default(false) }}"
+          os_family: "{{ ansible_facts['os_family'] }}"
   register: update_discord_response
-  until: update_discord_response.status == 204
+  until: update_discord_response.status in [200, 202]
   retries: 5
   delay: 2
   delegate_to: localhost

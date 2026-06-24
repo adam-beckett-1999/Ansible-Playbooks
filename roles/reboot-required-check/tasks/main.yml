@@ -99,7 +99,7 @@
   run_once: true
   delegate_to: localhost
 
-- name: Send single reboot-check payload to Semaphore Discord Bot
+- name: Send reboot-check payload to Semaphore Discord Bot
   ansible.builtin.uri:
     url: "{{ report_bot_url }}"
     method: POST

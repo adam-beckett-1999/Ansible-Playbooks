@@ -16,9 +16,8 @@
 - name: Get list of security updates [Debian]
   ansible.builtin.shell: |
     set -o pipefail
-    # Check for security updates using apt-get upgrade simulation
-    apt-get upgrade -s 2>/dev/null | \
-    grep -E "^Inst.*security" | \
+    apt-get upgrade -s 2>/dev/null |
+    grep -E "^Inst.*security" |
     awk '{print $2}' || true
   args:
     executable: /usr/bin/bash
@@ -81,27 +80,23 @@
       upgradable: "{{ win_update_result.updates.values() | map(attribute='title') | list if win_update_result.updates is defined else [] }}"
       security: >-
         {{
-          win_update_result.updates.values()
-          | selectattr('categories', 'search', '(Security Updates|Critical Updates|Definition Updates)')
-          | map(attribute='title')
-          | list
-          if win_update_result.updates is defined else []
+        win_update_result.updates.values()
+        | selectattr('categories', 'search', '(Security Updates|Critical Updates|Definition Updates)')
+        | map(attribute='title')
+        | list
+        if win_update_result.updates is defined else []
         }}
   when: ansible_facts['os_family'] == "Windows"
-
-- name: Convert UTC time to UK local time (BST/GMT)
-  ansible.builtin.set_fact:
-    local_time_uk: "{{ lookup('pipe', 'date \"+%Y-%m-%d %H:%M:%S %Z\"') }}"
 
 - name: Collect report data from hosts that defined it
   ansible.builtin.set_fact:
     all_reports: >-
       {{
-        ansible_play_hosts
-        | map('extract', hostvars)
-        | selectattr('report_data', 'defined')
-        | map(attribute='report_data')
-        | list
+      ansible_play_hosts
+      | map('extract', hostvars)
+      | selectattr('report_data', 'defined')
+      | map(attribute='report_data')
+      | list
       }}
   run_once: true
 
@@ -111,113 +106,54 @@
       total_hosts: "{{ all_reports | length }}"
       hosts_with_updates: >-
         {{
-          all_reports
-          | map(attribute='upgradable')
-          | map('default', [])
-          | map('length')
-          | select('>', 0)
-          | list
-          | length
+        all_reports
+        | map(attribute='upgradable')
+        | map('default', [])
+        | map('length')
+        | select('>', 0)
+        | list
+        | length
         }}
       hosts_with_security: >-
         {{
-          all_reports
-          | map(attribute='security')
-          | map('default', [])
-          | map('length')
-          | select('>', 0)
-          | list
-          | length
+        all_reports
+        | map(attribute='security')
+        | map('default', [])
+        | map('length')
+        | select('>', 0)
+        | list
+        | length
         }}
       total_upgradable: "{{ all_reports | map(attribute='upgradable') | map('default', []) | map('length') | sum }}"
       total_security: "{{ all_reports | map(attribute='security') | map('default', []) | map('length') | sum }}"
   run_once: true
 
-- name: Create compact host status list
-  ansible.builtin.set_fact:
-    host_status_lines: []
-  run_once: true
-
-- name: Build host status lines
-  ansible.builtin.set_fact:
-    host_status_lines: "{{ host_status_lines + [host_status] }}"
-  vars:
-    host_status: >-
-      {%- set upgradable_count = item.upgradable | default([]) | length -%}
-      {%- set security_count = item.security | default([]) | length -%}
-      {%- if upgradable_count == 0 -%}
-      ✅ {{ item.hostname | default('Unknown') }} - Up to date{%- else -%}
-      {%- if security_count > 0 -%}
-      🔴 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates ({{ security_count }} security){%- else -%}
-      🟡 {{ item.hostname | default('Unknown') }} - {{ upgradable_count }} updates{%- endif -%}
-      {%- endif -%}
-  loop: "{{ all_reports }}"
-  run_once: true
-
-- name: Split host status into chunks to avoid embed limits
-  ansible.builtin.set_fact:
-    host_chunks: >-
-      {{
-        host_status_lines | batch(15) | list
-      }}
-  run_once: true
-
-- name: Create embed fields from host chunks
-  ansible.builtin.set_fact:
-    embed_fields: []
-  run_once: true
-
-- name: Build embed fields for each chunk
-  ansible.builtin.set_fact:
-    embed_fields: "{{ embed_fields + [chunk_field] }}"
-  vars:
-    chunk_field:
-      name: >-
-        Hosts {{ (ansible_loop.index0 * 15) + 1 }}-{{
-        [(ansible_loop.index0 * 15) + 15, host_status_lines | length] | min
-        }}
-      value: "{{ item | join('\n') | truncate(1024) }}"
-      inline: true
-  loop: "{{ host_chunks[0:25] }}"
-  loop_control:
-    extended: true
-  run_once: true
-
-- name: Set embed color for report summary
-  ansible.builtin.set_fact:
-    embed_color: >-
-      {{ (summary_stats.hosts_with_security | int > 0) | ternary(15158332, (summary_stats.hosts_with_updates
-      | int > 0) | ternary(16776960, 3066993)) }}
-  run_once: true
-
-- name: Send single aggregated Discord alert
+- name: Send aggregated report payload to Semaphore Discord Bot
   ansible.builtin.uri:
-    url: "{{ update_report_discord_webhook_url }}"
+    url: "{{ update_report_bot_reports_url }}"
     method: POST
-    headers:
-      Content-Type: "application/json"
-    status_code: 204
+    headers: >-
+      {{
+      {'Content-Type': 'application/json'}
+      | combine(
+      (update_report_bot_reports_token | default('') | length > 0)
+      | ternary({'Authorization': 'Bearer ' ~ update_report_bot_reports_token}, {})
+      )
+      }}
+    status_code:
+      - 200
+      - 202
     body_format: json
     body:
-      embeds:
-        - title: "🔐 Update Report for VMs & LXCs"
-          description: |
-            **Summary:** {{ summary_stats.total_hosts }} hosts checked
-            📊 **{{ summary_stats.hosts_with_updates }}** hosts need updates
-            ({{ summary_stats.total_upgradable }} total packages)
-            ⚠️ **{{ summary_stats.hosts_with_security }}** hosts have security updates
-            ({{ summary_stats.total_security }} packages)
-
-            **Legend:**
-            ✅ Up to date | 🟡 General updates | 🔴 Security updates available
-          color: "{{ embed_color }}"
-          fields: "{{ embed_fields }}"
-          footer:
-            text: "Reported at {{ local_time_uk }}"
+      scope: "{{ update_report_scope }}"
+      title: "{{ update_report_title }}"
+      generated_at: "{{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}"
+      summary:
+        total_hosts: "{{ summary_stats.total_hosts | int }}"
+        hosts_with_updates: "{{ summary_stats.hosts_with_updates | int }}"
+        hosts_with_security: "{{ summary_stats.hosts_with_security | int }}"
+        total_upgradable: "{{ summary_stats.total_upgradable | int }}"
+        total_security: "{{ summary_stats.total_security | int }}"
+      hosts: "{{ all_reports }}"
   run_once: true
   delegate_to: localhost
-
-- name: Wait to avoid Discord rate limits
-  ansible.builtin.pause:
-    seconds: 2
-  run_once: true

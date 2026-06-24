@@ -78,35 +78,49 @@
   run_once: true
   delegate_to: localhost
 
-- name: Send reboot-check payload to Semaphore Discord Bot
+- name: Build per-host reboot report row
+  ansible.builtin.set_fact:
+    reboot_report_row:
+      hostname: "{{ inventory_hostname }}"
+      reboot_required: "{{ reboot_required | default(false) }}"
+  when:
+    - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Windows"
+    - "'lxc' not in inventory_hostname | lower or ansible_facts['os_family'] == 'Windows'"
+
+- name: Build aggregated reboot hosts list
+  ansible.builtin.set_fact:
+    reboot_report_hosts: >-
+      {{
+        ansible_play_hosts_all
+        | map('extract', hostvars, 'reboot_report_row')
+        | select('defined')
+        | list
+      }}
+  run_once: true
+  delegate_to: localhost
+
+- name: Send single reboot-check payload to Semaphore Discord Bot
   ansible.builtin.uri:
     url: "{{ report_bot_url }}"
     method: POST
     headers: >-
       {{
-      {'Content-Type': 'application/json'}
-      | combine(
-      (report_bot_token | length > 0)
-      | ternary({'Authorization': 'Bearer ' ~ report_bot_token}, {})
-      )
+        {'Content-Type': 'application/json'}
+        | combine(
+            (report_bot_token | length > 0)
+            | ternary({'Authorization': 'Bearer ' ~ report_bot_token}, {})
+          )
       }}
     status_code:
       - 200
       - 202
     body_format: json
     body:
-      report_type: "reboot_check"
+      report_type: reboot_check
       scope: "{{ report_scope }}"
       title: "{{ report_title }}"
       generated_at: "{{ ansible_date_time.iso8601 }}"
-      hostname: "{{ inventory_hostname }}"
-      os_family: "{{ ansible_facts['os_family'] }}"
-      reboot_required: "{{ reboot_required | default(false) }}"
-  register: bot_report_response
-  until: bot_report_response.status in [200, 202]
-  retries: 5
-  delay: 2
+      hosts: "{{ reboot_report_hosts }}"
+  run_once: true
   delegate_to: localhost
-  when:
-    - ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Windows"
-    - "'lxc' not in inventory_hostname | lower or ansible_facts['os_family'] == 'Windows'"
+  when: reboot_report_hosts | length > 0
